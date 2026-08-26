@@ -1,0 +1,154 @@
+<!-- NIRMAAN EVENT GALLERY -->
+<section class="egal-section" id="gallery" aria-labelledby="egalTitleH">
+
+  <!-- header -->
+  <div class="egal-head">
+    <div class="egal-head-left">
+      <p class="egal-eyebrow">Edify Archives // Live Reel</p>
+      <h2 class="egal-title" id="egalTitleH">The <span class="u">Event</span> Gallery</h2>
+      <p class="egal-sub">A continuously running reel of event memories — build nights, mentorship, celebrations and the milestones that shape our Edify community. Click any frame to view it full-screen.</p>
+    </div>
+    <button type="button" class="egal-viewall" id="egalViewAll" aria-haspopup="dialog" aria-controls="egalLb">
+      View Full Gallery
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+    </button>
+  </div>
+
+  <!-- single auto-scrolling reel -->
+  <div class="egal-reel" id="egalReel" aria-label="Auto-scrolling reel of Edify event photos">
+
+    <div class="egal-row egal-row-a" data-pps="46" data-ppsm="26">
+      <div class="egal-track">
+
+        <figure class="egal-card egal-r-3x2" data-index="0"
+                data-cat="Build Floor" data-title="Build Floor — Night Cycle"
+                data-desc="Hundreds of students and builders collaborating through the night on the main floor — vibrant energy, deep focus."
+                data-full="images/event_build_floor_1787636816827.jpg"
+                role="button" tabindex="0" aria-label="Build Floor — open in full-screen gallery">
+          <img class="egal-media" src="images/event_build_floor_1787636816827.jpg" width="1200" height="800" loading="lazy" decoding="async" alt="Participants coding late into the night at the Edify build floor">
+          <span class="egal-overlay"></span>
+          <span class="egal-open" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg></span>
+          <figcaption class="egal-label"><span class="egal-tag">Build Floor</span><span class="egal-name">Build Floor — Night Cycle</span></figcaption>
+        </figure>
+
+        <figure class="egal-card egal-r-3x2" data-index="1"
+                data-cat="Team Moments" data-title="Collaborative Breakthroughs"
+                data-desc="When a complex concept finally clicks — authentic smiles, teamwork and celebratory moments captured on the floor."
+                data-full="images/event_team_moments_1787636920136.jpg"
+                role="button" tabindex="0" aria-label="Team Moments — open in full-screen gallery">
+          <img class="egal-media" src="images/event_team_moments_1787636920136.jpg" width="1200" height="800" loading="lazy" decoding="async" alt="Students celebrating a breakthrough together">
+          <span class="egal-overlay"></span>
+          <span class="egal-open" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg></span>
+          <figcaption class="egal-label"><span class="egal-tag">Team Moments</span><span class="egal-name">Collaborative Breakthroughs</span></figcaption>
+        </figure>
+
+        <figure class="egal-card egal-r-4x5" data-index="2"
+                data-cat="Grand Finale" data-title="Champions Crowned"
+                data-desc="Unforgettable stage celebrations, award honours and confetti moments as achievements are recognised."
+                data-full="images/event_grand_finale_1787636934592.jpg"
+                role="button" tabindex="0" aria-label="Grand Finale — open in full-screen gallery">
+          <img class="egal-media" src="images/event_grand_finale_1787636934592.jpg" width="1000" height="1200" loading="lazy" decoding="async" alt="Winning team holding a trophy at the grand finale ceremony">
+          <span class="egal-overlay"></span>
+          <span class="egal-open" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg></span>
+          <figcaption class="egal-label"><span class="egal-tag">Grand Finale</span><span class="egal-name">Champions Crowned</span></figcaption>
+        </figure>
+
+        <figure class="egal-card egal-r-4x5" data-index="3"
+                data-cat="Mentorship" data-title="Expert Guidance in Action"
+                data-desc="Dedicated one-on-one tutoring and industry mentorship sessions guiding students toward mastery."
+                data-full="images/event_mentorship_1787637057706.jpg"
+                role="button" tabindex="0" aria-label="Mentorship — open in full-screen gallery">
+          <img class="egal-media" src="images/event_mentorship_1787637057706.jpg" width="1000" height="1200" loading="lazy" decoding="async" alt="A mentor guiding a student team at their desk">
+          <span class="egal-overlay"></span>
+          <span class="egal-open" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg></span>
+          <figcaption class="egal-label"><span class="egal-tag">Mentorship</span><span class="egal-name">Expert Guidance in Action</span></figcaption>
+        </figure>
+
+        <figure class="egal-card egal-r-16x9" data-index="4"
+                data-cat="Workshops" data-title="Hands-on STEM Learning"
+                data-desc="Interactive robotics, coding and problem-solving workshops that encourage active, curious exploration."
+                data-full="images/event_workshops_1787637073600.jpg"
+                role="button" tabindex="0" aria-label="Workshops — open in full-screen gallery">
+          <img class="egal-media" src="images/event_workshops_1787637073600.jpg" width="1200" height="800" loading="lazy" decoding="async" alt="Students engaged in a hands-on robotics and coding workshop">
+          <span class="egal-overlay"></span>
+          <span class="egal-open" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg></span>
+          <figcaption class="egal-label"><span class="egal-tag">Workshops</span><span class="egal-name">Hands-on STEM Learning</span></figcaption>
+        </figure>
+
+        <figure class="egal-card egal-r-4x5" data-index="5"
+                data-cat="Excellence Awards" data-title="Celebrating Achievers"
+                data-desc="Honouring top academic performers and project winners at our annual excellence ceremony."
+                data-full="images/event_awards_1787637093248.jpg"
+                role="button" tabindex="0" aria-label="Excellence Awards — open in full-screen gallery">
+          <img class="egal-media" src="images/event_awards_1787637093248.jpg" width="1000" height="1200" loading="lazy" decoding="async" alt="A student receiving an academic excellence medal and certificate">
+          <span class="egal-overlay"></span>
+          <span class="egal-open" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg></span>
+          <figcaption class="egal-label"><span class="egal-tag">Excellence Awards</span><span class="egal-name">Celebrating Achievers</span></figcaption>
+        </figure>
+
+        <figure class="egal-card egal-r-3x2" data-index="6"
+                data-cat="Tech Showcase" data-title="Student Innovation Expo"
+                data-desc="Showcasing inventive student projects, science models and technology prototypes to peers and mentors."
+                data-full="https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1600&q=80"
+                role="button" tabindex="0" aria-label="Tech Showcase — open in full-screen gallery">
+          <img class="egal-media" src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&q=80" width="1200" height="800" loading="lazy" decoding="async" alt="An interactive student technology showcase and exhibition hall">
+          <span class="egal-overlay"></span>
+          <span class="egal-open" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg></span>
+          <figcaption class="egal-label"><span class="egal-tag">Tech Showcase</span><span class="egal-name">Student Innovation Expo</span></figcaption>
+        </figure>
+
+        <figure class="egal-card egal-r-16x9" data-index="7"
+                data-cat="Global Classroom" data-title="Overseas Live Sessions"
+                data-desc="Connecting international students with top faculty through seamless, interactive online classrooms."
+                data-full="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1600&q=80"
+                role="button" tabindex="0" aria-label="Overseas Online Class — open in full-screen gallery">
+          <img class="egal-media" src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=80" width="1200" height="800" loading="lazy" decoding="async" alt="A student in an interactive overseas online coaching session">
+          <span class="egal-overlay"></span>
+          <span class="egal-open" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg></span>
+          <figcaption class="egal-label"><span class="egal-tag">Global Classroom</span><span class="egal-name">Overseas Live Sessions</span></figcaption>
+        </figure>
+
+        <figure class="egal-card egal-r-3x2" data-index="8"
+                data-cat="Community" data-title="Campus Celebrations"
+                data-desc="Festive community gatherings and student events that build lifelong friendships and shared memories."
+                data-full="https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&w=1600&q=80"
+                role="button" tabindex="0" aria-label="Campus Celebration — open in full-screen gallery">
+          <img class="egal-media" src="https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&w=1200&q=80" width="1200" height="800" loading="lazy" decoding="async" alt="A vibrant campus celebration with smiling students">
+          <span class="egal-overlay"></span>
+          <span class="egal-open" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg></span>
+          <figcaption class="egal-label"><span class="egal-tag">Community</span><span class="egal-name">Campus Celebrations</span></figcaption>
+        </figure>
+
+      </div>
+    </div>
+
+  </div><!-- /egal-reel -->
+</section>
+
+<!-- FULL-SCREEN GALLERY / LIGHTBOX -->
+<div class="egal-lb" id="egalLb" role="dialog" aria-modal="true" aria-label="Event gallery viewer">
+  <div class="egal-lb-top">
+    <span class="egal-lb-counter" id="egalCount">01 / 09</span>
+    <span class="egal-lb-cat" id="egalCat"></span>
+    <button type="button" class="egal-lb-close" id="egalClose" aria-label="Close gallery">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="egal-lb-stage" id="egalStage">
+    <button type="button" class="egal-lb-nav egal-lb-prev" id="egalPrev" aria-label="Previous image">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+    </button>
+    <div class="egal-lb-figure">
+      <img class="egal-lb-img" id="egalImg" src="" alt="" draggable="false">
+      <div class="egal-lb-spin" id="egalSpin" aria-hidden="true"></div>
+    </div>
+    <button type="button" class="egal-lb-nav egal-lb-next" id="egalNext" aria-label="Next image">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+    </button>
+  </div>
+  <div class="egal-lb-cap">
+    <div class="egal-lb-cap-title" id="egalTitle"></div>
+    <div class="egal-lb-cap-desc" id="egalDesc"></div>
+  </div>
+  <div class="egal-lb-thumbs" id="egalThumbs" role="tablist" aria-label="Gallery thumbnails"></div>
+</div>

@@ -1,0 +1,2585 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edify Tutorial — Home Tuition, Coaching & Overseas Online Classes</title>
+    <meta
+      name="description"
+      content="Edify Tutorial offers personalised home tuition, small-batch classroom coaching, and live online classes for overseas students — Kindergarten to Class 12, across CBSE, ICSE, IGCSE and State boards. Based in Gurugram."
+    />
+    <meta name="theme-color" content="#0E2E57" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..700&family=Hanken+Grotesk:wght@400..700&family=Caveat:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --blue: #1e5aa8;
+        --blue-strong: #164a8f;
+        --blue-deep: #0e2e57;
+        --blue-deeper: #0a2447;
+        --ink: #22252b;
+        --ink-soft: #55606f;
+        --amber: #f5a623;
+        --amber-bright: #ffb63a;
+        --amber-soft: #fbe7bc;
+        --amber-deep: #a66a05;
+        --paper: #fbf8f1;
+        --paper-2: #f3eee1;
+        --card: #ffffff;
+        --rule: #e7dfce;
+        --rule-soft: #efe9db;
+        --marking: #c6402f;
+        --pass: #2e7d57;
+        --on-dark: #eaf1fb;
+        --on-dark-soft: #a9bcdc;
+        --shadow-sm: 0 1px 2px rgba(20, 45, 90, 0.06);
+        --shadow-card: 0 2px 4px rgba(20, 40, 80, 0.04), 0 14px 30px -20px rgba(14, 46, 87, 0.3);
+        --shadow-lg: 0 30px 60px -32px rgba(10, 36, 71, 0.5);
+        --container: 1160px;
+        --pad: clamp(64px, 8vw, 116px);
+        --gutter: clamp(20px, 5vw, 44px);
+        --radius: 16px;
+        --radius-lg: 22px;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+        -webkit-text-size-adjust: 100%;
+      }
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: "Hanken Grotesk", system-ui, sans-serif;
+        font-size: 17px;
+        line-height: 1.62;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-family: "Bricolage Grotesque", "Hanken Grotesk", sans-serif;
+        font-optical-sizing: auto;
+        margin: 0;
+        color: var(--blue-deep);
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        line-height: 1.06;
+      }
+      p {
+        margin: 0;
+      }
+      a {
+        color: inherit;
+      }
+      img {
+        max-width: 100%;
+        display: block;
+      }
+      ::selection {
+        background: var(--amber-soft);
+        color: var(--blue-deep);
+      }
+      :focus-visible {
+        outline: 3px solid var(--amber);
+        outline-offset: 2px;
+        border-radius: 5px;
+      }
+
+      .container {
+        max-width: var(--container);
+        margin: 0 auto;
+        padding-inline: var(--gutter);
+      }
+      .section {
+        padding-block: var(--pad);
+        scroll-margin-top: 84px;
+        position: relative;
+      }
+
+      /* editorial section head: eyebrow sits in the margin like an annotation */
+      .head {
+        display: grid;
+        grid-template-columns: 190px minmax(0, 1fr);
+        gap: clamp(20px, 4vw, 56px);
+        align-items: start;
+        margin-bottom: clamp(36px, 5vw, 60px);
+      }
+      .eyebrow {
+        font:
+          700 12.5px/1.3 "Hanken Grotesk",
+          sans-serif;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--amber-deep);
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+      }
+      .eyebrow::before {
+        content: "";
+        width: 22px;
+        height: 2px;
+        background: var(--amber);
+        border-radius: 2px;
+        flex: none;
+      }
+      .head .m-note {
+        display: block;
+        margin-top: 14px;
+        font-family: "Caveat", cursive;
+        font-size: 22px;
+        line-height: 1.15;
+        color: var(--marking);
+        transform: rotate(-2.5deg);
+        transform-origin: left;
+        max-width: 170px;
+      }
+      .h-title {
+        font-size: clamp(28px, 3.4vw, 42px);
+      }
+      .lede {
+        margin-top: 18px;
+        font-size: clamp(17px, 1.4vw, 19px);
+        color: var(--ink-soft);
+        max-width: 60ch;
+      }
+
+      .js .reveal {
+        opacity: 0;
+        transform: translateY(18px);
+        transition:
+          opacity 0.6s cubic-bezier(0.2, 0.7, 0.2, 1),
+          transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+      }
+      .js .reveal.in {
+        opacity: 1;
+        transform: none;
+      }
+
+      /* ---------- buttons ---------- */
+      .btn {
+        font-family: "Hanken Grotesk", sans-serif;
+        font-weight: 600;
+        font-size: 15.5px;
+        padding: 14px 24px;
+        border-radius: 12px;
+        text-decoration: none;
+        cursor: pointer;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        transition:
+          transform 0.16s ease,
+          box-shadow 0.16s ease,
+          background 0.16s ease,
+          border-color 0.16s ease,
+          color 0.16s ease;
+      }
+      .btn svg {
+        width: 18px;
+        height: 18px;
+        flex: none;
+      }
+      .btn-amber {
+        background: var(--amber);
+        color: #3a2704;
+        box-shadow: 0 8px 20px -10px rgba(245, 166, 35, 0.8);
+      }
+      .btn-amber:hover {
+        background: var(--amber-bright);
+        transform: translateY(-1px);
+        box-shadow: 0 12px 26px -10px rgba(245, 166, 35, 0.9);
+      }
+      .btn-ink {
+        background: var(--blue-deep);
+        color: #fff;
+      }
+      .btn-ink:hover {
+        background: var(--blue);
+        transform: translateY(-1px);
+      }
+      .btn-outline {
+        background: transparent;
+        color: var(--blue-deep);
+        border: 1.5px solid var(--rule);
+      }
+      .btn-outline:hover {
+        border-color: var(--blue);
+        color: var(--blue);
+      }
+      .btn-ghost {
+        background: rgba(255, 255, 255, 0.06);
+        color: #fff;
+        border: 1.5px solid rgba(255, 255, 255, 0.22);
+      }
+      .btn-ghost:hover {
+        background: rgba(255, 255, 255, 0.12);
+        border-color: rgba(255, 255, 255, 0.5);
+      }
+
+      /* ---------- header ---------- */
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background: rgba(251, 248, 241, 0.82);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--rule);
+      }
+      .nav {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        padding: 14px var(--gutter);
+        max-width: var(--container);
+        margin: 0 auto;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        flex: none;
+      }
+      .brand-logo {
+        height: 40px;
+        width: auto;
+      }
+      .nav-links {
+        display: flex;
+        gap: 26px;
+        align-items: center;
+        margin-left: auto;
+      }
+      .nav-links a {
+        text-decoration: none;
+        font-size: 14.5px;
+        font-weight: 500;
+        color: var(--ink-soft);
+        position: relative;
+        padding: 4px 0;
+        transition: color 0.15s ease;
+      }
+      .nav-links a::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 100%;
+        bottom: -2px;
+        height: 2px;
+        background: var(--amber);
+        transition: right 0.22s ease;
+      }
+      .nav-links a:hover {
+        color: var(--blue-deep);
+      }
+      .nav-links a:hover::after {
+        right: 0;
+      }
+      .nav-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .call-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--blue-deep);
+        text-decoration: none;
+        font-size: 14.5px;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+      .call-pill svg {
+        width: 16px;
+        height: 16px;
+        color: var(--amber-deep);
+      }
+      .call-pill:hover {
+        color: var(--blue);
+      }
+
+      .nav-toggle {
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        gap: 5px;
+        width: 42px;
+        height: 42px;
+        border-radius: 11px;
+        border: 1px solid var(--rule);
+        background: var(--card);
+        cursor: pointer;
+        padding: 0;
+        flex: none;
+        margin-left: auto;
+      }
+      .nav-toggle span {
+        width: 19px;
+        height: 2px;
+        background: var(--blue-deep);
+        margin: 0 auto;
+        border-radius: 2px;
+        transition:
+          transform 0.22s ease,
+          opacity 0.22s ease;
+      }
+      .nav-toggle[aria-expanded="true"] span:nth-child(1) {
+        transform: translateY(7px) rotate(45deg);
+      }
+      .nav-toggle[aria-expanded="true"] span:nth-child(2) {
+        opacity: 0;
+      }
+      .nav-toggle[aria-expanded="true"] span:nth-child(3) {
+        transform: translateY(-7px) rotate(-45deg);
+      }
+
+      .mobile-menu {
+        display: none;
+        flex-direction: column;
+        max-width: var(--container);
+        margin: 0 auto;
+        padding-inline: var(--gutter);
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.28s ease;
+      }
+      .mobile-menu.open {
+        max-height: 460px;
+        padding-bottom: 18px;
+      }
+      .mobile-menu a {
+        text-decoration: none;
+        color: var(--ink);
+        font-size: 16px;
+        font-weight: 500;
+        padding: 13px 4px;
+        border-top: 1px solid var(--rule);
+      }
+      .mobile-menu .mobile-cta {
+        margin-top: 14px;
+        border-top: none;
+        background: var(--amber);
+        color: #3a2704;
+        text-align: center;
+        border-radius: 12px;
+        font-weight: 600;
+        padding: 14px;
+      }
+
+      /* ---------- hero ---------- */
+      .hero {
+        background: radial-gradient(120% 130% at 82% 0%, #153a72 0%, var(--blue-deep) 42%, var(--blue-deeper) 100%);
+        color: var(--on-dark);
+        position: relative;
+        overflow: hidden;
+      }
+      .hero::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0.5;
+        background: radial-gradient(60% 55% at 88% 18%, rgba(245, 166, 35, 0.16), transparent 70%);
+      }
+      .hero-grid {
+        display: grid;
+        grid-template-columns: 1.04fr 0.96fr;
+        gap: clamp(36px, 5vw, 72px);
+        align-items: center;
+        padding-block: clamp(60px, 7vw, 104px);
+        position: relative;
+        z-index: 1;
+      }
+      .hero-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        font:
+          700 12.5px/1 "Hanken Grotesk",
+          sans-serif;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--amber);
+        background: rgba(245, 166, 35, 0.12);
+        border: 1px solid rgba(245, 166, 35, 0.28);
+        padding: 8px 14px;
+        border-radius: 100px;
+        margin-bottom: 26px;
+      }
+      .hero h1 {
+        color: #fff;
+        font-size: clamp(38px, 5.2vw, 62px);
+        line-height: 1.03;
+        letter-spacing: -0.025em;
+      }
+      .hero h1 .u {
+        position: relative;
+        white-space: nowrap;
+        color: #fff;
+      }
+      .hero h1 .u::after {
+        content: "";
+        position: absolute;
+        left: -2px;
+        right: -2px;
+        bottom: 0.06em;
+        height: 0.32em;
+        z-index: -1;
+        background: var(--amber);
+        border-radius: 3px;
+        transform: rotate(-0.6deg);
+        opacity: 0.92;
+      }
+      .hero-sub {
+        margin-top: 24px;
+        font-size: clamp(17px, 1.5vw, 20px);
+        color: var(--on-dark-soft);
+        max-width: 52ch;
+      }
+      .hero-ctas {
+        display: flex;
+        gap: 14px;
+        margin-top: 34px;
+        flex-wrap: wrap;
+      }
+      .hero-trust {
+        margin-top: 34px;
+        display: flex;
+        gap: 10px 22px;
+        flex-wrap: wrap;
+        font-size: 14px;
+        color: var(--on-dark-soft);
+      }
+      .hero-trust span {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .hero-trust svg {
+        width: 16px;
+        height: 16px;
+        color: var(--amber);
+        flex: none;
+      }
+
+      /* signature: progress-snapshot report card */
+      .report {
+        position: relative;
+        background: var(--card);
+        border-radius: var(--radius-lg);
+        padding: 28px 28px 24px 46px;
+        color: var(--ink);
+        box-shadow: var(--shadow-lg);
+        background-image: repeating-linear-gradient(to bottom, transparent, transparent 37px, rgba(30, 90, 168, 0.06) 37px, rgba(30, 90, 168, 0.06) 38px);
+        max-width: 440px;
+        margin-inline: auto;
+      }
+      .report::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 30px;
+        width: 1.5px;
+        background: rgba(198, 64, 47, 0.4);
+      }
+      .report-tag {
+        position: absolute;
+        top: -11px;
+        right: 20px;
+        background: var(--blue-deep);
+        color: #fff;
+        font-size: 10.5px;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        padding: 5px 11px;
+        border-radius: 100px;
+      }
+      .report-head {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        padding-bottom: 18px;
+        border-bottom: 1.5px solid var(--rule);
+      }
+      .report-cap {
+        width: 40px;
+        height: 40px;
+        border-radius: 11px;
+        background: var(--blue-deep);
+        color: var(--amber);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: none;
+      }
+      .report-cap svg {
+        width: 24px;
+        height: 20px;
+      }
+      .report-name {
+        font-family: "Bricolage Grotesque", sans-serif;
+        font-weight: 600;
+        font-size: 17px;
+        color: var(--blue-deep);
+      }
+      .report-course {
+        font-size: 13px;
+        color: var(--ink-soft);
+      }
+      .report-grade {
+        margin-left: auto;
+        position: relative;
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        border: 2.5px solid var(--amber);
+        color: var(--blue-deep);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Bricolage Grotesque", sans-serif;
+        font-weight: 700;
+        font-size: 26px;
+        flex: none;
+        background: var(--amber-soft);
+      }
+      .report-grade .tick {
+        position: absolute;
+        right: -7px;
+        bottom: -5px;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: var(--pass);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 6px rgba(46, 125, 87, 0.5);
+      }
+      .report-grade .tick svg {
+        width: 12px;
+        height: 12px;
+      }
+      .report-bars {
+        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+      .bar {
+        display: grid;
+        grid-template-columns: 64px 1fr 34px;
+        align-items: center;
+        gap: 12px;
+      }
+      .bar-label {
+        font-size: 12.5px;
+        color: var(--ink-soft);
+        font-weight: 500;
+      }
+      .bar-track {
+        height: 9px;
+        background: var(--paper-2);
+        border-radius: 100px;
+        overflow: hidden;
+      }
+      .bar-fill {
+        display: block;
+        height: 100%;
+        width: var(--w);
+        border-radius: 100px;
+        background: linear-gradient(90deg, var(--blue), var(--blue-strong));
+        transform-origin: left;
+        animation: grow 1s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+      }
+      .bar:nth-child(2) .bar-fill {
+        background: linear-gradient(90deg, #6f97cf, #4f79b8);
+        animation-delay: 0.05s;
+      }
+      .bar:nth-child(3) .bar-fill {
+        animation-delay: 0.18s;
+      }
+      .bar:nth-child(3) {
+      }
+      .bar:nth-child(3) .bar-fill {
+        background: linear-gradient(90deg, var(--amber), #e0961d);
+        animation-delay: 0.3s;
+      }
+      .bar-mark {
+        font-family: "Bricolage Grotesque", sans-serif;
+        font-weight: 700;
+        font-size: 16px;
+        color: var(--blue-deep);
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+      .report-foot {
+        margin-top: 20px;
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+      }
+      .report-foot .up {
+        font-family: "Caveat", cursive;
+        font-size: 26px;
+        color: var(--marking);
+        line-height: 1;
+        transform: rotate(-3deg);
+      }
+      .report-foot .cap {
+        font-size: 12.5px;
+        color: var(--ink-soft);
+      }
+      @keyframes grow {
+        from {
+          transform: scaleX(0);
+        }
+        to {
+          transform: scaleX(1);
+        }
+      }
+
+      /* ---------- formats (three ways) ---------- */
+      .formats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+      }
+      .fmt {
+        position: relative;
+        background: var(--card);
+        border: 1px solid var(--rule);
+        border-radius: var(--radius);
+        padding: 28px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        box-shadow: var(--shadow-sm);
+        transition:
+          box-shadow 0.22s ease,
+          border-color 0.22s ease,
+          transform 0.22s ease;
+        overflow: hidden;
+      }
+      .fmt::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--accent);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.28s ease;
+      }
+      .fmt:hover {
+        box-shadow: var(--shadow-card);
+        transform: translateY(-3px);
+        border-color: transparent;
+      }
+      .fmt:hover::before {
+        transform: scaleX(1);
+      }
+      .fmt.home {
+        --accent: var(--blue);
+      }
+      .fmt.center {
+        --accent: var(--pass);
+      }
+      .fmt.online {
+        --accent: var(--amber);
+      }
+      .fmt-icon {
+        width: 46px;
+        height: 46px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+      }
+      .fmt-icon svg {
+        width: 24px;
+        height: 24px;
+      }
+      .fmt.home .fmt-icon {
+        background: var(--blue);
+      }
+      .fmt.center .fmt-icon {
+        background: var(--pass);
+      }
+      .fmt.online .fmt-icon {
+        background: var(--amber);
+        color: #3a2704;
+      }
+      .fmt h3 {
+        font-size: 21px;
+      }
+      .fmt p {
+        color: var(--ink-soft);
+        font-size: 15.5px;
+      }
+      .fmt-meta {
+        margin-top: auto;
+        padding-top: 16px;
+        border-top: 1px solid var(--rule);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 8px;
+      }
+      .fmt-meta span {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--ink-soft);
+        background: var(--paper);
+        border: 1px solid var(--rule);
+        padding: 5px 10px;
+        border-radius: 100px;
+      }
+
+      /* ---------- tutors ---------- */
+      .tutors {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+      .tutor {
+        position: relative;
+        background: var(--card);
+        border: 1px solid var(--rule);
+        border-radius: var(--radius-lg);
+        padding: 28px;
+        box-shadow: var(--shadow-sm);
+      }
+      .tutor-head {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        margin-bottom: 16px;
+      }
+      .medallion {
+        width: 76px;
+        height: 76px;
+        border-radius: 50%;
+        flex: none;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        font-family: "Bricolage Grotesque", sans-serif;
+        font-weight: 700;
+        font-size: 27px;
+      }
+      .medallion img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .medallion.blue {
+        background: var(--amber-soft);
+        color: var(--blue-deep);
+        box-shadow:
+          inset 0 0 0 3px var(--blue),
+          inset 0 0 0 6px #fff;
+      }
+      .medallion.amber {
+        background: #dbe6f6;
+        color: var(--blue-deep);
+        box-shadow:
+          inset 0 0 0 3px var(--amber),
+          inset 0 0 0 6px #fff;
+      }
+      .medallion .cap {
+        position: absolute;
+        bottom: 6px;
+        right: 6px;
+        width: 20px;
+        height: 16px;
+        color: var(--amber-deep);
+      }
+      .tutor-name {
+        font-size: 23px;
+      }
+      .tutor-role {
+        margin-top: 3px;
+        font-size: 13.5px;
+        font-weight: 600;
+        color: var(--amber-deep);
+        letter-spacing: 0.02em;
+      }
+      .tutor p {
+        color: var(--ink-soft);
+        font-size: 15.5px;
+      }
+      .tutor-meta {
+        margin-top: 18px;
+        padding-top: 16px;
+        border-top: 1px solid var(--rule);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .tutor-meta span {
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--blue-deep);
+        background: var(--paper);
+        border: 1px solid var(--rule);
+        padding: 6px 11px;
+        border-radius: 100px;
+      }
+
+      /* ---------- subjects (syllabus index) ---------- */
+      .subjects {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0 clamp(28px, 4vw, 56px);
+      }
+      .subj {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: baseline;
+        gap: 14px;
+        padding: 18px 6px;
+        border-bottom: 1px solid var(--rule);
+        transition: padding-left 0.2s ease;
+      }
+      .subj:hover {
+        padding-left: 14px;
+      }
+      .subj .idx {
+        width: 8px;
+        height: 8px;
+        border-radius: 2px;
+        background: var(--dot);
+        transform: translateY(-2px);
+      }
+      .subj h4 {
+        font-size: 19px;
+        font-weight: 600;
+        color: var(--blue-deep);
+      }
+      .subj p {
+        font-size: 14px;
+        color: var(--ink-soft);
+        grid-column: 2;
+        margin-top: 2px;
+      }
+      .subj .lvl {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--amber-deep);
+        white-space: nowrap;
+        font-variant-numeric: tabular-nums;
+      }
+      @media (min-width: 761px) {
+        .subjects .subj:nth-last-child(2) {
+          border-bottom: none;
+        }
+        .subjects .subj:last-child {
+          border-bottom: none;
+        }
+      }
+
+      /* ---------- approach (ticked checklist) ---------- */
+      .checklist {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: clamp(24px, 3vw, 40px) clamp(28px, 4vw, 52px);
+      }
+      .check {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 14px;
+        align-items: start;
+      }
+      .check .tick {
+        width: 30px;
+        height: 30px;
+        border-radius: 9px;
+        background: rgba(46, 125, 87, 0.12);
+        color: var(--pass);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: none;
+        margin-top: 2px;
+      }
+      .check .tick svg {
+        width: 17px;
+        height: 17px;
+      }
+      .check h4 {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--blue-deep);
+        margin-bottom: 5px;
+      }
+      .check p {
+        font-size: 14.5px;
+        color: var(--ink-soft);
+      }
+
+      /* ---------- gallery ---------- */
+      .gallery {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-auto-rows: 170px;
+        gap: 16px;
+      }
+      .tile {
+        position: relative;
+        border-radius: 14px;
+        overflow: hidden;
+        background: var(--paper-2);
+        border: 1px solid var(--rule);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+      }
+      .tile.tall {
+        grid-row: span 2;
+      }
+      .tile img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .tile-empty {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--blue);
+        opacity: 0.28;
+      }
+      .tile-empty svg {
+        width: 38px;
+        height: 38px;
+      }
+      .tile-cap {
+        position: relative;
+        z-index: 1;
+        margin: 12px;
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--blue-deep);
+        background: rgba(255, 255, 255, 0.86);
+        backdrop-filter: blur(4px);
+        padding: 7px 11px;
+        border-radius: 9px;
+        align-self: flex-start;
+        box-shadow: var(--shadow-sm);
+      }
+
+      /* ---------- pricing (fee register) ---------- */
+      .pricing-toggle {
+        display: inline-flex;
+        background: var(--paper-2);
+        border: 1px solid var(--rule);
+        border-radius: 100px;
+        padding: 5px;
+        gap: 4px;
+      }
+      .pricing-toggle button {
+        font-family: "Hanken Grotesk", sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        padding: 10px 22px;
+        border-radius: 100px;
+        border: none;
+        background: transparent;
+        color: var(--ink-soft);
+        cursor: pointer;
+        transition:
+          color 0.2s ease,
+          background 0.2s ease;
+      }
+      .pricing-toggle button.active {
+        background: var(--blue-deep);
+        color: #fff;
+        box-shadow: var(--shadow-sm);
+      }
+      .fee-wrap {
+        margin-top: 26px;
+        background: var(--card);
+        border: 1px solid var(--rule);
+        border-radius: var(--radius);
+        overflow: hidden;
+        box-shadow: var(--shadow-card);
+      }
+      .fee-scroll {
+        overflow-x: auto;
+      }
+      .fee-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14.5px;
+        min-width: 560px;
+      }
+      .fee-table thead th {
+        background: var(--paper);
+        font:
+          700 11.5px/1 "Hanken Grotesk",
+          sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--ink-soft);
+        text-align: left;
+        padding: 16px 22px;
+        border-bottom: 1.5px solid var(--rule);
+      }
+      .fee-table th:nth-child(n + 3),
+      .fee-table td:nth-child(n + 3) {
+        text-align: right;
+      }
+      .fee-table td {
+        padding: 15px 22px;
+        border-bottom: 1px solid var(--rule-soft);
+        color: var(--ink);
+        vertical-align: top;
+      }
+      .fee-table tbody tr:last-child td {
+        border-bottom: none;
+      }
+      .fee-table tr.highlight {
+        background: rgba(245, 166, 35, 0.07);
+      }
+      .fee-table td:first-child {
+        font-weight: 600;
+        color: var(--blue-deep);
+        white-space: nowrap;
+      }
+      .fee-table .tutor {
+        display: block;
+        font-size: 12.5px;
+        color: var(--ink-soft);
+        margin-top: 3px;
+        font-weight: 500;
+      }
+      .fee-table td:nth-child(n + 3) {
+        font-family: "Bricolage Grotesque", sans-serif;
+        font-weight: 600;
+        color: var(--blue-deep);
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+      }
+      .fee-table td.na {
+        color: #b7bcc6;
+        font-family: "Hanken Grotesk", sans-serif;
+        font-weight: 500;
+      }
+      .price-note {
+        margin-top: 18px;
+        font-size: 13.5px;
+        color: var(--ink-soft);
+        max-width: 70ch;
+      }
+      .price-note strong {
+        color: var(--blue-deep);
+      }
+
+      /* ---------- how it starts (real sequence → numbered) ---------- */
+      .steps {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        counter-reset: step;
+      }
+      .step {
+        position: relative;
+        background: var(--card);
+        border: 1px solid var(--rule);
+        border-radius: var(--radius);
+        padding: 30px 26px 26px;
+        box-shadow: var(--shadow-sm);
+      }
+      .step-n {
+        font-family: "Bricolage Grotesque", sans-serif;
+        font-weight: 700;
+        font-size: 15px;
+        color: var(--amber-deep);
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 16px;
+      }
+      .step-n::before {
+        counter-increment: step;
+        content: "0" counter(step);
+        font-size: 44px;
+        line-height: 0.8;
+        color: var(--paper-2);
+        -webkit-text-stroke: 1.5px var(--rule);
+      }
+      .step h4 {
+        font-size: 19px;
+        margin-bottom: 8px;
+      }
+      .step p {
+        font-size: 15px;
+        color: var(--ink-soft);
+      }
+      .step .arrow {
+        position: absolute;
+        top: 38px;
+        right: -14px;
+        z-index: 2;
+        color: var(--amber);
+      }
+      .step .arrow svg {
+        width: 26px;
+        height: 26px;
+      }
+      .step:last-child .arrow {
+        display: none;
+      }
+
+      /* ---------- lead form (enrol) ---------- */
+      .enrol {
+        background: radial-gradient(120% 120% at 15% 0%, #164079 0%, var(--blue-deep) 55%, var(--blue-deeper) 100%);
+        color: var(--on-dark);
+      }
+      .enrol .eyebrow {
+        color: var(--amber);
+      }
+      .enrol .h-title {
+        color: #fff;
+      }
+      .enrol .lede {
+        color: var(--on-dark-soft);
+      }
+      .form-card {
+        margin-top: 8px;
+        background: var(--card);
+        border-radius: var(--radius-lg);
+        padding: clamp(24px, 3vw, 40px);
+        color: var(--ink);
+        box-shadow: var(--shadow-lg);
+      }
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+      }
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+      }
+      .field.full {
+        grid-column: 1/-1;
+      }
+      .field label {
+        font-size: 13.5px;
+        font-weight: 600;
+        color: var(--blue-deep);
+      }
+      .field input,
+      .field select,
+      .field textarea {
+        font-family: "Hanken Grotesk", sans-serif;
+        font-size: 15.5px;
+        padding: 13px 15px;
+        color: var(--ink);
+        border: 1.5px solid var(--rule);
+        border-radius: 11px;
+        background: var(--paper);
+        transition:
+          border-color 0.15s ease,
+          background 0.15s ease;
+      }
+      .field input::placeholder,
+      .field textarea::placeholder {
+        color: #98a0ad;
+      }
+      .field input:hover,
+      .field select:hover,
+      .field textarea:hover {
+        background: #fff;
+      }
+      .field input:focus,
+      .field select:focus,
+      .field textarea:focus {
+        outline: none;
+        border-color: var(--blue);
+        background: #fff;
+        box-shadow: 0 0 0 3px rgba(30, 90, 168, 0.14);
+      }
+      .radio-row {
+        display: flex;
+        gap: 12px;
+      }
+      .radio-opt {
+        flex: 1;
+        border: 1.5px solid var(--rule);
+        border-radius: 11px;
+        padding: 13px 14px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        background: var(--paper);
+        transition:
+          border-color 0.15s ease,
+          background 0.15s ease;
+      }
+      .radio-opt:hover {
+        background: #fff;
+      }
+      .radio-opt input {
+        width: 17px;
+        height: 17px;
+        accent-color: var(--blue);
+        flex: none;
+      }
+      .radio-opt.checked {
+        border-color: var(--amber);
+        background: rgba(245, 166, 35, 0.08);
+      }
+      .form-submit {
+        margin-top: 6px;
+        width: 100%;
+        padding: 16px;
+        border-radius: 12px;
+        border: none;
+        background: var(--amber);
+        color: #3a2704;
+        font-family: "Hanken Grotesk", sans-serif;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 10px 24px -12px rgba(245, 166, 35, 0.9);
+        transition:
+          transform 0.15s ease,
+          background 0.15s ease;
+      }
+      .form-submit:hover {
+        transform: translateY(-1px);
+        background: var(--amber-bright);
+      }
+      .form-note {
+        font-size: 12.5px;
+        color: var(--ink-soft);
+        margin-top: 14px;
+        text-align: center;
+      }
+      .error-text {
+        color: var(--marking);
+        font-size: 12.5px;
+        font-weight: 600;
+        display: none;
+      }
+      .form-success {
+        display: none;
+        text-align: center;
+        padding: 36px 20px;
+      }
+      .form-success .ok {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: rgba(46, 125, 87, 0.12);
+        color: var(--pass);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 18px;
+      }
+      .form-success .ok svg {
+        width: 30px;
+        height: 30px;
+      }
+      .form-success h3 {
+        font-size: 24px;
+        margin-bottom: 10px;
+      }
+      .form-success p {
+        color: var(--ink-soft);
+        font-size: 15px;
+        max-width: 40ch;
+        margin-inline: auto;
+      }
+
+      /* ---------- notes ---------- */
+      .notes-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+      }
+      .note {
+        position: relative;
+        background: var(--card);
+        border: 1px solid var(--rule);
+        border-radius: 14px;
+        padding: 22px 20px;
+        box-shadow: var(--shadow-sm);
+        transition:
+          border-color 0.2s ease,
+          box-shadow 0.2s ease,
+          transform 0.2s ease;
+      }
+      .note:hover {
+        border-color: var(--amber);
+        box-shadow: var(--shadow-card);
+        transform: translateY(-2px);
+      }
+      .note-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+      }
+      .note-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: var(--blue-deep);
+        color: var(--amber);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Bricolage Grotesque", sans-serif;
+        font-weight: 700;
+        font-size: 16px;
+      }
+      .note-lock {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 10.5px;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+        color: var(--amber-deep);
+        background: rgba(245, 166, 35, 0.12);
+        padding: 4px 9px;
+        border-radius: 100px;
+      }
+      .note-lock svg {
+        width: 11px;
+        height: 11px;
+      }
+      .note h4 {
+        font-size: 15.5px;
+        font-weight: 600;
+        color: var(--blue-deep);
+        margin-bottom: 5px;
+      }
+      .note p {
+        font-size: 13px;
+        color: var(--ink-soft);
+      }
+      .notes-cta {
+        margin-top: 30px;
+        background: var(--blue-deep);
+        border-radius: var(--radius);
+        padding: 28px clamp(24px, 3vw, 36px);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 18px;
+        color: var(--on-dark);
+      }
+      .notes-cta p {
+        max-width: 52ch;
+        font-size: 15.5px;
+        color: var(--on-dark-soft);
+      }
+      .notes-cta strong {
+        color: #fff;
+      }
+
+      /* ---------- footer ---------- */
+      footer {
+        background: var(--blue-deeper);
+        color: var(--on-dark-soft);
+        padding: clamp(52px, 6vw, 72px) 0 28px;
+      }
+      .footer-grid {
+        display: grid;
+        grid-template-columns: 1.5fr 1fr 1fr;
+        gap: clamp(28px, 4vw, 52px);
+      }
+      .footer-brand {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        margin-bottom: 16px;
+        color: #fff;
+      }
+      .footer-brand .cap {
+        width: 34px;
+        height: 28px;
+        color: var(--amber);
+      }
+      .footer-brand b {
+        font-family: "Bricolage Grotesque", sans-serif;
+        font-size: 21px;
+        font-weight: 700;
+      }
+      footer .desc {
+        font-size: 14.5px;
+        line-height: 1.7;
+        max-width: 34ch;
+      }
+      footer h5 {
+        color: #fff;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 16px;
+      }
+      footer ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 11px;
+      }
+      footer a {
+        text-decoration: none;
+        font-size: 14.5px;
+        color: var(--on-dark-soft);
+        transition: color 0.15s ease;
+      }
+      footer a:hover {
+        color: var(--amber);
+      }
+      footer li {
+        font-size: 14.5px;
+      }
+      .footer-bottom {
+        max-width: var(--container);
+        margin: 44px auto 0;
+        padding: 22px var(--gutter) 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        font-size: 13px;
+        color: #7c8cad;
+      }
+
+      /* ---------- whatsapp float ---------- */
+      .whatsapp-float {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 60;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: #25d366;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 12px 30px -8px rgba(37, 211, 102, 0.7);
+        transition: transform 0.2s ease;
+        text-decoration: none;
+      }
+      .whatsapp-float:hover {
+        transform: scale(1.08);
+      }
+      .whatsapp-float svg {
+        width: 30px;
+        height: 30px;
+      }
+
+      /* ---------- responsive ---------- */
+      @media (max-width: 1024px) {
+        .hero-grid {
+          grid-template-columns: 1fr;
+          gap: 44px;
+        }
+        .report {
+          margin-inline: 0;
+        }
+        .checklist {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .notes-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      @media (max-width: 860px) {
+        .nav-links,
+        .nav-actions {
+          display: none;
+        }
+        .nav-toggle {
+          display: flex;
+        }
+        .mobile-menu {
+          display: flex;
+        }
+        .head {
+          grid-template-columns: 1fr;
+          gap: 14px;
+        }
+        .head .m-note {
+          display: none;
+        }
+        .eyebrow {
+          margin-bottom: 2px;
+        }
+      }
+      @media (max-width: 760px) {
+        .formats,
+        .tutors,
+        .steps,
+        .subjects {
+          grid-template-columns: 1fr;
+        }
+        .gallery {
+          grid-template-columns: repeat(2, 1fr);
+          grid-auto-rows: 150px;
+        }
+        .tile.tall {
+          grid-row: span 1;
+        }
+        .form-grid {
+          grid-template-columns: 1fr;
+        }
+        .radio-row {
+          flex-direction: column;
+        }
+        .step .arrow {
+          display: none;
+        }
+        .checklist {
+          grid-template-columns: 1fr;
+        }
+        .footer-grid {
+          grid-template-columns: 1fr;
+          gap: 32px;
+        }
+        .notes-cta {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+      }
+      @media (max-width: 480px) {
+        body {
+          font-size: 16px;
+        }
+        .notes-grid {
+          grid-template-columns: 1fr;
+        }
+        .gallery {
+          grid-template-columns: 1fr;
+          grid-auto-rows: 170px;
+        }
+        .footer-bottom {
+          flex-direction: column;
+        }
+        .whatsapp-float {
+          width: 52px;
+          height: 52px;
+          bottom: 18px;
+          right: 18px;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          scroll-behavior: auto !important;
+        }
+        .js .reveal {
+          opacity: 1;
+          transform: none;
+          transition: none;
+        }
+        .bar-fill {
+          animation: none;
+        }
+        .btn,
+        .fmt,
+        .note {
+          transition: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="nav">
+        <a class="brand" href="#top" aria-label="Edify Tutorial — home">
+          <img class="brand-logo" src="data:image/png;base64,__EDIFY_LOGO_PNG__" alt="Edify Tutorial" width="636" height="185" />
+        </a>
+        <nav class="nav-links" aria-label="Primary">
+          <a href="#paths">Ways to learn</a>
+          <a href="#tutors">Tutors</a>
+          <a href="#subjects">Subjects</a>
+          <a href="#gallery">Gallery</a>
+          <a href="#pricing">Fees</a>
+          <a href="#notes-library">Notes</a>
+        </nav>
+        <div class="nav-actions">
+          <a class="call-pill" href="tel:+919811265418">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path
+                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"
+              />
+            </svg>
+            <span class="call-text">+91 98112 65418</span>
+          </a>
+          <a href="#lead-form" class="btn btn-amber">Book a free demo</a>
+        </div>
+        <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+      <div class="mobile-menu" id="mobileMenu">
+        <a href="#paths">Ways to learn</a>
+        <a href="#tutors">Tutors</a>
+        <a href="#subjects">Subjects</a>
+        <a href="#gallery">Gallery</a>
+        <a href="#pricing">Fees</a>
+        <a href="#notes-library">Notes</a>
+        <a href="#lead-form" class="mobile-cta">Book a free demo class</a>
+      </div>
+    </header>
+
+    <span id="top"></span>
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <span class="hero-eyebrow">Home tuition · Coaching · Overseas online</span>
+          <h1>Tuition that <span class="u">moves the grade</span>, not just the syllabus.</h1>
+          <p class="hero-sub">
+            Personalised home tuition and small-batch coaching across Gurugram, plus live online classes for students in Australia, Dubai, the USA, UK,
+            Singapore and Canada — Kindergarten to Class XII.
+          </p>
+          <div class="hero-ctas">
+            <a href="#lead-form" class="btn btn-amber">Book a free demo class</a>
+            <a href="#paths" class="btn btn-ghost">See how it works</a>
+          </div>
+          <div class="hero-trust">
+            <span
+              ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+              CBSE · ICSE · IGCSE · State</span
+            >
+            <span
+              ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+              Kindergarten – Class XII</span
+            >
+            <span
+              ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+              Verified, qualified tutors</span
+            >
+          </div>
+        </div>
+
+        <figure class="report" aria-label="Illustration: a student's marks improving over one term">
+          <figcaption class="report-tag">Sample progress snapshot</figcaption>
+          <div class="report-head">
+            <div class="report-cap" aria-hidden="true">
+              <svg viewBox="0 0 48 40">
+                <path d="M24 5 46 14 24 23 2 14z" fill="currentColor" />
+                <path d="M11 18v9c0 2.8 5.8 5.5 13 5.5s13-2.7 13-5.5v-9l-13 5.6z" fill="currentColor" opacity=".6" />
+                <path d="M46 14v10" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                <circle cx="46" cy="27" r="2.4" fill="currentColor" />
+              </svg>
+            </div>
+            <div>
+              <div class="report-name">Class X student</div>
+              <div class="report-course">Mathematics · CBSE</div>
+            </div>
+            <div class="report-grade">
+              A
+              <span class="tick" aria-hidden="true"
+                ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 6 9 17l-5-5" /></svg
+              ></span>
+            </div>
+          </div>
+          <div class="report-bars">
+            <div class="bar">
+              <span class="bar-label">Unit test 1</span><span class="bar-track"><span class="bar-fill" style="--w: 62%"></span></span
+              ><span class="bar-mark">62</span>
+            </div>
+            <div class="bar">
+              <span class="bar-label">Unit test 2</span><span class="bar-track"><span class="bar-fill" style="--w: 74%"></span></span
+              ><span class="bar-mark">74</span>
+            </div>
+            <div class="bar">
+              <span class="bar-label">Unit test 3</span><span class="bar-track"><span class="bar-fill" style="--w: 88%"></span></span
+              ><span class="bar-mark">88</span>
+            </div>
+          </div>
+          <div class="report-foot">
+            <span class="up">↗ up 26 marks</span>
+            <span class="cap">tracked across one term of weekly tests</span>
+          </div>
+        </figure>
+      </div>
+    </section>
+
+    <!-- WAYS TO LEARN -->
+    <section class="section" id="paths">
+      <div class="container reveal">
+        <div class="head">
+          <div><span class="eyebrow">Ways to learn</span><span class="m-note">same tutors, same tracking</span></div>
+          <div>
+            <h2 class="h-title">Pick what fits your child's routine</h2>
+            <p class="lede">Only the setting changes — from your living room in Gurugram, to our center, to a live class from anywhere in the world.</p>
+          </div>
+        </div>
+        <div class="formats">
+          <article class="fmt home">
+            <div class="fmt-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 10.5 12 3l9 7.5" />
+                <path d="M5 9.5V21h14V9.5" />
+                <path d="M9 21v-6h6v6" />
+              </svg>
+            </div>
+            <h3>Home tuition</h3>
+            <p>
+              A tutor comes to your home in Gurugram, on a schedule that fits around school. Best for younger students and focused, distraction-free learning.
+            </p>
+            <div class="fmt-meta"><span>Gurugram only</span><span>1-on-1 at home</span></div>
+          </article>
+          <article class="fmt center">
+            <div class="fmt-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 21h18" />
+                <path d="M4 21V10l8-5 8 5v11" />
+                <path d="M9 21v-6h6v6" />
+                <path d="M4 10h16" />
+              </svg>
+            </div>
+            <h3>Classroom coaching</h3>
+            <p>Small-batch classes at our Gurugram center — peer learning alongside individual attention, with regular tests built in as standard.</p>
+            <div class="fmt-meta"><span>Gurugram center</span><span>Small batches</span></div>
+          </article>
+          <article class="fmt online">
+            <div class="fmt-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="4" width="20" height="14" rx="2" />
+                <path d="M8 21h8" />
+                <path d="M12 18v3" />
+                <path d="m10 9 4 2-4 2z" fill="currentColor" />
+              </svg>
+            </div>
+            <h3>Overseas &amp; online</h3>
+            <p>
+              Live one-on-one classes over video for students anywhere — Australia, Dubai, the USA, UK, Singapore and Canada. Same tracking as home tuition,
+              zero travel.
+            </p>
+            <div class="fmt-meta"><span>Anywhere, incl. overseas</span><span>1-on-1, live video</span></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- TUTORS -->
+    <section class="section" id="tutors" style="background: var(--paper-2)">
+      <div class="container reveal">
+        <div class="head">
+          <div><span class="eyebrow">Your tutors</span></div>
+          <div>
+            <h2 class="h-title">Taught by teachers who know the syllabus cold</h2>
+            <p class="lede">Not a rotating panel of strangers — the same two experienced teachers, matched to your child's subject and board.</p>
+          </div>
+        </div>
+        <div class="tutors">
+          <article class="tutor">
+            <div class="tutor-head">
+              <div class="medallion blue" id="photo-ashok" aria-hidden="true">
+                AS
+                <svg class="cap" viewBox="0 0 48 40">
+                  <path d="M24 5 46 14 24 23 2 14z" fill="currentColor" />
+                  <path d="M11 18v9c0 2.8 5.8 5.5 13 5.5s13-2.7 13-5.5v-9l-13 5.6z" fill="currentColor" opacity=".65" />
+                </svg>
+              </div>
+              <div>
+                <div class="tutor-name">Ashok Sir</div>
+                <div class="tutor-role">Maths &amp; Science · Class V–XII</div>
+              </div>
+            </div>
+            <p>
+              Maths &amp; Science across CBSE, ICSE and State boards — at home, at the center, or online. Focused on board-exam readiness and genuine concept
+              clarity, not rote practice.
+            </p>
+            <div class="tutor-meta"><span>Class V–XII</span><span>Home · Center · Online</span></div>
+          </article>
+          <article class="tutor">
+            <div class="tutor-head">
+              <div class="medallion amber" id="photo-shalini" aria-hidden="true">
+                SM
+                <svg class="cap" viewBox="0 0 48 40">
+                  <path d="M24 5 46 14 24 23 2 14z" fill="currentColor" />
+                  <path d="M11 18v9c0 2.8 5.8 5.5 13 5.5s13-2.7 13-5.5v-9l-13 5.6z" fill="currentColor" opacity=".65" />
+                </svg>
+              </div>
+              <div>
+                <div class="tutor-name">Shalini Ma'am</div>
+                <div class="tutor-role">All subjects KG–VIII · Hindi · Art</div>
+              </div>
+            </div>
+            <p>
+              All subjects for Kindergarten to Class VIII, plus Hindi for Class IX–XII, at the center. Also runs Art &amp; Craft from the basics up — building
+              foundation and creativity together.
+            </p>
+            <div class="tutor-meta"><span>KG – Class XII</span><span>Center</span></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- SUBJECTS -->
+    <section class="section" id="subjects">
+      <div class="container reveal">
+        <div class="head">
+          <div><span class="eyebrow">Syllabus</span></div>
+          <div>
+            <h2 class="h-title">Every core subject, every board</h2>
+            <p class="lede">CBSE, ICSE, IGCSE and State boards — the same syllabus support whether your child is in Gurugram or overseas.</p>
+          </div>
+        </div>
+        <div class="subjects">
+          <div class="subj">
+            <span class="idx" style="--dot: var(--blue)"></span>
+            <h4>Mathematics</h4>
+            <p>Concept clarity plus problem solving, from basics to board prep.</p>
+            <span class="lvl">All boards</span>
+          </div>
+          <div class="subj">
+            <span class="idx" style="--dot: var(--amber)"></span>
+            <h4>Science</h4>
+            <p>Physics, Chemistry &amp; Biology, taught with real-world examples.</p>
+            <span class="lvl">All boards</span>
+          </div>
+          <div class="subj">
+            <span class="idx" style="--dot: var(--pass)"></span>
+            <h4>English</h4>
+            <p>Grammar, comprehension and writing, built for exams and beyond.</p>
+            <span class="lvl">All boards</span>
+          </div>
+          <div class="subj">
+            <span class="idx" style="--dot: var(--blue)"></span>
+            <h4>Social studies</h4>
+            <p>History, Civics &amp; Geography made easy to recall, not just read.</p>
+            <span class="lvl">Up to X</span>
+          </div>
+          <div class="subj">
+            <span class="idx" style="--dot: var(--amber)"></span>
+            <h4>Economics</h4>
+            <p>Micro to macro, with case-based practice.</p>
+            <span class="lvl">XI–XII</span>
+          </div>
+          <div class="subj">
+            <span class="idx" style="--dot: var(--pass)"></span>
+            <h4>Commerce</h4>
+            <p>Accountancy &amp; Business Studies for senior classes.</p>
+            <span class="lvl">XI–XII</span>
+          </div>
+          <div class="subj">
+            <span class="idx" style="--dot: var(--blue)"></span>
+            <h4>Computer science</h4>
+            <p>Programming fundamentals through board-level coding.</p>
+            <span class="lvl">All boards</span>
+          </div>
+          <div class="subj">
+            <span class="idx" style="--dot: var(--amber)"></span>
+            <h4>Hindi</h4>
+            <p>Vyakaran, comprehension and writing for all boards.</p>
+            <span class="lvl">All boards</span>
+          </div>
+          <div class="subj">
+            <span class="idx" style="--dot: var(--pass)"></span>
+            <h4>Art &amp; craft</h4>
+            <p>Basic to advanced with Shalini Ma'am, at the center.</p>
+            <span class="lvl">All ages</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- APPROACH / WHY -->
+    <section class="section" id="why" style="background: var(--paper-2)">
+      <div class="container reveal">
+        <div class="head">
+          <div><span class="eyebrow">Why parents stay</span><span class="m-note">marked, every week</span></div>
+          <div>
+            <h2 class="h-title">Built around what actually moves a grade</h2>
+            <p class="lede">The things parents tell us matter most — handled as standard, not sold as extras.</p>
+          </div>
+        </div>
+        <div class="checklist">
+          <div class="check">
+            <span class="tick" aria-hidden="true"
+              ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 6 9 17l-5-5" /></svg
+            ></span>
+            <div>
+              <h4>Fair, transparent fees</h4>
+              <p>High-caliber teaching without the coaching-centre markup — priced per subject, per month, listed in full below.</p>
+            </div>
+          </div>
+          <div class="check">
+            <span class="tick" aria-hidden="true"
+              ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 6 9 17l-5-5" /></svg
+            ></span>
+            <div>
+              <h4>Verified &amp; qualified tutors</h4>
+              <p>Every tutor is screened before they ever teach your child — at home, center or online.</p>
+            </div>
+          </div>
+          <div class="check">
+            <span class="tick" aria-hidden="true"
+              ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 6 9 17l-5-5" /></svg
+            ></span>
+            <div>
+              <h4>Homework, marks &amp; weekly tests</h4>
+              <p>Regular assessments and tutor remarks you can see as they happen — not just at exam time.</p>
+            </div>
+          </div>
+          <div class="check">
+            <span class="tick" aria-hidden="true"
+              ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 6 9 17l-5-5" /></svg
+            ></span>
+            <div>
+              <h4>Matched, not assigned</h4>
+              <p>We match on subject, board and teaching style — and swap the tutor if it isn't clicking.</p>
+            </div>
+          </div>
+          <div class="check">
+            <span class="tick" aria-hidden="true"
+              ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 6 9 17l-5-5" /></svg
+            ></span>
+            <div>
+              <h4>Flexible timings</h4>
+              <p>Sessions fit around school, other classes, and time zones for overseas students.</p>
+            </div>
+          </div>
+          <div class="check">
+            <span class="tick" aria-hidden="true"
+              ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 6 9 17l-5-5" /></svg
+            ></span>
+            <div>
+              <h4>Small class sizes</h4>
+              <p>Coaching batches stay small enough that no student slips through unnoticed.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GALLERY -->
+    <section class="section" id="gallery">
+      <div class="container reveal">
+        <div class="head">
+          <div><span class="eyebrow">A look inside</span></div>
+          <div>
+            <h2 class="h-title">Glimpses of Edify Tutorial</h2>
+            <p class="lede">Classes, students and campus moments — this gallery fills in as new photos come through.</p>
+          </div>
+        </div>
+        <div class="gallery">
+          <figure class="tile tall" id="gallery-1">
+            <span class="tile-empty" aria-hidden="true"
+              ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                <rect x="3" y="5" width="18" height="14" rx="2" />
+                <circle cx="8.5" cy="10.5" r="1.5" />
+                <path d="M21 15l-5-5-9 9" /></svg
+            ></span>
+            <figcaption class="tile-cap">Home tuition session</figcaption>
+          </figure>
+          <figure class="tile" id="gallery-2">
+            <span class="tile-empty" aria-hidden="true"
+              ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                <rect x="3" y="5" width="18" height="14" rx="2" />
+                <circle cx="8.5" cy="10.5" r="1.5" />
+                <path d="M21 15l-5-5-9 9" /></svg
+            ></span>
+            <figcaption class="tile-cap">Coaching center</figcaption>
+          </figure>
+          <figure class="tile" id="gallery-3">
+            <span class="tile-empty" aria-hidden="true"
+              ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                <rect x="3" y="5" width="18" height="14" rx="2" />
+                <circle cx="8.5" cy="10.5" r="1.5" />
+                <path d="M21 15l-5-5-9 9" /></svg
+            ></span>
+            <figcaption class="tile-cap">Students at work</figcaption>
+          </figure>
+          <figure class="tile" id="gallery-4">
+            <span class="tile-empty" aria-hidden="true"
+              ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                <rect x="3" y="5" width="18" height="14" rx="2" />
+                <circle cx="8.5" cy="10.5" r="1.5" />
+                <path d="M21 15l-5-5-9 9" /></svg
+            ></span>
+            <figcaption class="tile-cap">Art &amp; craft class</figcaption>
+          </figure>
+          <figure class="tile tall" id="gallery-5">
+            <span class="tile-empty" aria-hidden="true"
+              ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                <rect x="3" y="5" width="18" height="14" rx="2" />
+                <circle cx="8.5" cy="10.5" r="1.5" />
+                <path d="M21 15l-5-5-9 9" /></svg
+            ></span>
+            <figcaption class="tile-cap">Online class in session</figcaption>
+          </figure>
+          <figure class="tile" id="gallery-6">
+            <span class="tile-empty" aria-hidden="true"
+              ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                <rect x="3" y="5" width="18" height="14" rx="2" />
+                <circle cx="8.5" cy="10.5" r="1.5" />
+                <path d="M21 15l-5-5-9 9" /></svg
+            ></span>
+            <figcaption class="tile-cap">Test / assessment day</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRICING -->
+    <section class="section" id="pricing" style="background: var(--paper-2)">
+      <div class="container reveal">
+        <div class="head">
+          <div><span class="eyebrow">Fees</span></div>
+          <div>
+            <h2 class="h-title">Simple, per-subject pricing</h2>
+            <p class="lede">Real fees, per subject, per month. Taking more than one subject? Ask on the form for a combined quote.</p>
+          </div>
+        </div>
+        <div class="pricing-toggle" role="tablist" aria-label="Billing period">
+          <button type="button" class="active" id="tab-monthly" role="tab" aria-selected="true">Monthly</button>
+          <button type="button" id="tab-annual" role="tab" aria-selected="false">Annual (2 months free)</button>
+        </div>
+        <div class="fee-wrap">
+          <div class="fee-scroll">
+            <table class="fee-table" id="feeTable">
+              <thead>
+                <tr>
+                  <th>Class</th>
+                  <th>Subject</th>
+                  <th>Center</th>
+                  <th>Home</th>
+                  <th>Online</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>KG – IV</td>
+                  <td>All subjects <span class="tutor">Shalini Ma'am</span></td>
+                  <td data-m="1200">&#8377;1,200</td>
+                  <td data-m="0" class="na">—</td>
+                  <td data-m="800">&#8377;800</td>
+                </tr>
+                <tr>
+                  <td>V – VIII</td>
+                  <td>All subjects <span class="tutor">Shalini Ma'am</span></td>
+                  <td data-m="1500">&#8377;1,500</td>
+                  <td data-m="0" class="na">—</td>
+                  <td data-m="1000">&#8377;1,000</td>
+                </tr>
+                <tr>
+                  <td>IX – X</td>
+                  <td>Hindi <span class="tutor">Shalini Ma'am</span></td>
+                  <td data-m="1800">&#8377;1,800</td>
+                  <td data-m="0" class="na">—</td>
+                  <td data-m="1200">&#8377;1,200</td>
+                </tr>
+                <tr class="highlight">
+                  <td>IX – X</td>
+                  <td>Maths <span class="tutor">Ashok Sir</span></td>
+                  <td data-m="2000">&#8377;2,000</td>
+                  <td data-m="2500">&#8377;2,500</td>
+                  <td data-m="1500">&#8377;1,500</td>
+                </tr>
+                <tr class="highlight">
+                  <td>IX – X</td>
+                  <td>Science <span class="tutor">Ashok Sir</span></td>
+                  <td data-m="2000">&#8377;2,000</td>
+                  <td data-m="2500">&#8377;2,500</td>
+                  <td data-m="1500">&#8377;1,500</td>
+                </tr>
+                <tr>
+                  <td>XI – XII</td>
+                  <td>Maths <span class="tutor">Ashok Sir</span></td>
+                  <td data-m="2500">&#8377;2,500</td>
+                  <td data-m="3000">&#8377;3,000</td>
+                  <td data-m="2000">&#8377;2,000</td>
+                </tr>
+                <tr>
+                  <td>XI – XII</td>
+                  <td>Science <span class="tutor">Ashok Sir</span></td>
+                  <td data-m="2500">&#8377;2,500</td>
+                  <td data-m="3000">&#8377;3,000</td>
+                  <td data-m="2000">&#8377;2,000</td>
+                </tr>
+                <tr>
+                  <td>All ages</td>
+                  <td>Art &amp; craft <span class="tutor">Shalini Ma'am</span></td>
+                  <td data-m="900">&#8377;900</td>
+                  <td data-m="0" class="na">—</td>
+                  <td data-m="0" class="na">—</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="price-note">
+          <strong>How the columns work:</strong> Home tuition is Gurugram-only and currently offered by Ashok Sir; Shalini Ma'am's classes run at the center.
+          Overseas students join under the Online column, billed in INR.
+        </p>
+      </div>
+    </section>
+
+    <!-- HOW IT STARTS -->
+    <section class="section" id="start">
+      <div class="container reveal">
+        <div class="head">
+          <div><span class="eyebrow">Getting started</span></div>
+          <div>
+            <h2 class="h-title">From first call to first class in a few days</h2>
+            <p class="lede">No sign-up fees and no commitment to book — the demo class is free, so you can see the fit before you decide.</p>
+          </div>
+        </div>
+        <div class="steps">
+          <article class="step">
+            <span class="step-n">Book a demo</span>
+            <h4>Tell us the basics</h4>
+            <p>Share your child's class, board and the subjects they need. We'll call within 24 hours to confirm a free demo class.</p>
+            <span class="arrow" aria-hidden="true"
+              ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12h14" />
+                <path d="m13 6 6 6-6 6" /></svg
+            ></span>
+          </article>
+          <article class="step">
+            <span class="step-n">Meet the tutor</span>
+            <h4>See the fit, free</h4>
+            <p>Ashok Sir or Shalini Ma'am takes the demo, matched to the subject and board. No cost, no obligation to continue.</p>
+            <span class="arrow" aria-hidden="true"
+              ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12h14" />
+                <path d="m13 6 6 6-6 6" /></svg
+            ></span>
+          </article>
+          <article class="step">
+            <span class="step-n">Start &amp; track</span>
+            <h4>Learn, with progress you can see</h4>
+            <p>Weekly tests, homework checks and tutor remarks you can actually follow — and you can change the tutor anytime.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- LEAD FORM -->
+    <section class="section enrol" id="lead-form">
+      <div class="container reveal">
+        <div class="head">
+          <div><span class="eyebrow">Free demo class</span></div>
+          <div>
+            <h2 class="h-title">Tell us about your child — we'll take it from there</h2>
+            <p class="lede">Fill this in and we'll call within 24 hours to set up a free demo class. No cost, no commitment.</p>
+          </div>
+        </div>
+        <div class="form-card">
+          <form id="leadForm" novalidate>
+            <div class="form-grid">
+              <div class="field">
+                <label for="parentName">Your name</label>
+                <input type="text" id="parentName" name="parentName" placeholder="Full name" autocomplete="name" required />
+                <span class="error-text">Enter your name.</span>
+              </div>
+              <div class="field">
+                <label for="phone">Phone number</label>
+                <input type="tel" id="phone" name="phone" placeholder="10-digit mobile number" autocomplete="tel-national" required />
+                <span class="error-text">Enter a valid 10-digit number.</span>
+              </div>
+              <div class="field">
+                <label for="studentClass">Student's class</label>
+                <select id="studentClass" name="studentClass" required>
+                  <option value="">Select class</option>
+                  <option>Kindergarten</option>
+                  <option>Class I–V</option>
+                  <option>Class VI–VIII</option>
+                  <option>Class IX–X</option>
+                  <option>Class XI–XII</option>
+                </select>
+                <span class="error-text">Select a class.</span>
+              </div>
+              <div class="field">
+                <label for="subject">Subject(s) needed</label>
+                <input type="text" id="subject" name="subject" placeholder="e.g. Maths, Science" />
+              </div>
+              <div class="field full">
+                <label>Mode of tuition</label>
+                <div class="radio-row">
+                  <label class="radio-opt"><input type="radio" name="mode" value="Home" checked /> Home tuition (Gurugram)</label>
+                  <label class="radio-opt"><input type="radio" name="mode" value="Coaching" /> Classroom coaching</label>
+                  <label class="radio-opt"><input type="radio" name="mode" value="Online" /> Online / overseas</label>
+                </div>
+              </div>
+              <div class="field full" id="areaField">
+                <label for="area">Area / locality in Gurugram</label>
+                <input type="text" id="area" name="area" placeholder="e.g. Palam Vihar, Sector 110" />
+              </div>
+              <div class="field full">
+                <label for="message">Anything else we should know? (optional)</label>
+                <textarea id="message" name="message" rows="3" placeholder="Board, preferred timing, specific concerns…"></textarea>
+              </div>
+            </div>
+            <button type="submit" class="form-submit">Request my free demo class</button>
+            <p class="form-note">By submitting, you agree to be contacted by Edify Tutorial by phone or WhatsApp.</p>
+          </form>
+          <div class="form-success" id="formSuccess">
+            <div class="ok" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+            </div>
+            <h3>Thanks — we've got it.</h3>
+            <p>Someone from Edify Tutorial will call you within 24 hours to set up the free demo class.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- NOTES -->
+    <section class="section" id="notes-library">
+      <div class="container reveal">
+        <div class="head">
+          <div><span class="eyebrow">Study material</span></div>
+          <div>
+            <h2 class="h-title">A growing library of notes, worksheets &amp; formula sheets</h2>
+            <p class="lede">Organised by class and subject, written by your own tutors — full access opens up once you're enrolled.</p>
+          </div>
+        </div>
+        <div class="notes-grid">
+          <article class="note">
+            <div class="note-top">
+              <span class="note-icon">M</span
+              ><span class="note-lock"
+                ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="4" y="10" width="16" height="10" rx="2" />
+                  <path d="M8 10V7a4 4 0 0 1 8 0v3" /></svg
+                >Members</span
+              >
+            </div>
+            <h4>Maths — Class X</h4>
+            <p>Chapter-wise notes &amp; board-pattern practice sheets.</p>
+          </article>
+          <article class="note">
+            <div class="note-top">
+              <span class="note-icon">S</span
+              ><span class="note-lock"
+                ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="4" y="10" width="16" height="10" rx="2" />
+                  <path d="M8 10V7a4 4 0 0 1 8 0v3" /></svg
+                >Members</span
+              >
+            </div>
+            <h4>Science — Class VIII</h4>
+            <p>Concept notes with diagrams and quick-revision points.</p>
+          </article>
+          <article class="note">
+            <div class="note-top">
+              <span class="note-icon">M</span
+              ><span class="note-lock"
+                ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="4" y="10" width="16" height="10" rx="2" />
+                  <path d="M8 10V7a4 4 0 0 1 8 0v3" /></svg
+                >Members</span
+              >
+            </div>
+            <h4>Maths — Class XII</h4>
+            <p>Formula sheets and previous-year style problem sets.</p>
+          </article>
+          <article class="note">
+            <div class="note-top">
+              <span class="note-icon">E</span
+              ><span class="note-lock"
+                ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="4" y="10" width="16" height="10" rx="2" />
+                  <path d="M8 10V7a4 4 0 0 1 8 0v3" /></svg
+                >Members</span
+              >
+            </div>
+            <h4>English — Class VI</h4>
+            <p>Grammar notes and comprehension practice.</p>
+          </article>
+          <article class="note">
+            <div class="note-top">
+              <span class="note-icon">S</span
+              ><span class="note-lock"
+                ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="4" y="10" width="16" height="10" rx="2" />
+                  <path d="M8 10V7a4 4 0 0 1 8 0v3" /></svg
+                >Members</span
+              >
+            </div>
+            <h4>Science — Class X</h4>
+            <p>Physics, Chemistry &amp; Biology notes, board-aligned.</p>
+          </article>
+          <article class="note">
+            <div class="note-top">
+              <span class="note-icon">H</span
+              ><span class="note-lock"
+                ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="4" y="10" width="16" height="10" rx="2" />
+                  <path d="M8 10V7a4 4 0 0 1 8 0v3" /></svg
+                >Members</span
+              >
+            </div>
+            <h4>Hindi — Class IX</h4>
+            <p>Vyakaran notes and comprehension practice sets.</p>
+          </article>
+          <article class="note">
+            <div class="note-top">
+              <span class="note-icon">E</span
+              ><span class="note-lock"
+                ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="4" y="10" width="16" height="10" rx="2" />
+                  <path d="M8 10V7a4 4 0 0 1 8 0v3" /></svg
+                >Members</span
+              >
+            </div>
+            <h4>Economics — Class XI</h4>
+            <p>Concept notes covering micro &amp; macro fundamentals.</p>
+          </article>
+          <article class="note">
+            <div class="note-top">
+              <span class="note-icon">A</span
+              ><span class="note-lock"
+                ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="4" y="10" width="16" height="10" rx="2" />
+                  <path d="M8 10V7a4 4 0 0 1 8 0v3" /></svg
+                >Members</span
+              >
+            </div>
+            <h4>Art &amp; craft — All ages</h4>
+            <p>Step-by-step project sheets from Shalini Ma'am.</p>
+          </article>
+        </div>
+        <div class="notes-cta">
+          <p><strong>New notes added every week</strong> by Ashok Sir and Shalini Ma'am, matched to what your child is studying right now.</p>
+          <a href="#lead-form" class="btn btn-amber">Enrol to unlock full access</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+      <div class="container footer-grid">
+        <div>
+          <div class="footer-brand">
+            <svg class="cap" viewBox="0 0 48 40">
+              <path d="M24 5 46 14 24 23 2 14z" fill="currentColor" />
+              <path d="M11 18v9c0 2.8 5.8 5.5 13 5.5s13-2.7 13-5.5v-9l-13 5.6z" fill="currentColor" opacity=".6" />
+              <path d="M46 14v10" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            <b>Edify Tutorial</b>
+          </div>
+          <p class="desc">
+            Personalised home tuition, classroom coaching, and online overseas classes — for students from Kindergarten to Class 12, across Gurugram and around
+            the world.
+          </p>
+        </div>
+        <div>
+          <h5>Explore</h5>
+          <ul>
+            <li><a href="#paths">Ways to learn</a></li>
+            <li><a href="#subjects">Subjects</a></li>
+            <li><a href="#gallery">Gallery</a></li>
+            <li><a href="#pricing">Fees</a></li>
+            <li><a href="#notes-library">Notes</a></li>
+            <li><a href="#lead-form">Free demo class</a></li>
+          </ul>
+        </div>
+        <div>
+          <h5>Contact</h5>
+          <ul>
+            <li><a href="tel:+919811265418">+91 98112 65418</a></li>
+            <li><a href="tel:+919999511487">+91 99995 11487</a></li>
+            <li>
+              <a href="mailto:info@edifytutorial.com">info@edifytutorial.com</a>
+            </li>
+            <li>Sector 110, Gurugram</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 Edify Tutorial. All rights reserved.</span>
+        <span>Home Tuition · Coaching · Overseas Classes</span>
+      </div>
+    </footer>
+
+    <a
+      href="https://wa.me/919811265418?text=Hi%2C%20I%27d%20like%20to%20know%20more%20about%20Edify%20Tutorial%20classes"
+      class="whatsapp-float"
+      target="_blank"
+      rel="noopener"
+      aria-label="Chat on WhatsApp"
+    >
+      <svg viewBox="0 0 32 32" fill="#fff">
+        <path
+          d="M16.02 3C9.4 3 4 8.36 4 15c0 2.36.66 4.57 1.8 6.46L4 29l7.75-1.75A11.9 11.9 0 0 0 16.02 27C22.64 27 28 21.64 28 15S22.64 3 16.02 3zm0 21.8c-1.98 0-3.83-.55-5.4-1.5l-.39-.23-4.6 1.04 1.02-4.48-.25-.4A9.7 9.7 0 0 1 6.2 15c0-5.4 4.42-9.8 9.82-9.8 5.4 0 9.8 4.4 9.8 9.8s-4.4 9.8-9.8 9.8zm5.4-7.35c-.3-.15-1.75-.86-2.02-.96-.27-.1-.47-.15-.66.15-.2.3-.76.96-.93 1.16-.17.2-.34.22-.63.07-.3-.15-1.25-.46-2.38-1.47-.88-.78-1.47-1.75-1.65-2.05-.17-.3-.02-.46.13-.61.13-.13.3-.34.44-.5.15-.18.2-.3.3-.5.1-.2.05-.38-.02-.53-.07-.15-.66-1.58-.9-2.17-.24-.57-.48-.5-.66-.5h-.56c-.2 0-.5.07-.77.38-.27.3-1 .98-1 2.4 0 1.4 1.02 2.77 1.17 2.96.15.2 2 3.06 4.86 4.29.68.3 1.2.47 1.62.6.68.22 1.3.19 1.79.11.55-.08 1.75-.71 2-1.4.24-.68.24-1.27.17-1.4-.07-.13-.27-.2-.57-.35z"
+        />
+      </svg>
+    </a>
+
+    <script>
+      document.documentElement.classList.add("js");
+      var navToggle = document.getElementById("navToggle");
+      var mobileMenu = document.getElementById("mobileMenu");
+      navToggle.addEventListener("click", function () {
+        var open = mobileMenu.classList.toggle("open");
+        navToggle.setAttribute("aria-expanded", open ? "true" : "false");
+      });
+      mobileMenu.querySelectorAll("a").forEach(function (link) {
+        link.addEventListener("click", function () {
+          mobileMenu.classList.remove("open");
+          navToggle.setAttribute("aria-expanded", "false");
+        });
+      });
+
+      var tabMonthly = document.getElementById("tab-monthly");
+      var tabAnnual = document.getElementById("tab-annual");
+      var feeCells = document.querySelectorAll("#feeTable td[data-m]");
+      function renderFees(annual) {
+        feeCells.forEach(function (cell) {
+          var monthly = parseInt(cell.getAttribute("data-m"), 10);
+          if (monthly === 0) {
+            cell.textContent = "—";
+            return;
+          }
+          var amount = annual ? monthly * 10 : monthly;
+          cell.textContent = "₹" + amount.toLocaleString("en-IN") + (annual ? "/yr" : "");
+        });
+      }
+      tabMonthly.addEventListener("click", function () {
+        tabMonthly.classList.add("active");
+        tabAnnual.classList.remove("active");
+        tabMonthly.setAttribute("aria-selected", "true");
+        tabAnnual.setAttribute("aria-selected", "false");
+        renderFees(false);
+      });
+      tabAnnual.addEventListener("click", function () {
+        tabAnnual.classList.add("active");
+        tabMonthly.classList.remove("active");
+        tabAnnual.setAttribute("aria-selected", "true");
+        tabMonthly.setAttribute("aria-selected", "false");
+        renderFees(true);
+      });
+
+      var modeRadios = document.querySelectorAll('input[name="mode"]');
+      var areaField = document.getElementById("areaField");
+      function syncArea() {
+        var checked = document.querySelector('input[name="mode"]:checked');
+        areaField.style.display = checked && checked.value === "Home" ? "flex" : "none";
+        document.querySelectorAll(".radio-opt").forEach(function (opt) {
+          opt.classList.toggle("checked", opt.querySelector("input").checked);
+        });
+      }
+      modeRadios.forEach(function (r) {
+        r.addEventListener("change", syncArea);
+      });
+      syncArea();
+
+      var form = document.getElementById("leadForm");
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var valid = true;
+        var name = document.getElementById("parentName");
+        var phone = document.getElementById("phone");
+        var studentClass = document.getElementById("studentClass");
+        function showError(field, show) {
+          var err = field.parentElement.querySelector(".error-text");
+          if (err) {
+            err.style.display = show ? "block" : "none";
+          }
+          field.style.borderColor = show ? "var(--marking)" : "var(--rule)";
+        }
+        if (!name.value.trim()) {
+          showError(name, true);
+          valid = false;
+        } else {
+          showError(name, false);
+        }
+        var phoneOk = /^[0-9]{10}$/.test(phone.value.trim());
+        if (!phoneOk) {
+          showError(phone, true);
+          valid = false;
+        } else {
+          showError(phone, false);
+        }
+        if (!studentClass.value) {
+          showError(studentClass, true);
+          valid = false;
+        } else {
+          showError(studentClass, false);
+        }
+        if (!valid) {
+          return;
+        }
+        form.style.display = "none";
+        document.getElementById("formSuccess").style.display = "block";
+      });
+
+      if ("IntersectionObserver" in window) {
+        var observer = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("in");
+                observer.unobserve(entry.target);
+              }
+            });
+          },
+          { threshold: 0.12 },
+        );
+        document.querySelectorAll(".reveal").forEach(function (el) {
+          observer.observe(el);
+        });
+      } else {
+        document.querySelectorAll(".reveal").forEach(function (el) {
+          el.classList.add("in");
+        });
+      }
+    </script>
+  </body>
+</html>

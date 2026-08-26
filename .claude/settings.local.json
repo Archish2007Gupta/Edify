@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python .gallery_build/splice.py)"
+    ]
+  }
+}

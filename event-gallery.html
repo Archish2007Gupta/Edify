@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edify - Campus Event Gallery</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Hanken+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    /* ==========================================================================
+       DESIGN SYSTEM & CSS VARIABLES
+       ========================================================================== */
+    :root {
+      --blue: #1e5aa8;
+      --blue-strong: #164a8f;
+      --blue-deep: #0e2e57;
+      --blue-deeper: #0a2447;
+      --ink: #22252b;
+      --ink-soft: #55606f;
+      --amber: #f5a623;
+      --amber-bright: #ffb63a;
+      --amber-soft: #fbe7bc;
+      --paper: #fbf8f1;
+      --paper-2: #f3eee1;
+      --card: #ffffff;
+      --rule: #e7dfce;
+      --radius: 16px;
+      --radius-lg: 24px;
+      --shadow-sm: 0 4px 12px rgba(14, 46, 87, 0.05);
+      --shadow-card: 0 10px 30px -10px rgba(14, 46, 87, 0.12);
+      --shadow-hover: 0 20px 40px -12px rgba(14, 46, 87, 0.22);
+      --transition-fast: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-normal: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Hanken Grotesk', system-ui, -apple-system, sans-serif;
+      background-color: var(--paper);
+      color: var(--ink);
+      line-height: 1.6;
+      overflow-x: hidden;
+      padding-bottom: 80px;
+    }
+
+    /* ==========================================================================
+       CONTAINER & HEADER
+       ========================================================================== */
+    .event-gallery-section {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 60px 24px;
+    }
+
+    .gallery-header {
+      text-align: center;
+      max-width: 720px;
+      margin: 0 auto 48px;
+    }
+
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--amber-soft);
+      color: var(--blue-deep);
+      font-weight: 700;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 6px 16px;
+      border-radius: 100px;
+      margin-bottom: 16px;
+      border: 1px solid rgba(245, 166, 35, 0.3);
+    }
+
+    .gallery-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 700;
+      color: var(--blue-deep);
+      line-height: 1.15;
+      margin-bottom: 16px;
+      letter-spacing: -0.02em;
+    }
+
+    .gallery-subtitle {
+      font-size: 1.1rem;
+      color: var(--ink-soft);
+      line-height: 1.6;
+    }
+
+    /* ==========================================================================
+       SECTION 1: INFINITE AUTO-SCROLLING MARQUEE (TOP REEL)
+       ========================================================================== */
+    .marquee-wrapper {
+      width: 100vw;
+      position: relative;
+      left: 50%;
+      right: 50%;
+      margin-left: -50vw;
+      margin-right: -50vw;
+      overflow: hidden;
+      padding: 20px 0;
+      margin-bottom: 50px;
+      background: linear-gradient(180deg, rgba(243, 238, 225, 0.4) 0%, rgba(251, 248, 241, 0) 100%);
+      mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+      -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+    }
+
+    .marquee-track {
+      display: flex;
+      gap: 20px;
+      width: max-content;
+      animation: marqueeScroll 35s linear infinite;
+    }
+
+    .marquee-wrapper:hover .marquee-track {
+      animation-play-state: paused;
+    }
+
+    @keyframes marqueeScroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    .marquee-item {
+      width: 280px;
+      height: 170px;
+      border-radius: var(--radius);
+      overflow: hidden;
+      position: relative;
+      flex-shrink: 0;
+      box-shadow: var(--shadow-sm);
+      cursor: pointer;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .marquee-item:hover {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: var(--shadow-card);
+    }
+
+    .marquee-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s ease;
+    }
+
+    .marquee-item:hover img {
+      transform: scale(1.1);
+    }
+
+    .marquee-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(14, 46, 87, 0.85) 0%, transparent 60%);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 14px;
+      color: #fff;
+    }
+
+    .marquee-tag {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      background: var(--amber);
+      color: var(--blue-deep);
+      padding: 2px 8px;
+      border-radius: 4px;
+      width: fit-content;
+      margin-bottom: 4px;
+    }
+
+    .marquee-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ==========================================================================
+       SECTION 2: FILTER BUTTONS BAR
+       ========================================================================== */
+    .filter-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 36px;
+    }
+
+    .filter-btn {
+      background: #ffffff;
+      border: 1px solid var(--rule);
+      color: var(--ink-soft);
+      padding: 10px 22px;
+      border-radius: 100px;
+      font-family: 'Hanken Grotesk', sans-serif;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+    }
+
+    .filter-btn:hover {
+      border-color: var(--blue);
+      color: var(--blue);
+      background: #f4f8ff;
+      transform: translateY(-2px);
+    }
+
+    .filter-btn.active {
+      background: var(--blue-deep);
+      color: #ffffff;
+      border-color: var(--blue-deep);
+      box-shadow: 0 4px 14px rgba(14, 46, 87, 0.25);
+    }
+
+    .filter-btn.active .count-badge {
+      background: var(--amber);
+      color: var(--blue-deep);
+    }
+
+    .count-badge {
+      background: var(--paper-2);
+      color: var(--ink-soft);
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-weight: 700;
+      transition: background var(--transition-fast);
+    }
+
+    /* ==========================================================================
+       SECTION 3: HORIZONTAL CAROUSEL WITH SCROLL & ARROWS
+       ========================================================================== */
+    .carousel-section-wrapper {
+      position: relative;
+    }
+
+    /* Navigation Arrows Header Bar */
+    .carousel-nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .gallery-counter-text {
+      font-weight: 600;
+      color: var(--ink-soft);
+      font-size: 0.95rem;
+    }
+
+    .nav-arrow-group {
+      display: flex;
+      gap: 12px;
+    }
+
+    .nav-arrow-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 1px solid var(--rule);
+      color: var(--blue-deep);
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .nav-arrow-btn:hover:not(:disabled) {
+      background: var(--blue);
+      color: #ffffff;
+      border-color: var(--blue);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-card);
+    }
+
+    .nav-arrow-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    /* Scrollable Container */
+    .cards-carousel-container {
+      display: flex;
+      gap: 28px;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      scroll-snap-type: x mandatory;
+      padding: 12px 4px 24px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .cards-carousel-container::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Event Card Item */
+    .event-card {
+      min-width: 340px;
+      max-width: 340px;
+      background: var(--card);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--rule);
+      overflow: hidden;
+      scroll-snap-align: start;
+      box-shadow: var(--shadow-card);
+      transition: transform var(--transition-normal), box-shadow var(--transition-normal), border-color var(--transition-normal);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .event-card:hover {
+      transform: translateY(-10px);
+      box-shadow: var(--shadow-hover);
+      border-color: rgba(30, 90, 168, 0.3);
+    }
+
+    .card-media {
+      position: relative;
+      height: 220px;
+      overflow: hidden;
+    }
+
+    .card-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.7s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .event-card:hover .card-media img {
+      transform: scale(1.08);
+    }
+
+    .date-badge {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      background: rgba(14, 46, 87, 0.88);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color: #ffffff;
+      padding: 6px 12px;
+      border-radius: 10px;
+      text-align: center;
+      line-height: 1.1;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .date-badge .day {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--amber-bright);
+      display: block;
+    }
+
+    .date-badge .month {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .category-tag {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: #ffffff;
+      color: var(--blue-deep);
+      font-weight: 700;
+      font-size: 0.75rem;
+      padding: 5px 12px;
+      border-radius: 100px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-body {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+
+    .event-meta {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 0.825rem;
+      color: var(--ink-soft);
+      margin-bottom: 12px;
+    }
+
+    .event-meta i {
+      color: var(--amber-deep);
+    }
+
+    .card-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--blue-deep);
+      line-height: 1.3;
+      margin-bottom: 10px;
+    }
+
+    .card-desc {
+      font-size: 0.925rem;
+      color: var(--ink-soft);
+      margin-bottom: 20px;
+      flex-grow: 1;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-footer {
+      border-top: 1px solid var(--paper-2);
+      padding-top: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .attendee-count {
+      font-size: 0.825rem;
+      font-weight: 600;
+      color: var(--ink-soft);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .view-gallery-btn {
+      background: transparent;
+      border: none;
+      color: var(--blue);
+      font-family: 'Hanken Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      padding: 6px 12px;
+      border-radius: 8px;
+      transition: background var(--transition-fast), color var(--transition-fast);
+    }
+
+    .event-card:hover .view-gallery-btn {
+      background: var(--blue);
+      color: #ffffff;
+    }
+
+    /* Scroll Bar Progress Container */
+    .scroll-progress-bar-container {
+      width: 100%;
+      height: 6px;
+      background: var(--paper-2);
+      border-radius: 10px;
+      margin-top: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .scroll-progress-thumb {
+      height: 100%;
+      width: 25%;
+      background: linear-gradient(90deg, var(--blue), var(--amber));
+      border-radius: 10px;
+      transition: transform 0.15s ease-out;
+    }
+
+    /* ==========================================================================
+       SECTION 4: LIGHTBOX MODAL PREVIEW
+       ========================================================================== */
+    .lightbox-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: rgba(10, 36, 71, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--transition-fast);
+      padding: 24px;
+    }
+
+    .lightbox-modal.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .lightbox-content-box {
+      background: var(--card);
+      border-radius: var(--radius-lg);
+      max-width: 900px;
+      width: 100%;
+      max-height: 90vh;
+      overflow: hidden;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      transform: scale(0.95);
+      transition: transform var(--transition-normal);
+    }
+
+    .lightbox-modal.active .lightbox-content-box {
+      transform: scale(1);
+    }
+
+    .lightbox-close-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.5);
+      color: #fff;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background var(--transition-fast);
+    }
+
+    .lightbox-close-btn:hover {
+      background: var(--amber);
+      color: var(--blue-deep);
+    }
+
+    .lightbox-img-wrapper {
+      height: 480px;
+      background: #000;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .lightbox-img-wrapper img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .lightbox-details {
+      padding: 24px 30px;
+      background: var(--card);
+    }
+
+    .lightbox-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 8px;
+    }
+
+    .lightbox-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.6rem;
+      color: var(--blue-deep);
+      margin-bottom: 8px;
+    }
+
+    .lightbox-desc {
+      color: var(--ink-soft);
+      font-size: 1rem;
+    }
+
+    /* Media queries for responsiveness */
+    @media (max-width: 768px) {
+      .event-card {
+        min-width: 290px;
+        max-width: 290px;
+      }
+      .lightbox-img-wrapper {
+        height: 300px;
+      }
+      .gallery-header {
+        margin-bottom: 32px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <section class="event-gallery-section">
+    <!-- Header Title -->
+    <div class="gallery-header">
+      <span class="badge-pill">
+        <i class="fa-solid fa-sparkles"></i> Life at Edify
+      </span>
+      <h2 class="gallery-title">Campus Events & Celebrations</h2>
+      <p class="gallery-subtitle">
+        Explore vibrant moments from our recent hackathons, annual cultural festivals, sports tournaments, and leadership workshops.
+      </p>
+    </div>
+
+    <!-- 1. INFINITE SCROLLING MARQUEE BANNER -->
+    <div class="marquee-wrapper">
+      <!-- Row 1: Left Scroll -->
+      <div class="marquee-track">
+        <!-- Item 1 -->
+        <div class="marquee-item" onclick="openLightbox('Annual Cultural Fest 2025', 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1000&q=80', 'Cultural', 'Main Campus Grounds', 'Our flagship 3-day fest filled with music, dance, and creative performances.')">
+          <img src="https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=600&q=80" alt="Cultural Fest">
+          <div class="marquee-overlay">
+            <span class="marquee-tag">Cultural</span>
+            <div class="marquee-title">Annual Cultural Fest 2025</div>
+          </div>
+        </div>
+        <!-- Item 2 -->
+        <div class="marquee-item" onclick="openLightbox('Edify Hackathon Hack-N-Innovate', 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1000&q=80', 'Tech Expo', 'Innovation Lab', '36 hours of continuous coding, AI building, and problem solving by 400+ students.')">
+          <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80" alt="Hackathon">
+          <div class="marquee-overlay">
+            <span class="marquee-tag">Tech Expo</span>
+            <div class="marquee-title">Hack-N-Innovate 2025</div>
+          </div>
+        </div>
+        <!-- Item 3 -->
+        <div class="marquee-item" onclick="openLightbox('Inter-College Sports League', 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1000&q=80', 'Sports', 'Sports Complex', 'Thrilling football finals and track events with overwhelming participation.')">
+          <img src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=600&q=80" alt="Sports League">
+          <div class="marquee-overlay">
+            <span class="marquee-tag">Sports</span>
+            <div class="marquee-title">Inter-College Sports League</div>
+          </div>
+        </div>
+        <!-- Item 4 -->
+        <div class="marquee-item" onclick="openLightbox('Robotics Showcase 2025', 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=1000&q=80', 'Tech Expo', 'Tech Arena', 'Displaying autonomous drones, line followers, and robotic arms built by engineering students.')">
+          <img src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=600&q=80" alt="Robotics">
+          <div class="marquee-overlay">
+            <span class="marquee-tag">Tech Expo</span>
+            <div class="marquee-title">Robotics Showcase 2025</div>
+          </div>
+        </div>
+        <!-- Item 5 -->
+        <div class="marquee-item" onclick="openLightbox('Global Leadership Summit', 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=1000&q=80', 'Seminars', 'Grand Auditorium', 'Renowned industry leaders interacting with students on future tech trends and career paths.')">
+          <img src="https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=600&q=80" alt="Leadership Summit">
+          <div class="marquee-overlay">
+            <span class="marquee-tag">Seminars</span>
+            <div class="marquee-title">Global Leadership Summit</div>
+          </div>
+        </div>
+        <!-- Duplicate Set for Seamless Continuous Loop -->
+        <div class="marquee-item" onclick="openLightbox('Annual Cultural Fest 2025', 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1000&q=80', 'Cultural', 'Main Campus Grounds', 'Our flagship 3-day fest filled with music, dance, and creative performances.')">
+          <img src="https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=600&q=80" alt="Cultural Fest">
+          <div class="marquee-overlay">
+            <span class="marquee-tag">Cultural</span>
+            <div class="marquee-title">Annual Cultural Fest 2025</div>
+          </div>
+        </div>
+        <div class="marquee-item" onclick="openLightbox('Edify Hackathon Hack-N-Innovate', 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1000&q=80', 'Tech Expo', 'Innovation Lab', '36 hours of continuous coding, AI building, and problem solving by 400+ students.')">
+          <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80" alt="Hackathon">
+          <div class="marquee-overlay">
+            <span class="marquee-tag">Tech Expo</span>
+            <div class="marquee-title">Hack-N-Innovate 2025</div>
+          </div>
+        </div>
+        <div class="marquee-item" onclick="openLightbox('Inter-College Sports League', 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1000&q=80', 'Sports', 'Sports Complex', 'Thrilling football finals and track events with overwhelming participation.')">
+          <img src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=600&q=80" alt="Sports League">
+          <div class="marquee-overlay">
+            <span class="marquee-tag">Sports</span>
+            <div class="marquee-title">Inter-College Sports League</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. CATEGORY FILTER CONTROL BAR -->
+    <div class="filter-controls">
+      <button class="filter-btn active" onclick="filterGallery('all', this)">
+        <i class="fa-solid fa-layer-group"></i> All Events <span class="count-badge" id="count-all">6</span>
+      </button>
+      <button class="filter-btn" onclick="filterGallery('cultural', this)">
+        <i class="fa-solid fa-masks-theater"></i> Cultural Fest <span class="count-badge" id="count-cultural">2</span>
+      </button>
+      <button class="filter-btn" onclick="filterGallery('tech', this)">
+        <i class="fa-solid fa-microchip"></i> Tech Expo <span class="count-badge" id="count-tech">2</span>
+      </button>
+      <button class="filter-btn" onclick="filterGallery('sports', this)">
+        <i class="fa-solid fa-trophy"></i> Sports Meet <span class="count-badge" id="count-sports">1</span>
+      </button>
+      <button class="filter-btn" onclick="filterGallery('workshops', this)">
+        <i class="fa-solid fa-chalkboard-user"></i> Workshops <span class="count-badge" id="count-workshops">1</span>
+      </button>
+    </div>
+
+    <!-- 3. SCROLLABLE CAROUSEL SECTION -->
+    <div class="carousel-section-wrapper">
+      
+      <!-- Nav Controls Header -->
+      <div class="carousel-nav-bar">
+        <span class="gallery-counter-text" id="gallery-counter-label">Showing 6 Events</span>
+        <div class="nav-arrow-group">
+          <button class="nav-arrow-btn" id="prev-btn" onclick="scrollCarousel(-1)" aria-label="Previous Events">
+            <i class="fa-solid fa-arrow-left"></i>
+          </button>
+          <button class="nav-arrow-btn" id="next-btn" onclick="scrollCarousel(1)" aria-label="Next Events">
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Scroll Container -->
+      <div class="cards-carousel-container" id="carouselContainer">
+
+        <!-- Card 1: Cultural Fest -->
+        <article class="event-card" data-category="cultural">
+          <div class="card-media">
+            <img src="https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=800&q=80" alt="Cultural Fest 2025">
+            <div class="date-badge">
+              <span class="day">15</span>
+              <span class="month">OCT</span>
+            </div>
+            <span class="category-tag"><i class="fa-solid fa-music"></i> Cultural</span>
+          </div>
+          <div class="card-body">
+            <div class="event-meta">
+              <span><i class="fa-solid fa-location-dot"></i> Main Campus Grounds</span>
+            </div>
+            <h3 class="card-title">Annual Cultural Fest 2025</h3>
+            <p class="card-desc">
+              A 3-day spectacular extravaganza showcasing music, battle of the bands, classical dances, and fashion parades.
+            </p>
+            <div class="card-footer">
+              <span class="attendee-count"><i class="fa-solid fa-users"></i> 1,200+ Attended</span>
+              <button class="view-gallery-btn" onclick="openLightbox('Annual Cultural Fest 2025', 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=80', 'Cultural', 'Main Campus Grounds', 'A 3-day spectacular extravaganza showcasing music, battle of the bands, classical dances, and fashion parades.')">
+                View Photos <i class="fa-solid fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 2: Tech Expo -->
+        <article class="event-card" data-category="tech">
+          <div class="card-media">
+            <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80" alt="Hackathon 2025">
+            <div class="date-badge">
+              <span class="day">02</span>
+              <span class="month">NOV</span>
+            </div>
+            <span class="category-tag"><i class="fa-solid fa-laptop-code"></i> Tech Expo</span>
+          </div>
+          <div class="card-body">
+            <div class="event-meta">
+              <span><i class="fa-solid fa-location-dot"></i> Innovation Hub</span>
+            </div>
+            <h3 class="card-title">Edify Hack-N-Innovate 24H</h3>
+            <p class="card-desc">
+              Over 80 teams built groundbreaking AI solutions and Web3 apps in an intense 24-hour hackathon challenge.
+            </p>
+            <div class="card-footer">
+              <span class="attendee-count"><i class="fa-solid fa-users"></i> 450+ Hackers</span>
+              <button class="view-gallery-btn" onclick="openLightbox('Edify Hack-N-Innovate 24H', 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80', 'Tech Expo', 'Innovation Hub', 'Over 80 teams built groundbreaking AI solutions and Web3 apps in an intense 24-hour hackathon challenge.')">
+                View Photos <i class="fa-solid fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 3: Sports -->
+        <article class="event-card" data-category="sports">
+          <div class="card-media">
+            <img src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=800&q=80" alt="Sports Meet">
+            <div class="date-badge">
+              <span class="day">20</span>
+              <span class="month">DEC</span>
+            </div>
+            <span class="category-tag"><i class="fa-solid fa-medal"></i> Sports Meet</span>
+          </div>
+          <div class="card-body">
+            <div class="event-meta">
+              <span><i class="fa-solid fa-location-dot"></i> Edify Athletics Stadium</span>
+            </div>
+            <h3 class="card-title">Inter-College Sports Championship</h3>
+            <p class="card-desc">
+              An energetic week of athletics, basketball, football, and cricket matches bringing together top institutions.
+            </p>
+            <div class="card-footer">
+              <span class="attendee-count"><i class="fa-solid fa-users"></i> 800+ Athletes</span>
+              <button class="view-gallery-btn" onclick="openLightbox('Inter-College Sports Championship', 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1200&q=80', 'Sports Meet', 'Edify Athletics Stadium', 'An energetic week of athletics, basketball, football, and cricket matches bringing together top institutions.')">
+                View Photos <i class="fa-solid fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 4: Workshops -->
+        <article class="event-card" data-category="workshops">
+          <div class="card-media">
+            <img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80" alt="Design Workshop">
+            <div class="date-badge">
+              <span class="day">10</span>
+              <span class="month">JAN</span>
+            </div>
+            <span class="category-tag"><i class="fa-solid fa-pen-nib"></i> Workshops</span>
+          </div>
+          <div class="card-body">
+            <div class="event-meta">
+              <span><i class="fa-solid fa-location-dot"></i> Studio 3, Design Block</span>
+            </div>
+            <h3 class="card-title">UI/UX Masterclass & Design Sprint</h3>
+            <p class="card-desc">
+              Hands-on interactive session guided by industry product designers on design systems, Figma prototypes, and micro-interactions.
+            </p>
+            <div class="card-footer">
+              <span class="attendee-count"><i class="fa-solid fa-users"></i> 180+ Designers</span>
+              <button class="view-gallery-btn" onclick="openLightbox('UI/UX Masterclass & Design Sprint', 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1200&q=80', 'Workshops', 'Studio 3, Design Block', 'Hands-on interactive session guided by industry product designers on design systems, Figma prototypes, and micro-interactions.')">
+                View Photos <i class="fa-solid fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 5: Tech Expo -->
+        <article class="event-card" data-category="tech">
+          <div class="card-media">
+            <img src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=800&q=80" alt="Robotics Exhibition">
+            <div class="date-badge">
+              <span class="day">28</span>
+              <span class="month">JAN</span>
+            </div>
+            <span class="category-tag"><i class="fa-solid fa-robot"></i> Tech Expo</span>
+          </div>
+          <div class="card-body">
+            <div class="event-meta">
+              <span><i class="fa-solid fa-location-dot"></i> Central Exhibition Hall</span>
+            </div>
+            <h3 class="card-title">Robotics & AI Expo 2026</h3>
+            <p class="card-desc">
+              Exhibition of autonomous robotics projects, computer vision demos, and drone acrobatics created by students.
+            </p>
+            <div class="card-footer">
+              <span class="attendee-count"><i class="fa-solid fa-users"></i> 650+ Visitors</span>
+              <button class="view-gallery-btn" onclick="openLightbox('Robotics & AI Expo 2026', 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=1200&q=80', 'Tech Expo', 'Central Exhibition Hall', 'Exhibition of autonomous robotics projects, computer vision demos, and drone acrobatics created by students.')">
+                View Photos <i class="fa-solid fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 6: Cultural -->
+        <article class="event-card" data-category="cultural">
+          <div class="card-media">
+            <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=800&q=80" alt="Music Night">
+            <div class="date-badge">
+              <span class="day">14</span>
+              <span class="month">FEB</span>
+            </div>
+            <span class="category-tag"><i class="fa-solid fa-guitar"></i> Cultural</span>
+          </div>
+          <div class="card-body">
+            <div class="event-meta">
+              <span><i class="fa-solid fa-location-dot"></i> Open Air Theater</span>
+            </div>
+            <h3 class="card-title">Acoustic & Unplugged Night</h3>
+            <p class="card-desc">
+              A serene evening under the stars featuring acoustic band performances, spoken word poetry, and live art creation.
+            </p>
+            <div class="card-footer">
+              <span class="attendee-count"><i class="fa-solid fa-users"></i> 500+ Audience</span>
+              <button class="view-gallery-btn" onclick="openLightbox('Acoustic & Unplugged Night', 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1200&q=80', 'Cultural', 'Open Air Theater', 'A serene evening under the stars featuring acoustic band performances, spoken word poetry, and live art creation.')">
+                View Photos <i class="fa-solid fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+        </article>
+
+      </div>
+
+      <!-- Scroll Progress Bar -->
+      <div class="scroll-progress-bar-container">
+        <div class="scroll-progress-thumb" id="scrollProgressThumb"></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 4. LIGHTBOX PREVIEW MODAL -->
+  <div class="lightbox-modal" id="lightboxModal">
+    <div class="lightbox-content-box">
+      <button class="lightbox-close-btn" onclick="closeLightbox()">&times;</button>
+      <div class="lightbox-img-wrapper">
+        <img id="lightboxImg" src="" alt="Event Detail Image">
+      </div>
+      <div class="lightbox-details">
+        <div class="lightbox-meta-row">
+          <span class="marquee-tag" id="lightboxTag">Cultural</span>
+          <span style="font-size:0.85rem; color:var(--ink-soft);" id="lightboxLocation"><i class="fa-solid fa-location-dot"></i> Location</span>
+        </div>
+        <h3 class="lightbox-title" id="lightboxTitle">Event Title</h3>
+        <p class="lightbox-desc" id="lightboxDesc">Event description text goes here.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT FOR CAROUSEL & LIGHTBOX & FILTERS -->
+  <script>
+    const carousel = document.getElementById('carouselContainer');
+    const progressThumb = document.getElementById('scrollProgressThumb');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+
+    // 1. CAROUSEL SCROLL LOGIC & PROGRESS BAR
+    function updateScrollState() {
+      const scrollLeft = carousel.scrollLeft;
+      const scrollWidth = carousel.scrollWidth - carousel.clientWidth;
+      const progressPercent = scrollWidth > 0 ? (scrollLeft / scrollWidth) * 100 : 0;
+      
+      // Update progress thumb position & size
+      progressThumb.style.width = '25%';
+      progressThumb.style.transform = `translateX(${progressPercent * 3}%)`;
+
+      // Update button disabled state
+      prevBtn.disabled = scrollLeft <= 5;
+      nextBtn.disabled = scrollLeft >= scrollWidth - 5;
+    }
+
+    function scrollCarousel(direction) {
+      const cardWidth = 340 + 28; // width + gap
+      carousel.scrollBy({ left: direction * cardWidth, behavior: 'smooth' });
+    }
+
+    carousel.addEventListener('scroll', updateScrollState);
+    window.addEventListener('resize', updateScrollState);
+
+    // Initial check
+    updateScrollState();
+
+    // 2. CATEGORY FILTER LOGIC
+    function filterGallery(category, btnElement) {
+      // Toggle active button
+      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+      btnElement.classList.add('active');
+
+      const cards = document.querySelectorAll('.event-card');
+      let visibleCount = 0;
+
+      cards.forEach(card => {
+        const cardCategory = card.getAttribute('data-category');
+        if (category === 'all' || cardCategory === category) {
+          card.style.display = 'flex';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      // Reset scroll position to start after filter
+      carousel.scrollLeft = 0;
+      updateScrollState();
+
+      // Update counter text
+      document.getElementById('gallery-counter-label').innerText = `Showing ${visibleCount} Event${visibleCount !== 1 ? 's' : ''}`;
+    }
+
+    // 3. LIGHTBOX MODAL LOGIC
+    function openLightbox(title, imgUrl, tag, location, desc) {
+      document.getElementById('lightboxTitle').innerText = title;
+      document.getElementById('lightboxImg').src = imgUrl;
+      document.getElementById('lightboxTag').innerText = tag;
+      document.getElementById('lightboxLocation').innerHTML = `<i class="fa-solid fa-location-dot"></i> ${location}`;
+      document.getElementById('lightboxDesc').innerText = desc;
+      
+      document.getElementById('lightboxModal').classList.add('active');
+      document.body.style.overflow = 'hidden'; // prevent background scrolling
+    }
+
+    function closeLightbox() {
+      document.getElementById('lightboxModal').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    // Close lightbox on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeLightbox();
+    });
+
+    // Close lightbox on backdrop click
+    document.getElementById('lightboxModal').addEventListener('click', (e) => {
+      if (e.target.id === 'lightboxModal') closeLightbox();
+    });
+
+    // Drag-to-scroll support for desktop
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+
+    carousel.addEventListener('mousedown', (e) => {
+      isDown = true;
+      carousel.style.cursor = 'grabbing';
+      startX = e.pageX - carousel.offsetLeft;
+      scrollLeft = carousel.scrollLeft;
+    });
+    carousel.addEventListener('mouseleave', () => {
+      isDown = false;
+      carousel.style.cursor = 'default';
+    });
+    carousel.addEventListener('mouseup', () => {
+      isDown = false;
+      carousel.style.cursor = 'default';
+    });
+    carousel.addEventListener('mousemove', (e) => {
+      if(!isDown) return;
+      e.preventDefault();
+      const x = e.pageX - carousel.offsetLeft;
+      const walk = (x - startX) * 2;
+      carousel.scrollLeft = scrollLeft - walk;
+    });
+  </script>
+
+</body>
+</html>

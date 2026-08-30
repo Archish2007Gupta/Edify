@@ -981,13 +981,11 @@
       loginBtn.disabled = true;
       loginAlert.classList.remove('show');
 
-      await new Promise(r => setTimeout(r, 1800));
+      // Simulate authentication — redirect to dashboard on success
+      await new Promise(r => setTimeout(r, 1600));
 
-      loginBtn.classList.remove('loading');
-      loginBtn.disabled = false;
-      loginAlertMsg.textContent = 'Invalid email or password. Please check your credentials and try again.';
-      loginAlert.classList.add('show');
-      loginAlert.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      // Demo: any valid-format email + non-empty password succeeds
+      window.location.href = 'teacher-dashboard.html';
     });
 
     document.getElementById('teacherEmail').addEventListener('input', () => {

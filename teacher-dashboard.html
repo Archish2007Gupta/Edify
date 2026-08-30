@@ -1,0 +1,982 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Teacher Dashboard — Edify Tutorial</title>
+  <meta name="description" content="Teacher dashboard for Edify Tutorial. View enrolled students, manage new enrollments and track progress." />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="theme-color" content="#0E2E57" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --blue: #1e5aa8;
+      --blue-strong: #164a8f;
+      --blue-deep: #0e2e57;
+      --blue-deeper: #0a2447;
+      --ink: #22252b;
+      --ink-soft: #55606f;
+      --amber: #f5a623;
+      --amber-soft: #fbe7bc;
+      --amber-deep: #a66a05;
+      --paper: #fbf8f1;
+      --paper-2: #f3eee1;
+      --card: #ffffff;
+      --rule: #e7dfce;
+      --rule-soft: #efe9db;
+      --marking: #c6402f;
+      --pass: #2e7d57;
+      --pass-soft: #e8f5ef;
+      --warn: #d97706;
+      --warn-soft: #fef3c7;
+      --on-dark: #eaf1fb;
+      --on-dark-soft: #a9bcdc;
+      --sidebar-w: 280px;
+      --topbar-h: 72px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+    body {
+      font-family: "Hanken Grotesk", system-ui, sans-serif;
+      font-size: 17px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      background: var(--paper);
+      color: var(--ink);
+      min-height: 100vh;
+      display: flex;
+    }
+    a { color: inherit; text-decoration: none; }
+    ::selection { background: var(--amber-soft); color: var(--blue-deep); }
+    :focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; border-radius: 6px; }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: var(--sidebar-w);
+      min-height: 100vh;
+      background: var(--blue-deeper);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      z-index: 200;
+      overflow-y: auto;
+    }
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 22px 20px 18px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      flex-shrink: 0;
+    }
+    .sidebar-logo-badge {
+      background: #fff;
+      border-radius: 9px;
+      padding: 6px 12px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+    }
+    .sidebar-logo-badge img { height: 28px; width: auto; display: block; }
+    .sidebar-brand-text {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+    }
+    .sidebar-brand-text span {
+      display: block;
+      font-family: "Hanken Grotesk", sans-serif;
+      font-size: 11.5px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--on-dark-soft);
+      margin-top: 2px;
+    }
+    .sidebar-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 18px;
+      margin: 14px 10px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.08);
+      flex-shrink: 0;
+    }
+    .profile-avatar {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue) 0%, var(--amber) 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 700; color: #fff;
+      flex-shrink: 0;
+    }
+    .profile-name { font-size: 16px; font-weight: 600; color: #fff; }
+    .profile-role { font-size: 13px; color: var(--on-dark-soft); }
+    .nav-section-label {
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(169,188,220,.5);
+      padding: 16px 22px 6px;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 20px;
+      margin: 2px 8px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--on-dark-soft);
+      cursor: pointer;
+      transition: background .15s, color .15s;
+      position: relative;
+    }
+    .nav-item svg { width: 20px; height: 20px; flex-shrink: 0; }
+    .nav-item:hover { background: rgba(255,255,255,.07); color: #fff; }
+    .nav-item.active { background: rgba(30,90,168,.55); color: #fff; font-weight: 600; }
+    .nav-item.active::before {
+      content: "";
+      position: absolute;
+      left: -8px; top: 50%;
+      transform: translateY(-50%);
+      width: 4px; height: 24px;
+      background: var(--amber);
+      border-radius: 0 4px 4px 0;
+    }
+    .nav-badge {
+      margin-left: auto;
+      background: var(--amber);
+      color: #fff;
+      font-size: 12px; font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 100px;
+    }
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 16px 10px;
+      border-top: 1px solid rgba(255,255,255,.07);
+      flex-shrink: 0;
+    }
+    .btn-logout {
+      display: flex; align-items: center; gap: 10px;
+      width: 100%;
+      padding: 12px 18px;
+      border-radius: 10px;
+      background: rgba(198,64,47,.1);
+      border: 1px solid rgba(198,64,47,.2);
+      color: #f87171;
+      font-family: "Hanken Grotesk", sans-serif;
+      font-size: 16px; font-weight: 600;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .btn-logout:hover { background: rgba(198,64,47,.2); }
+    .btn-logout svg { width: 18px; height: 18px; }
+
+    /* MAIN */
+    .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      height: var(--topbar-h);
+      background: var(--card);
+      border-bottom: 1px solid var(--rule);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px;
+      box-shadow: 0 1px 8px rgba(20,40,80,.06);
+    }
+    .topbar-left h1 {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: 24px; font-weight: 700;
+      color: var(--blue-deep); letter-spacing: -0.02em;
+    }
+    .topbar-left p { font-size: 15px; color: var(--ink-soft); margin-top: 1px; }
+    .topbar-right { display: flex; align-items: center; gap: 14px; }
+    .topbar-search {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--paper); border: 1px solid var(--rule);
+      border-radius: 10px; padding: 10px 16px;
+      width: 240px; transition: border-color .18s, box-shadow .18s;
+    }
+    .topbar-search input {
+      border: none; background: transparent;
+      font: 16px "Hanken Grotesk", sans-serif;
+      color: var(--ink); width: 100%; outline: none;
+    }
+    .topbar-search svg { width: 17px; height: 17px; color: var(--ink-soft); flex-shrink: 0; }
+    .topbar-search:focus-within { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(30,90,168,.1); }
+    .topbar-icon-btn {
+      width: 42px; height: 42px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--paper); border: 1px solid var(--rule);
+      border-radius: 10px; cursor: pointer;
+      transition: background .15s; position: relative;
+    }
+    .topbar-icon-btn:hover { background: var(--paper-2); }
+    .topbar-icon-btn svg { width: 20px; height: 20px; color: var(--ink-soft); }
+    .notif-dot {
+      position: absolute; top: 9px; right: 9px;
+      width: 9px; height: 9px;
+      background: var(--marking); border-radius: 50%;
+      border: 2px solid var(--card);
+    }
+    .topbar-avatar {
+      width: 42px; height: 42px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue) 0%, var(--amber) 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 700; color: #fff;
+      cursor: pointer; border: 2px solid var(--rule);
+    }
+
+    /* CONTENT */
+    .content { flex: 1; padding: 32px 32px 52px; }
+
+    /* STATS */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px; margin-bottom: 32px;
+    }
+    .stat-card {
+      background: var(--card); border: 1px solid var(--rule);
+      border-radius: 16px; padding: 22px 24px;
+      display: flex; flex-direction: column; gap: 14px;
+      box-shadow: 0 1px 4px rgba(20,40,80,.04);
+      transition: box-shadow .18s, transform .18s;
+    }
+    .stat-card:hover { box-shadow: 0 6px 20px rgba(20,40,80,.1); transform: translateY(-2px); }
+    .stat-top { display: flex; align-items: center; justify-content: space-between; }
+    .stat-icon {
+      width: 48px; height: 48px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .stat-icon svg { width: 24px; height: 24px; }
+    .stat-icon.blue { background: rgba(30,90,168,.1); color: var(--blue); }
+    .stat-icon.amber { background: var(--amber-soft); color: var(--amber-deep); }
+    .stat-icon.green { background: var(--pass-soft); color: var(--pass); }
+    .stat-icon.red { background: #fef0ef; color: var(--marking); }
+    .stat-trend {
+      font-size: 13.5px; font-weight: 600;
+      padding: 4px 10px; border-radius: 100px;
+    }
+    .stat-trend.up { background: var(--pass-soft); color: var(--pass); }
+    .stat-trend.down { background: #fef0ef; color: var(--marking); }
+    .stat-value {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: 36px; font-weight: 700;
+      color: var(--blue-deep); letter-spacing: -0.03em; line-height: 1;
+    }
+    .stat-label { font-size: 15.5px; color: var(--ink-soft); margin-top: 2px; }
+
+    /* GRID */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 24px; align-items: start;
+    }
+
+    /* SECTION CARD */
+    .section-card {
+      background: var(--card); border: 1px solid var(--rule);
+      border-radius: 18px; overflow: hidden;
+      box-shadow: 0 1px 4px rgba(20,40,80,.04);
+    }
+    .section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 22px 26px 18px;
+      border-bottom: 1px solid var(--rule-soft);
+    }
+    .section-title {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: 20px; font-weight: 700;
+      color: var(--blue-deep); letter-spacing: -0.01em;
+    }
+    .section-sub { font-size: 15px; color: var(--ink-soft); margin-top: 2px; }
+    .section-actions { display: flex; align-items: center; gap: 10px; }
+    .btn-sm {
+      font-family: "Hanken Grotesk", sans-serif;
+      font-size: 15px; font-weight: 600;
+      padding: 9px 18px; border-radius: 8px;
+      cursor: pointer; transition: all .15s;
+      display: inline-flex; align-items: center; gap: 7px;
+    }
+    .btn-sm svg { width: 16px; height: 16px; }
+    .btn-primary { background: var(--blue); color: #fff; border: none; }
+    .btn-primary:hover { background: var(--blue-strong); }
+    .btn-ghost {
+      background: transparent; color: var(--ink-soft);
+      border: 1.5px solid var(--rule);
+    }
+    .btn-ghost:hover { background: var(--paper); color: var(--ink); }
+
+    /* TABLE TOOLBAR */
+    .table-toolbar {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--rule-soft);
+      background: var(--paper);
+      flex-wrap: wrap;
+    }
+    .table-search {
+      display: flex; align-items: center; gap: 9px;
+      background: var(--card); border: 1px solid var(--rule);
+      border-radius: 8px; padding: 9px 14px;
+      flex: 1; min-width: 200px;
+    }
+    .table-search input {
+      border: none; background: transparent;
+      font: 16px "Hanken Grotesk", sans-serif;
+      color: var(--ink); width: 100%; outline: none;
+    }
+    .table-search svg { width: 17px; height: 17px; color: var(--ink-soft); flex-shrink: 0; }
+    .filter-select {
+      font: 15px "Hanken Grotesk", sans-serif;
+      color: var(--ink); background: var(--card);
+      border: 1px solid var(--rule); border-radius: 8px;
+      padding: 9px 14px; cursor: pointer; outline: none;
+    }
+
+    /* STUDENT TABLE */
+    .student-table { width: 100%; border-collapse: collapse; }
+    .student-table th {
+      text-align: left;
+      font-size: 13px; font-weight: 700;
+      letter-spacing: 0.07em; text-transform: uppercase;
+      color: var(--ink-soft); padding: 14px 24px;
+      border-bottom: 1px solid var(--rule-soft);
+      background: var(--paper); white-space: nowrap;
+    }
+    .student-table td {
+      padding: 15px 24px;
+      border-bottom: 1px solid var(--rule-soft);
+      font-size: 16px; vertical-align: middle;
+    }
+    .student-table tr:last-child td { border-bottom: none; }
+    .student-table tbody tr { transition: background .12s; }
+    .student-table tbody tr:hover { background: var(--paper); }
+    .student-info { display: flex; align-items: center; gap: 13px; }
+    .student-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      font-size: 15px; font-weight: 700; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .student-name { font-weight: 600; color: var(--ink); font-size: 16px; }
+    .student-email { font-size: 13.5px; color: var(--ink-soft); margin-top: 1px; }
+
+    .badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 11px; border-radius: 100px;
+      font-size: 13.5px; font-weight: 600; white-space: nowrap;
+    }
+    .badge-green { background: var(--pass-soft); color: var(--pass); }
+    .badge-blue { background: rgba(30,90,168,.1); color: var(--blue); }
+    .badge-amber { background: var(--amber-soft); color: var(--amber-deep); }
+    .badge-red { background: #fef0ef; color: var(--marking); }
+    .badge-gray { background: #f0f0f0; color: #666; }
+
+    .progress-wrap { display: flex; align-items: center; gap: 10px; }
+    .progress-bar {
+      flex: 1; height: 7px; background: var(--rule-soft);
+      border-radius: 100px; overflow: hidden; min-width: 60px;
+    }
+    .progress-fill { height: 100%; border-radius: 100px; }
+    .progress-label { font-size: 14.5px; font-weight: 600; color: var(--ink-soft); white-space: nowrap; }
+
+    .action-btn {
+      background: none; border: none; cursor: pointer;
+      color: var(--ink-soft); display: inline-flex; align-items: center;
+      padding: 6px; border-radius: 8px;
+      transition: color .13s, background .13s;
+    }
+    .action-btn:hover { color: var(--blue); background: rgba(30,90,168,.08); }
+    .action-btn svg { width: 18px; height: 18px; }
+
+    /* TABLE FOOTER */
+    .table-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 24px;
+      border-top: 1px solid var(--rule-soft);
+      background: var(--paper);
+    }
+    .table-footer-info { font-size: 15px; color: var(--ink-soft); }
+    .pagination { display: flex; align-items: center; gap: 5px; }
+    .page-btn {
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 8px; border: 1px solid var(--rule);
+      background: var(--card); font-size: 15px; font-weight: 500;
+      color: var(--ink-soft); cursor: pointer; transition: all .13s;
+    }
+    .page-btn:hover { background: var(--paper-2); color: var(--ink); }
+    .page-btn.active { background: var(--blue); color: #fff; border-color: var(--blue); font-weight: 700; }
+    .page-btn svg { width: 16px; height: 16px; }
+
+    /* ENROLLMENTS */
+    .enrollment-list { padding: 4px 0; }
+    .enrollment-item {
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--rule-soft);
+      transition: background .13s;
+    }
+    .enrollment-item:last-child { border-bottom: none; }
+    .enrollment-item:hover { background: var(--paper); }
+    .enrollment-top {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 12px;
+    }
+    .enroll-avatar {
+      width: 42px; height: 42px; border-radius: 50%;
+      font-size: 15px; font-weight: 700; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .enroll-name { font-size: 17px; font-weight: 600; color: var(--ink); }
+    .enroll-meta { font-size: 14px; color: var(--ink-soft); margin-top: 2px; }
+    .enroll-course {
+      font-size: 14.5px; color: var(--blue-deep);
+      background: rgba(30,90,168,.07); border-radius: 8px;
+      padding: 8px 14px; margin-bottom: 12px; font-weight: 500;
+    }
+    .enroll-actions { display: flex; gap: 10px; }
+    .btn-approve {
+      flex: 1; font: 600 14.5px "Hanken Grotesk", sans-serif;
+      padding: 10px; border: none; border-radius: 8px;
+      background: var(--pass); color: #fff; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      transition: background .14s;
+    }
+    .btn-approve:hover { background: #245e41; }
+    .btn-approve svg { width: 15px; height: 15px; }
+    .btn-decline {
+      flex: 1; font: 600 14.5px "Hanken Grotesk", sans-serif;
+      padding: 10px; border: 1.5px solid var(--rule); border-radius: 8px;
+      background: transparent; color: var(--ink-soft); cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      transition: all .14s;
+    }
+    .btn-decline:hover { border-color: var(--marking); color: var(--marking); background: #fef0ef; }
+    .btn-decline svg { width: 15px; height: 15px; }
+
+    /* EMPTY STATE */
+    .empty-state {
+      text-align: center; padding: 44px 24px; color: var(--ink-soft);
+    }
+    .empty-state svg { width: 42px; height: 42px; margin-bottom: 12px; color: var(--rule); }
+    .empty-state p { font-size: 14px; }
+
+    /* TOAST */
+    .toast-container {
+      position: fixed; bottom: 26px; right: 26px;
+      z-index: 9999; display: flex; flex-direction: column; gap: 10px;
+    }
+    .toast {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 20px; border-radius: 12px;
+      font-size: 14px; font-weight: 500;
+      box-shadow: 0 8px 30px rgba(10,36,71,.2);
+      animation: slideUp .3s cubic-bezier(.2,.7,.2,1);
+      min-width: 280px;
+    }
+    .toast.success { background: var(--pass); color: #fff; }
+    .toast.info { background: var(--blue); color: #fff; }
+    .toast.error { background: var(--marking); color: #fff; }
+    .toast svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 1100px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .dashboard-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" role="navigation" aria-label="Teacher portal navigation">
+    <div class="sidebar-brand">
+      <div class="sidebar-logo-badge">
+        <img src="_logo1.png" alt="Edify Tutorial" />
+      </div>
+      <div class="sidebar-brand-text">
+        Edify Tutorial
+        <span>Teacher Portal</span>
+      </div>
+    </div>
+
+    <div class="sidebar-profile">
+      <div class="profile-avatar">RP</div>
+      <div>
+        <div class="profile-name">Ritu Patel</div>
+        <div class="profile-role">Mathematics · Sr. Faculty</div>
+      </div>
+    </div>
+
+    <p class="nav-section-label">Overview</p>
+    <a class="nav-item active" id="nav-dashboard" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </a>
+    <a class="nav-item" id="nav-students" href="#enrolled-section">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+      My Students
+      <span class="nav-badge" id="studentCount">28</span>
+    </a>
+    <a class="nav-item" id="nav-enroll" href="#enrollments-section">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+      New Enrollments
+      <span class="nav-badge" id="enrollBadge">5</span>
+    </a>
+
+    <p class="nav-section-label">Academics</p>
+    <a class="nav-item" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Class Schedule
+    </a>
+    <a class="nav-item" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      Study Materials
+    </a>
+    <a class="nav-item" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Progress Reports
+    </a>
+    <a class="nav-item" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      Reviews &amp; Feedback
+    </a>
+
+    <div class="sidebar-footer">
+      <button class="btn-logout" onclick="window.location='teacher-login.html'" aria-label="Sign out">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sign Out
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- Top Bar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1 id="greetingText">Good morning, Ritu 👋</h1>
+        <p id="dateText">Loading…</p>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="search" placeholder="Search students…" aria-label="Search students" id="globalSearch" />
+        </div>
+        <button class="topbar-icon-btn" aria-label="Notifications">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+          <span class="notif-dot"></span>
+        </button>
+        <div class="topbar-avatar" title="Ritu Patel" aria-label="Profile: Ritu Patel">RP</div>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <main class="content">
+
+      <!-- STATS -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-top">
+            <div class="stat-icon blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+            </div>
+            <span class="stat-trend up">↑ 4</span>
+          </div>
+          <div class="stat-value">28</div>
+          <div class="stat-label">Enrolled Students</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top">
+            <div class="stat-icon amber">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+            </div>
+            <span class="stat-trend up">↑ 5</span>
+          </div>
+          <div class="stat-value">5</div>
+          <div class="stat-label">Pending Enrollments</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top">
+            <div class="stat-icon green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </div>
+            <span class="stat-trend up">↑ 8%</span>
+          </div>
+          <div class="stat-value">76%</div>
+          <div class="stat-label">Avg. Attendance</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top">
+            <div class="stat-icon red">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </div>
+            <span class="stat-trend down">↓ 1</span>
+          </div>
+          <div class="stat-value">12</div>
+          <div class="stat-label">Sessions This Month</div>
+        </div>
+      </div>
+
+      <!-- DASHBOARD GRID -->
+      <div class="dashboard-grid">
+
+        <!-- Enrolled Students Table -->
+        <div class="section-card" id="enrolled-section">
+          <div class="section-header">
+            <div>
+              <div class="section-title">Enrolled Students</div>
+              <div class="section-sub" id="enrolledSubtitle">28 students across all active batches</div>
+            </div>
+            <div class="section-actions">
+              <button class="btn-sm btn-ghost" id="exportBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Export
+              </button>
+              <button class="btn-sm btn-primary" id="addStudentBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Add Student
+              </button>
+            </div>
+          </div>
+
+          <div class="table-toolbar">
+            <div class="table-search">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="search" placeholder="Search by name or email…" aria-label="Filter students" id="tableSearch" />
+            </div>
+            <select class="filter-select" id="batchFilter" aria-label="Filter by batch">
+              <option value="">All Batches</option>
+              <option value="Class IX">Class IX</option>
+              <option value="Class X">Class X</option>
+              <option value="Class XI">Class XI</option>
+              <option value="Class XII">Class XII</option>
+            </select>
+            <select class="filter-select" id="statusFilter" aria-label="Filter by status">
+              <option value="">All Status</option>
+              <option value="active">Active</option>
+              <option value="at-risk">At Risk</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+
+          <div style="overflow-x:auto;">
+            <table class="student-table" aria-label="Enrolled students list">
+              <thead>
+                <tr>
+                  <th>Student</th>
+                  <th>Batch</th>
+                  <th>Progress</th>
+                  <th>Attendance</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="studentTableBody"></tbody>
+            </table>
+          </div>
+
+          <div class="table-footer">
+            <span class="table-footer-info" id="tableInfo">Showing 10 of 28 students</span>
+            <div class="pagination" aria-label="Table pagination">
+              <button class="page-btn" aria-label="Previous page" id="prevPage">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
+              <button class="page-btn active" id="page1" onclick="goPage(1)">1</button>
+              <button class="page-btn" id="page2" onclick="goPage(2)">2</button>
+              <button class="page-btn" id="page3" onclick="goPage(3)">3</button>
+              <button class="page-btn" aria-label="Next page" id="nextPage">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- New Enrollments -->
+        <div class="section-card" id="enrollments-section">
+          <div class="section-header">
+            <div>
+              <div class="section-title">New Enrollments</div>
+              <div class="section-sub" id="enrollSub">5 pending your approval</div>
+            </div>
+          </div>
+          <div class="enrollment-list" id="enrollmentList"></div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+  <script>
+    /* ── DATA ──────────────────────────────────────── */
+    const COLORS = ['#1e5aa8','#e67e22','#27ae60','#8e44ad','#c0392b','#16a085','#d35400','#2980b9','#e91e63','#009688'];
+
+    const allStudents = [
+      { id:1,  name:'Aarav Sharma',   email:'aarav.s@student.edify',   batch:'Class X',   progress:82, attendance:91, status:'active'   },
+      { id:2,  name:'Priya Mehta',    email:'priya.m@student.edify',   batch:'Class XII', progress:67, attendance:74, status:'at-risk'  },
+      { id:3,  name:'Rohan Gupta',    email:'rohan.g@student.edify',   batch:'Class IX',  progress:95, attendance:98, status:'active'   },
+      { id:4,  name:'Sneha Joshi',    email:'sneha.j@student.edify',   batch:'Class X',   progress:44, attendance:55, status:'at-risk'  },
+      { id:5,  name:'Kabir Singh',    email:'kabir.s@student.edify',   batch:'Class XI',  progress:78, attendance:83, status:'active'   },
+      { id:6,  name:'Diya Patel',     email:'diya.p@student.edify',    batch:'Class XII', progress:91, attendance:96, status:'active'   },
+      { id:7,  name:'Arjun Verma',    email:'arjun.v@student.edify',   batch:'Class IX',  progress:59, attendance:61, status:'inactive' },
+      { id:8,  name:'Meera Nair',     email:'meera.n@student.edify',   batch:'Class X',   progress:73, attendance:79, status:'active'   },
+      { id:9,  name:'Vivaan Shah',    email:'vivaan.s@student.edify',  batch:'Class XI',  progress:88, attendance:90, status:'active'   },
+      { id:10, name:'Ananya Reddy',   email:'ananya.r@student.edify',  batch:'Class XII', progress:34, attendance:48, status:'at-risk'  },
+      { id:11, name:'Aryan Kapoor',   email:'aryan.k@student.edify',   batch:'Class IX',  progress:70, attendance:77, status:'active'   },
+      { id:12, name:'Siya Desai',     email:'siya.d@student.edify',    batch:'Class X',   progress:55, attendance:60, status:'at-risk'  },
+      { id:13, name:'Neel Bose',      email:'neel.b@student.edify',    batch:'Class XI',  progress:85, attendance:89, status:'active'   },
+      { id:14, name:'Riya Agarwal',   email:'riya.a@student.edify',    batch:'Class XII', progress:92, attendance:95, status:'active'   },
+      { id:15, name:'Dev Kumar',      email:'dev.k@student.edify',     batch:'Class IX',  progress:40, attendance:50, status:'inactive' },
+      { id:16, name:'Trisha Sen',     email:'trisha.s@student.edify',  batch:'Class X',   progress:76, attendance:81, status:'active'   },
+      { id:17, name:'Harsh Malhotra', email:'harsh.m@student.edify',   batch:'Class XI',  progress:63, attendance:70, status:'at-risk'  },
+      { id:18, name:'Pooja Iyer',     email:'pooja.i@student.edify',   batch:'Class XII', progress:90, attendance:94, status:'active'   },
+      { id:19, name:'Sameer Jain',    email:'sameer.j@student.edify',  batch:'Class IX',  progress:50, attendance:58, status:'at-risk'  },
+      { id:20, name:'Kriti Pandey',   email:'kriti.p@student.edify',   batch:'Class X',   progress:80, attendance:86, status:'active'   },
+      { id:21, name:'Aditya Rao',     email:'aditya.r@student.edify',  batch:'Class XI',  progress:69, attendance:72, status:'active'   },
+      { id:22, name:'Shruti Saxena',  email:'shruti.s@student.edify',  batch:'Class XII', progress:87, attendance:91, status:'active'   },
+      { id:23, name:'Manav Tiwari',   email:'manav.t@student.edify',   batch:'Class IX',  progress:42, attendance:47, status:'inactive' },
+      { id:24, name:'Zara Sheikh',    email:'zara.s@student.edify',    batch:'Class X',   progress:94, attendance:97, status:'active'   },
+      { id:25, name:'Rahul Ghosh',    email:'rahul.g@student.edify',   batch:'Class XI',  progress:72, attendance:75, status:'active'   },
+      { id:26, name:'Kavya Nair',     email:'kavya.n@student.edify',   batch:'Class XII', progress:58, attendance:65, status:'at-risk'  },
+      { id:27, name:'Ishit Shah',     email:'ishit.s@student.edify',   batch:'Class IX',  progress:83, attendance:88, status:'active'   },
+      { id:28, name:'Tanishi Roy',    email:'tanishi.r@student.edify', batch:'Class X',   progress:61, attendance:68, status:'active'   },
+    ];
+
+    const enrollments = [
+      { id:101, name:'Ishaan Kapoor', email:'ishaan.k@gmail.com',  batch:'Class X',   subject:'Mathematics', date:'29 Aug 2026' },
+      { id:102, name:'Tanvi Desai',   email:'tanvi.d@gmail.com',   batch:'Class XII', subject:'Mathematics', date:'28 Aug 2026' },
+      { id:103, name:'Advait Kumar',  email:'advait.k@gmail.com',  batch:'Class XI',  subject:'Mathematics', date:'28 Aug 2026' },
+      { id:104, name:'Sanya Agarwal', email:'sanya.a@gmail.com',   batch:'Class IX',  subject:'Mathematics', date:'27 Aug 2026' },
+      { id:105, name:'Neil Bose',     email:'neil.b@gmail.com',    batch:'Class X',   subject:'Mathematics', date:'26 Aug 2026' },
+    ];
+
+    /* ── HELPERS ──────────────────────────────────── */
+    const initials = n => n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const color    = id => COLORS[id % COLORS.length];
+
+    function statusBadge(s) {
+      const m = { active: ['badge-green','● Active'], 'at-risk': ['badge-amber','⚠ At Risk'], inactive: ['badge-gray','✕ Inactive'] };
+      const [cls, label] = m[s] || ['badge-gray', s];
+      return `<span class="badge ${cls}">${label}</span>`;
+    }
+    function progressColor(p) {
+      return p >= 75 ? '#2e7d57' : p >= 50 ? '#1e5aa8' : '#c6402f';
+    }
+
+    /* ── PAGINATION STATE ─────────────────────────── */
+    let currentPage = 1;
+    const PAGE_SIZE = 10;
+    let filteredStudents = [...allStudents];
+
+    /* ── RENDER STUDENTS ──────────────────────────── */
+    function renderStudents() {
+      const tbody = document.getElementById('studentTableBody');
+      const start = (currentPage - 1) * PAGE_SIZE;
+      const slice = filteredStudents.slice(start, start + PAGE_SIZE);
+
+      if (!slice.length) {
+        tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+          <p>No students match your filters.</p>
+        </div></td></tr>`;
+      } else {
+        tbody.innerHTML = slice.map(s => `
+          <tr>
+            <td><div class="student-info">
+              <div class="student-avatar" style="background:${color(s.id)}">${initials(s.name)}</div>
+              <div>
+                <div class="student-name">${s.name}</div>
+                <div class="student-email">${s.email}</div>
+              </div>
+            </div></td>
+            <td><span class="badge badge-blue">${s.batch}</span></td>
+            <td><div class="progress-wrap">
+              <div class="progress-bar"><div class="progress-fill" style="width:${s.progress}%;background:${progressColor(s.progress)}"></div></div>
+              <span class="progress-label">${s.progress}%</span>
+            </div></td>
+            <td style="font-weight:600;color:${s.attendance>=80?'var(--pass)':s.attendance>=60?'var(--warn)':'var(--marking)'}">${s.attendance}%</td>
+            <td>${statusBadge(s.status)}</td>
+            <td><div style="display:flex;gap:4px;">
+              <button class="action-btn" title="View profile" onclick="showToast('Viewing ${s.name.replace(/'/g,"\\'")}','info')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+              <button class="action-btn" title="Send message" onclick="showToast('Message sent to ${s.name.replace(/'/g,"\\'")}','success')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+              </button>
+            </div></td>
+          </tr>`).join('');
+      }
+
+      const total = filteredStudents.length;
+      const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+      document.getElementById('tableInfo').textContent =
+        `Showing ${Math.min(start+1,total)}–${Math.min(start+PAGE_SIZE,total)} of ${total} students`;
+      [1,2,3].forEach(p => {
+        const btn = document.getElementById(`page${p}`);
+        if (btn) { btn.classList.toggle('active', p === currentPage); btn.style.display = p <= pages ? '' : 'none'; }
+      });
+    }
+
+    function goPage(p) {
+      currentPage = p;
+      renderStudents();
+    }
+
+    document.getElementById('prevPage').addEventListener('click', () => {
+      if (currentPage > 1) { currentPage--; renderStudents(); }
+    });
+    document.getElementById('nextPage').addEventListener('click', () => {
+      const pages = Math.ceil(filteredStudents.length / PAGE_SIZE);
+      if (currentPage < pages) { currentPage++; renderStudents(); }
+    });
+
+    /* ── FILTERS ──────────────────────────────────── */
+    function applyFilters() {
+      const q      = (document.getElementById('tableSearch').value + ' ' + document.getElementById('globalSearch').value).toLowerCase().trim();
+      const batch  = document.getElementById('batchFilter').value;
+      const status = document.getElementById('statusFilter').value;
+
+      filteredStudents = allStudents.filter(s => {
+        const mq = !q || s.name.toLowerCase().includes(q) || s.email.toLowerCase().includes(q);
+        const mb = !batch  || s.batch  === batch;
+        const ms = !status || s.status === status;
+        return mq && mb && ms;
+      });
+      currentPage = 1;
+      renderStudents();
+    }
+
+    ['tableSearch','globalSearch','batchFilter','statusFilter'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { el.addEventListener('input', applyFilters); el.addEventListener('change', applyFilters); }
+    });
+
+    /* ── ENROLLMENTS ──────────────────────────────── */
+    let pendingCount = enrollments.length;
+
+    function renderEnrollments() {
+      const el = document.getElementById('enrollmentList');
+      if (!enrollments.length) {
+        el.innerHTML = `<div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+          <p>No pending enrollments.</p>
+        </div>`;
+        return;
+      }
+      el.innerHTML = enrollments.map(e => `
+        <div class="enrollment-item" id="enroll-${e.id}">
+          <div class="enrollment-top">
+            <div class="enroll-avatar" style="background:${color(e.id)}">${initials(e.name)}</div>
+            <div style="flex:1;min-width:0;">
+              <div class="enroll-name">${e.name}</div>
+              <div class="enroll-meta">${e.email} &middot; ${e.date}</div>
+            </div>
+            <span class="badge badge-amber">New</span>
+          </div>
+          <div class="enroll-course">📚 ${e.subject} — ${e.batch}</div>
+          <div class="enroll-actions">
+            <button class="btn-approve" onclick="handleEnroll(${e.id},'approve')" aria-label="Approve ${e.name}">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+              Approve
+            </button>
+            <button class="btn-decline" onclick="handleEnroll(${e.id},'decline')" aria-label="Decline ${e.name}">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              Decline
+            </button>
+          </div>
+        </div>`).join('');
+    }
+
+    function handleEnroll(id, action) {
+      const item   = document.getElementById(`enroll-${id}`);
+      const enroll = enrollments.find(e => e.id === id);
+      if (!item || !enroll) return;
+      pendingCount = Math.max(0, pendingCount - 1);
+      document.getElementById('enrollBadge').textContent = pendingCount;
+      document.getElementById('enrollSub').textContent   = `${pendingCount} pending your approval`;
+
+      if (action === 'approve') {
+        item.innerHTML = `
+          <div class="enrollment-top" style="opacity:.65;">
+            <div class="enroll-avatar" style="background:${color(id)}">${initials(enroll.name)}</div>
+            <div style="flex:1;min-width:0;">
+              <div class="enroll-name">${enroll.name}</div>
+              <div class="enroll-meta">${enroll.email}</div>
+            </div>
+            <span class="badge badge-green">✓ Approved</span>
+          </div>`;
+        showToast(`${enroll.name} approved and enrolled!`, 'success');
+      } else {
+        item.style.transition = 'opacity .25s';
+        item.style.opacity = '0';
+        setTimeout(() => item.remove(), 250);
+        showToast(`${enroll.name}'s request was declined.`, 'error');
+      }
+    }
+
+    /* ── TOAST ────────────────────────────────────── */
+    function showToast(msg, type = 'success') {
+      const icons = {
+        success: '<polyline points="20 6 9 17 4 12"/>',
+        error:   '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+        info:    '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>',
+      };
+      const t = Object.assign(document.createElement('div'), { className: `toast ${type}` });
+      t.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[type]||icons.info}</svg>
+        <span>${msg}</span>`;
+      document.getElementById('toastContainer').appendChild(t);
+      setTimeout(() => { t.style.transition='opacity .3s'; t.style.opacity='0'; setTimeout(()=>t.remove(),300); }, 3500);
+    }
+
+    /* ── GREETING & DATE ──────────────────────────── */
+    function setGreeting() {
+      const h = new Date().getHours();
+      const g = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+      document.getElementById('greetingText').textContent = `${g}, Ritu 👋`;
+      const opts = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
+      document.getElementById('dateText').textContent = new Date().toLocaleDateString('en-IN', opts) + ' — Here\'s your class overview';
+    }
+
+    /* ── NAV ACTIVE ───────────────────────────────── */
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', () => {
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        item.classList.add('active');
+      });
+    });
+
+    /* ── TOOLBAR BUTTONS ──────────────────────────── */
+    document.getElementById('exportBtn').addEventListener('click', () => showToast('Student list exported as CSV.', 'success'));
+    document.getElementById('addStudentBtn').addEventListener('click', () => showToast('Add-student form coming soon!', 'info'));
+
+    /* ── INIT ─────────────────────────────────────── */
+    setGreeting();
+    renderStudents();
+    renderEnrollments();
+  </script>
+</body>
+</html>

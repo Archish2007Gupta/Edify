@@ -1963,44 +1963,13 @@
       }
     }
 
-    /* ---------- pricing (per-subject cards) ---------- */
-    .pricing-toggle {
-      display: inline-flex;
-      background: var(--card);
-      border: 1px solid var(--rule);
-      border-radius: 100px;
-      padding: 5px;
-      gap: 4px;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .pricing-toggle button {
-      font-family: "Hanken Grotesk", sans-serif;
-      font-size: 14px;
-      font-weight: 600;
-      padding: 10px 22px;
-      border-radius: 100px;
-      border: none;
-      background: transparent;
-      color: var(--ink-soft);
-      cursor: pointer;
-      white-space: nowrap;
-      transition:
-        color 0.2s ease,
-        background 0.2s ease;
-    }
-
-    .pricing-toggle button.active {
-      background: var(--blue-deep);
-      color: #fff;
-      box-shadow: var(--shadow-sm);
-    }
-
+    /* ---------- pricing (simple 3-card fee structure) ---------- */
     .fee-grid {
-      margin-top: 28px;
+      margin-top: 32px;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: clamp(16px, 1.8vw, 22px);
+      gap: clamp(18px, 2vw, 28px);
+      align-items: start;
     }
 
     /* staggered scroll-reveal: cards fade + slide/scale up one after another
@@ -2030,30 +1999,16 @@
     .fee-card:nth-of-type(1) {
       --rd: 0ms;
     }
+
     .fee-card:nth-of-type(2) {
-      --rd: 80ms;
+      --rd: 120ms;
     }
+
     .fee-card:nth-of-type(3) {
-      --rd: 160ms;
-    }
-    .fee-card:nth-of-type(4) {
       --rd: 240ms;
-    }
-    .fee-card:nth-of-type(5) {
-      --rd: 320ms;
-    }
-    .fee-card:nth-of-type(6) {
-      --rd: 400ms;
-    }
-    .fee-card:nth-of-type(7) {
-      --rd: 480ms;
-    }
-    .fee-card:nth-of-type(8) {
-      --rd: 560ms;
     }
 
     @media (prefers-reduced-motion: reduce) {
-      /* honor reduced motion: drop the travel/scale, keep a soft fade only */
       .js .fee-grid .fee-card {
         translate: 0 0;
         scale: 1;
@@ -2066,155 +2021,141 @@
       display: flex;
       flex-direction: column;
       background: var(--card);
-      border: 1px solid var(--rule);
+      border: 1.5px solid var(--rule);
       border-radius: var(--radius-lg);
-      padding: 24px 22px 20px;
-      box-shadow: 0 1px 2px rgba(20, 30, 50, 0.04);
+      padding: 32px 28px 28px;
+      box-shadow: 0 2px 6px rgba(20, 30, 50, 0.05);
       transition:
-        transform 0.18s ease,
-        box-shadow 0.18s ease,
-        border-color 0.18s ease;
+        transform 0.22s ease,
+        box-shadow 0.22s ease,
+        border-color 0.22s ease;
     }
 
     .fee-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 22px 40px -22px rgba(14, 46, 87, 0.4);
+      transform: translateY(-5px);
+      box-shadow: 0 22px 44px -20px rgba(14, 46, 87, 0.35);
       border-color: var(--blue);
     }
 
     .fee-card.popular {
       border-color: var(--amber);
+      border-width: 2px;
       box-shadow:
         0 0 0 1px var(--amber) inset,
-        0 14px 30px -20px rgba(166, 106, 5, 0.55);
-      background: linear-gradient(180deg, #fffaef 0%, var(--card) 42%);
+        0 18px 36px -18px rgba(166, 106, 5, 0.45);
+      background: linear-gradient(180deg, #fffaef 0%, var(--card) 38%);
+      padding-top: 38px;
     }
 
     .fee-card.popular:hover {
       border-color: var(--amber);
       box-shadow:
         0 0 0 1px var(--amber) inset,
-        0 24px 44px -22px rgba(166, 106, 5, 0.6);
+        0 28px 50px -20px rgba(166, 106, 5, 0.55);
     }
 
     .fee-badge {
       position: absolute;
-      top: -11px;
-      right: 18px;
+      top: -13px;
+      left: 50%;
+      transform: translateX(-50%);
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      font:
-        700 10.5px/1 "Hanken Grotesk",
-        sans-serif;
-      letter-spacing: 0.07em;
+      font: 700 10.5px/1 "Hanken Grotesk", sans-serif;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
       color: #4a2e02;
       background: var(--amber);
       border-radius: 100px;
-      padding: 6px 12px;
-      box-shadow: 0 6px 14px -6px rgba(166, 106, 5, 0.8);
+      padding: 7px 16px;
+      box-shadow: 0 6px 14px -6px rgba(166, 106, 5, 0.7);
+      white-space: nowrap;
     }
 
-    .fee-badge svg {
-      width: 12px;
-      height: 12px;
-    }
-
-    .fee-band {
-      display: inline-flex;
-      align-self: flex-start;
-      font:
-        700 11px/1 "Hanken Grotesk",
-        sans-serif;
-      letter-spacing: 0.09em;
-      text-transform: uppercase;
-      color: var(--blue);
-      background: rgba(30, 90, 168, 0.09);
-      border-radius: 7px;
-      padding: 6px 10px;
-      margin-bottom: 13px;
-    }
-
-    .fee-subject {
+    .fee-card-title {
       font-family: "Bricolage Grotesque", "Hanken Grotesk", sans-serif;
-      font-weight: 600;
-      font-size: 21px;
-      letter-spacing: -0.01em;
+      font-weight: 700;
+      font-size: clamp(22px, 2.4vw, 28px);
       color: var(--blue-deep);
+      letter-spacing: -0.02em;
       line-height: 1.15;
     }
 
-    .fee-tutor {
-      margin-top: 6px;
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      font-size: 13.5px;
+    .fee-card-subtitle {
+      margin-top: 4px;
+      font-size: 14px;
       color: var(--ink-soft);
+      font-weight: 500;
     }
 
-    .fee-tutor::before {
-      content: "";
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--tutor-dot, var(--blue));
-      flex: none;
-    }
-
-    .fee-modes {
-      margin-top: 18px;
-      padding-top: 16px;
+    .fee-rows {
+      margin-top: 24px;
+      padding-top: 20px;
       border-top: 1px solid var(--rule-soft);
       display: flex;
       flex-direction: column;
-      gap: 11px;
+      gap: 16px;
+      flex: 1;
     }
 
-    .fee-mode {
+    .fee-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
     }
 
-    .fee-mode-label {
-      display: inline-flex;
-      align-items: center;
-      gap: 9px;
-      font-size: 14px;
+    .fee-row-label {
+      font-size: 15px;
       font-weight: 500;
       color: var(--ink-soft);
     }
 
-    .fee-mode-label svg {
-      width: 16px;
-      height: 16px;
-      color: var(--blue);
-      flex: none;
-    }
-
-    .fee-price {
-      display: inline-flex;
-      align-items: baseline;
-      gap: 2px;
-      white-space: nowrap;
-    }
-
-    .fee-amt {
+    .fee-row-price {
       font-family: "Bricolage Grotesque", sans-serif;
       font-weight: 600;
       font-size: 17px;
       color: var(--blue-deep);
       font-variant-numeric: tabular-nums;
+      white-space: nowrap;
     }
 
-    .fee-per {
-      font:
-        600 11.5px/1 "Hanken Grotesk",
-        sans-serif;
+    .fee-row-price .fee-per {
+      font: 600 11.5px/1 "Hanken Grotesk", sans-serif;
       color: var(--ink-soft);
+    }
+
+    .fee-highlight {
+      color: var(--pass);
+      font-size: 13.5px;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    .fee-cta {
+      display: block;
+      width: 100%;
+      margin-top: 24px;
+      padding: 14px 20px;
+      border-radius: 12px;
+      border: none;
+      background: var(--amber);
+      color: #3a2704;
+      font-family: "Hanken Grotesk", sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      box-shadow: 0 8px 20px -10px rgba(245, 166, 35, 0.7);
+      transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .fee-cta:hover {
+      transform: translateY(-1px);
+      background: var(--amber-bright);
+      box-shadow: 0 12px 26px -10px rgba(245, 166, 35, 0.85);
     }
 
     .price-note {
@@ -2231,13 +2172,9 @@
 
     @media (max-width: 900px) {
       .fee-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    @media (max-width: 560px) {
-      .fee-grid {
         grid-template-columns: 1fr;
+        max-width: 420px;
+        margin-inline: auto;
       }
     }
 
@@ -3515,205 +3452,73 @@
       <div class="head reveal">
         <div><span class="eyebrow">Fees</span></div>
         <div>
-          <h2 class="h-title">Simple, per-subject pricing</h2>
-          <p class="lede">Real fees, per subject, per month. Taking more than one subject? Ask on the form for a
-            combined quote.</p>
+          <h2 class="h-title">Our Programs - Choose What Works for You</h2>
         </div>
       </div>
-      <div class="pricing-toggle reveal" role="tablist" aria-label="Billing period">
-        <button type="button" class="active" id="tab-monthly" role="tab" aria-selected="true">Monthly</button>
-        <button type="button" id="tab-annual" role="tab" aria-selected="false">Annual (2 months free)</button>
-      </div>
       <div class="fee-grid" id="feeGrid">
-        <svg width="0" height="0" style="position: absolute" aria-hidden="true">
-          <symbol id="ic-centre" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
-            stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 21h18" />
-            <path d="M6 21V8l6-4 6 4v13" />
-            <path d="M10 21v-5h4v5" />
-          </symbol>
-          <symbol id="ic-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
-            stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 10.5 12 4l9 6.5" />
-            <path d="M5 9.5V20h14V9.5" />
-            <path d="M9.5 20v-5h5v5" />
-          </symbol>
-          <symbol id="ic-online" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
-            stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="4" width="18" height="12" rx="1.5" />
-            <path d="M8 20h8M12 16v4" />
-          </symbol>
-          <symbol id="ic-star" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 18.9 6.2 21l1.1-6.5L2.6 9.4l6.5-.9z" />
-          </symbol>
-        </svg>
 
-        <article class="fee-card" style="--tutor-dot: #a66a05">
-          <span class="fee-band">KG – IV</span>
-          <h3 class="fee-subject">All subjects</h3>
-          <p class="fee-tutor">Shalini Ma'am</p>
-          <div class="fee-modes">
-            <div class="fee-mode">
-              <span class="fee-mode-label"><svg aria-hidden="true"><use href="#ic-centre"></use></svg>At the centre</span>
-              <span class="fee-price"><span class="fee-amt" data-m="1200">&#8377;1,200</span><span
-                  class="fee-per">/mo</span></span>
+        <!-- Card 1: 1st – 8th -->
+        <article class="fee-card">
+          <h3 class="fee-card-title">1st – 8th</h3>
+          <p class="fee-card-subtitle">All Subjects (Shalini Ma'am)</p>
+          <div class="fee-rows">
+            <div class="fee-row">
+              <span class="fee-row-label">Center Fee</span>
+              <span class="fee-row-price">&#8377;1,500<span class="fee-per">/mo</span></span>
             </div>
-            <div class="fee-mode">
-              <span class="fee-mode-label"><svg aria-hidden="true"><use href="#ic-online"></use></svg>Online</span>
-              <span class="fee-price"><span class="fee-amt" data-m="800">&#8377;800</span><span
-                  class="fee-per">/mo</span></span>
+            <div class="fee-row">
+              <span class="fee-row-label">Home Fee</span>
+              <span class="fee-row-price">&#8377;2,500<span class="fee-per">/mo</span></span>
+            </div>
+            <div class="fee-row">
+              <span class="fee-row-label">Online Fee</span>
+              <span class="fee-row-price">&#8377;1,000<span class="fee-per">/mo</span></span>
             </div>
           </div>
+          <a href="#lead-form" class="fee-cta">Enquire Now</a>
         </article>
 
-        <article class="fee-card" style="--tutor-dot: #a66a05">
-          <span class="fee-band">V – VIII</span>
-          <h3 class="fee-subject">All subjects</h3>
-          <p class="fee-tutor">Shalini Ma'am</p>
-          <div class="fee-modes">
-            <div class="fee-mode">
-              <span class="fee-mode-label"><svg aria-hidden="true"><use href="#ic-centre"></use></svg>At the centre</span>
-              <span class="fee-price"><span class="fee-amt" data-m="1500">&#8377;1,500</span><span
-                  class="fee-per">/mo</span></span>
+        <!-- Card 2: 9th – 12th (Most Popular) -->
+        <article class="fee-card popular">
+          <span class="fee-badge">Most Popular</span>
+          <h3 class="fee-card-title">9th – 12th</h3>
+          <p class="fee-card-subtitle">Mathematics (Ashok Sir)</p>
+          <div class="fee-rows">
+            <div class="fee-row">
+              <span class="fee-row-label">Center Fee</span>
+              <span class="fee-row-price">&#8377;2,000<span class="fee-per">/mo</span></span>
             </div>
-            <div class="fee-mode">
-              <span class="fee-mode-label"><svg aria-hidden="true"><use href="#ic-online"></use></svg>Online</span>
-              <span class="fee-price"><span class="fee-amt" data-m="1000">&#8377;1,000</span><span
-                  class="fee-per">/mo</span></span>
+            <div class="fee-row">
+              <span class="fee-row-label">Home Fee</span>
+              <span class="fee-row-price">&#8377;3,500<span class="fee-per">/mo</span></span>
+            </div>
+            <div class="fee-row">
+              <span class="fee-row-label">Online Fee</span>
+              <span class="fee-row-price">&#8377;1,500<span class="fee-per">/mo</span></span>
             </div>
           </div>
+          <a href="#lead-form" class="fee-cta">Enquire Now</a>
         </article>
 
-        <article class="fee-card" style="--tutor-dot: #a66a05">
-          <span class="fee-band">IX – X</span>
-          <h3 class="fee-subject">Hindi</h3>
-          <p class="fee-tutor">Shalini Ma'am</p>
-          <div class="fee-modes">
-            <div class="fee-mode">
-              <span class="fee-mode-label"><svg aria-hidden="true"><use href="#ic-centre"></use></svg>At the centre</span>
-              <span class="fee-price"><span class="fee-amt" data-m="1800">&#8377;1,800</span><span
-                  class="fee-per">/mo</span></span>
+        <!-- Card 3: Art & Craft -->
+        <article class="fee-card">
+          <h3 class="fee-card-title">Art &amp; Craft</h3>
+          <p class="fee-card-subtitle">All Age Groups</p>
+          <div class="fee-rows">
+            <div class="fee-row">
+              <span class="fee-row-label">Center Fee</span>
+              <span class="fee-row-price">&#8377;1,200<span class="fee-per">/mo</span></span>
             </div>
-            <div class="fee-mode">
-              <span class="fee-mode-label"><svg aria-hidden="true"><use href="#ic-online"></use></svg>Online</span>
-              <span class="fee-price"><span class="fee-amt" data-m="1200">&#8377;1,200</span><span
-                  class="fee-per">/mo</span></span>
+            <div class="fee-row">
+              <span class="fee-row-label">Annual Fee</span>
+              <span class="fee-row-price">&#8377;12,000<span class="fee-per">/yr</span></span>
             </div>
+            <p class="fee-highlight">Free Demo Class Available</p>
           </div>
+          <a href="#lead-form" class="fee-cta">Enquire Now</a>
         </article>
 
-        <article class="fee-card popular" style="--tutor-dot: #1e5aa8">
-          <span class="fee-badge"><svg aria-hidden="true"><use href="#ic-star"></use></svg>Most enrolled</span>
-          <span class="fee-band">IX – X</span>
-          <h3 class="fee-subject">Mathematics</h3>
-          <p class="fee-tutor">Ashok Sir</p>
-          <div class="fee-modes">
-            <div class="fee-mode">
-              <span class="fee-mode-label"><svg aria-hidden="true"><use href="#ic-centre"></use></svg>At the centre</span>
-              <span class="fee-price"><span class="fee-amt" data-m="2000">&#8377;2,000</span><span
-                  class="fee-per">/mo</span></span>
-            </div>
-            <div class="fee-mode">
-              <span class="fee-mode-label"><svg aria-hidden="true"><use href="#ic-home"></use></svg>Home tuition</span>
-              <span class="fee-price"><span class="fee-amt" data-m="2500">&#8377;2,500</span><span
-                  class="fee-per">/mo</span></span>
-            </div>
-            <div class="fee-mode">
-              <span class="fee-mode-label"><svg aria-hidden="true"><use href="#ic-online"></use></svg>Online</span>
-              <span class="fee-price"><span class="fee-amt" data-m="1500">&#8377;1,500</span><span
-                  class="fee-per">/mo</span></span>
-            </div>
-          </div>
-        </article>
-
-        <article class="fee-card popular" style="--tutor-dot: #1e5aa8">
-          <span class="fee-badge"><svg aria-hidden="true"><use href="#ic-star"></use></svg>Most enrolled</span>
-          <span class="fee-band">IX – X</span>
-          <h3 class="fee-subject">Science</h3>
-          <p class="fee-tutor">Ashok Sir</p>
-          <div class="fee-modes">
-            <div class="fee-mode">
-              <span class="fee-mode-label"><svg aria-hidden="true"><use href="#ic-centre"></use></svg>At the centre</span>
-              <span class="fee-price"><span class="fee-amt" data-m="2000">&#8377;2,000</span><span
-                  class="fee-per">/mo</span></span>
-            </div>
-            <div class="fee-mode">
-              <span class="fee-mode-label"><svg aria-hidden="true"><use href="#ic-home"></use></svg>Home tuition</span>
-              <span class="fee-price"><span class="fee-amt" data-m="2500">&#8377;2,500</span><span
-                  class="fee-per">/mo</span></span>
-            </div>
-            <div class="fee-mode">
-              <span class="fee-mode-label"><svg aria-hidden="true"><use href="#ic-online"></use></svg>Online</span>
-              <span class="fee-price"><span class="fee-amt" data-m="1500">&#8377;1,500</span><span
-                  class="fee-per">/mo</span></span>
-            </div>
-          </div>
-        </article>
-
-        <article class="fee-card" style="--tutor-dot: #1e5aa8">
-          <span class="fee-band">XI – XII</span>
-          <h3 class="fee-subject">Mathematics</h3>
-          <p class="fee-tutor">Ashok Sir</p>
-          <div class="fee-modes">
-            <div class="fee-mode">
-              <span class="fee-mode-label"><svg aria-hidden="true"><use href="#ic-centre"></use></svg>At the centre</span>
-              <span class="fee-price"><span class="fee-amt" data-m="2500">&#8377;2,500</span><span
-                  class="fee-per">/mo</span></span>
-            </div>
-            <div class="fee-mode">
-              <span class="fee-mode-label"><svg aria-hidden="true"><use href="#ic-home"></use></svg>Home tuition</span>
-              <span class="fee-price"><span class="fee-amt" data-m="3000">&#8377;3,000</span><span
-                  class="fee-per">/mo</span></span>
-            </div>
-            <div class="fee-mode">
-              <span class="fee-mode-label"><svg aria-hidden="true"><use href="#ic-online"></use></svg>Online</span>
-              <span class="fee-price"><span class="fee-amt" data-m="2000">&#8377;2,000</span><span
-                  class="fee-per">/mo</span></span>
-            </div>
-          </div>
-        </article>
-
-        <article class="fee-card" style="--tutor-dot: #1e5aa8">
-          <span class="fee-band">XI – XII</span>
-          <h3 class="fee-subject">Science</h3>
-          <p class="fee-tutor">Ashok Sir</p>
-          <div class="fee-modes">
-            <div class="fee-mode">
-              <span class="fee-mode-label"><svg aria-hidden="true"><use href="#ic-centre"></use></svg>At the centre</span>
-              <span class="fee-price"><span class="fee-amt" data-m="2500">&#8377;2,500</span><span
-                  class="fee-per">/mo</span></span>
-            </div>
-            <div class="fee-mode">
-              <span class="fee-mode-label"><svg aria-hidden="true"><use href="#ic-home"></use></svg>Home tuition</span>
-              <span class="fee-price"><span class="fee-amt" data-m="3000">&#8377;3,000</span><span
-                  class="fee-per">/mo</span></span>
-            </div>
-            <div class="fee-mode">
-              <span class="fee-mode-label"><svg aria-hidden="true"><use href="#ic-online"></use></svg>Online</span>
-              <span class="fee-price"><span class="fee-amt" data-m="2000">&#8377;2,000</span><span
-                  class="fee-per">/mo</span></span>
-            </div>
-          </div>
-        </article>
-
-        <article class="fee-card" style="--tutor-dot: #a66a05">
-          <span class="fee-band">All ages</span>
-          <h3 class="fee-subject">Art &amp; craft</h3>
-          <p class="fee-tutor">Shalini Ma'am</p>
-          <div class="fee-modes">
-            <div class="fee-mode">
-              <span class="fee-mode-label"><svg aria-hidden="true"><use href="#ic-centre"></use></svg>At the centre</span>
-              <span class="fee-price"><span class="fee-amt" data-m="900">&#8377;900</span><span
-                  class="fee-per">/mo</span></span>
-            </div>
-          </div>
-        </article>
       </div>
-      <p class="price-note reveal">
-        <strong>Good to know:</strong> Home tuition is Gurugram-only and currently offered by Ashok Sir; Shalini Ma'am's
-        classes run at the centre. Overseas students join Online, billed in INR. Cards show only the modes offered for
-        each subject — taking more than one? Ask on the form for a combined quote.
-      </p>
     </div>
   </section>
 
@@ -3781,9 +3586,8 @@
               <span class="error-text">Enter student's name.</span>
             </div>
             <div class="field">
-              <label for="parentName">Parent's name</label>
-              <input type="text" id="parentName" name="parentName" placeholder="Parent's full name" autocomplete="name"
-                required />
+              <label for="parentName">Parent's name (optional)</label>
+              <input type="text" id="parentName" name="parentName" placeholder="Parent's full name" autocomplete="name" />
               <span class="error-text">Enter parent's name.</span>
             </div>
             <div class="field">
@@ -3858,7 +3662,9 @@
           </div>
           <button type="submit" class="form-submit" id="submitDemoBtn">Request my free demo class</button>
           <p class="form-note">By submitting, you agree to be contacted by Edify Tutorial by phone or WhatsApp.</p>
-          <div id="formErrorMessage" style="display:none; color:#d9383a; font-weight:600; font-size:14px; margin-top:12px; text-align:center;"></div>
+          <div id="formErrorMessage"
+            style="display:none; color:#d9383a; font-weight:600; font-size:14px; margin-top:12px; text-align:center;">
+          </div>
         </form>
         <div class="form-success" id="formSuccess">
           <div class="ok" aria-hidden="true">
@@ -3945,35 +3751,7 @@
       });
     });
 
-    var tabMonthly = document.getElementById("tab-monthly");
-    var tabAnnual = document.getElementById("tab-annual");
-    var feeAmounts = document.querySelectorAll("#feeGrid .fee-amt[data-m]");
-    function renderFees(annual) {
-      feeAmounts.forEach(function (amt) {
-        var monthly = parseInt(amt.getAttribute("data-m"), 10);
-        var amount = annual ? monthly * 10 : monthly;
-        amt.textContent = "₹" + amount.toLocaleString("en-IN");
-        var per = amt.parentElement.querySelector(".fee-per");
-        if (per) {
-          per.textContent = annual ? "/yr" : "/mo";
-        }
-      });
-    }
-    renderFees(false);
-    tabMonthly.addEventListener("click", function () {
-      tabMonthly.classList.add("active");
-      tabAnnual.classList.remove("active");
-      tabMonthly.setAttribute("aria-selected", "true");
-      tabAnnual.setAttribute("aria-selected", "false");
-      renderFees(false);
-    });
-    tabAnnual.addEventListener("click", function () {
-      tabAnnual.classList.add("active");
-      tabMonthly.classList.remove("active");
-      tabAnnual.setAttribute("aria-selected", "true");
-      tabMonthly.setAttribute("aria-selected", "false");
-      renderFees(true);
-    });
+    /* pricing toggle removed — simple card layout has no monthly/annual switch */
 
     var modeRadios = document.querySelectorAll('input[name="mode"]');
     var areaField = document.getElementById("areaField");
@@ -4032,10 +3810,7 @@
       }
 
       var parentName = parentNameInput ? parentNameInput.value.trim() : "";
-      if (parentNameInput && !parentName) {
-        showError(parentNameInput, true);
-        valid = false;
-      } else if (parentNameInput) {
+      if (parentNameInput) {
         showError(parentNameInput, false);
       }
 

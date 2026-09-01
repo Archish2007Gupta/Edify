@@ -98,6 +98,7 @@ AS $$
 DECLARE
     v_teacher_id UUID;
     v_updated_row public.demo_requests;
+    v_current_assigned UUID;
 BEGIN
     -- Require authentication
     IF auth.uid() IS NULL THEN
@@ -110,15 +111,33 @@ BEGIN
         RAISE EXCEPTION 'User is not a registered teacher' USING ERRCODE = '42501';
     END IF;
 
-    -- Perform atomic update restricted ONLY to status, demo_date, demo_time
+    -- Verify request exists and teacher is authorized
+    SELECT assigned_teacher_id INTO v_current_assigned
+    FROM public.demo_requests
+    WHERE id = p_request_id;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Demo request not found' USING ERRCODE = 'P0002';
+    END IF;
+
+    IF NOT public.is_admin() AND v_current_assigned IS NOT NULL AND v_current_assigned <> v_teacher_id THEN
+        RAISE EXCEPTION 'Unauthorized: Request is assigned to another teacher' USING ERRCODE = '42501';
+    END IF;
+
+    -- Perform atomic update:
+    -- If request was unassigned and status is Accepted / Scheduled / Contacted / Completed, claim assignment for this teacher
     UPDATE public.demo_requests
     SET
         status = COALESCE(p_status, status),
+        assigned_teacher_id = CASE
+            WHEN NOT public.is_admin() AND assigned_teacher_id IS NULL AND p_status IN ('Accepted', 'Scheduled', 'Contacted', 'Completed') THEN v_teacher_id
+            ELSE assigned_teacher_id
+        END,
         demo_date = COALESCE(p_demo_date, demo_date),
         demo_time = COALESCE(p_demo_time, demo_time),
         updated_at = now()
     WHERE id = p_request_id
-      AND (public.is_admin() OR assigned_teacher_id = v_teacher_id)
+      AND (public.is_admin() OR assigned_teacher_id = v_teacher_id OR assigned_teacher_id IS NULL)
     RETURNING * INTO v_updated_row;
 
     IF v_updated_row.id IS NULL THEN
@@ -161,14 +180,25 @@ BEGIN
     RETURN NEW;
   END IF;
 
-  -- Verify row belongs to assigned teacher
-  IF OLD.assigned_teacher_id IS DISTINCT FROM public.get_current_teacher_id() THEN
+  -- Verify row belongs to assigned teacher OR was unassigned
+  IF OLD.assigned_teacher_id IS NOT NULL AND OLD.assigned_teacher_id IS DISTINCT FROM public.get_current_teacher_id() THEN
     RAISE EXCEPTION 'Unauthorized: You are not assigned to this demo request' USING ERRCODE = '42501';
   END IF;
 
+  -- If previously unassigned, non-admin teacher can ONLY claim it for themselves (NEW.assigned_teacher_id = current teacher) or leave it unchanged
+  IF OLD.assigned_teacher_id IS NULL THEN
+    IF NEW.assigned_teacher_id IS NOT NULL AND NEW.assigned_teacher_id IS DISTINCT FROM public.get_current_teacher_id() THEN
+      RAISE EXCEPTION 'Unauthorized: Cannot assign request to another teacher' USING ERRCODE = '42501';
+    END IF;
+  ELSE
+    -- If already assigned, non-admin teacher cannot re-assign
+    IF NEW.assigned_teacher_id IS DISTINCT FROM OLD.assigned_teacher_id THEN
+      RAISE EXCEPTION 'Unauthorized: Only administrators can reassign requests' USING ERRCODE = '42501';
+    END IF;
+  END IF;
+
   -- Block modification to all protected columns for non-admins
-  IF NEW.assigned_teacher_id IS DISTINCT FROM OLD.assigned_teacher_id OR
-     NEW.student_name IS DISTINCT FROM OLD.student_name OR
+  IF NEW.student_name IS DISTINCT FROM OLD.student_name OR
      NEW.parent_name IS DISTINCT FROM OLD.parent_name OR
      NEW.phone IS DISTINCT FROM OLD.phone OR
      NEW.email IS DISTINCT FROM OLD.email OR
@@ -179,7 +209,7 @@ BEGIN
      NEW.location IS DISTINCT FROM OLD.location OR
      NEW.created_at IS DISTINCT FROM OLD.created_at OR
      NEW.id IS DISTINCT FROM OLD.id THEN
-    RAISE EXCEPTION 'Unauthorized: Teachers may only update status, demo_date, and demo_time' USING ERRCODE = '42501';
+    RAISE EXCEPTION 'Unauthorized: Teachers may only update status, demo_date, demo_time, and claim unassigned requests' USING ERRCODE = '42501';
   END IF;
 
   RETURN NEW;
@@ -286,14 +316,15 @@ ON public.demo_requests
 FOR INSERT 
 WITH CHECK (true);
 
--- TEACHER & ADMIN READ: Teachers view assigned requests; Admins view all requests
+-- TEACHER & ADMIN READ: Teachers view assigned requests and unassigned new requests; Admins view all requests
 CREATE POLICY "Allow authenticated read demo_requests" 
 ON public.demo_requests 
 FOR SELECT 
 TO authenticated
 USING (
   public.is_admin() OR 
-  assigned_teacher_id = public.get_current_teacher_id()
+  assigned_teacher_id = public.get_current_teacher_id() OR
+  assigned_teacher_id IS NULL
 );
 
 -- ADMIN UPDATE ONLY ON DEMO_REQUESTS TABLE DIRECTLY:

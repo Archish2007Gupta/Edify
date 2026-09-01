@@ -291,11 +291,10 @@
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (!options.isAdmin) {
-        if (options.teacherId) {
-          query = query.eq("assigned_teacher_id", options.teacherId);
-        }
+      if (!options.isAdmin && options.teacherId) {
+        query = query.or("assigned_teacher_id.eq." + options.teacherId + ",assigned_teacher_id.is.null");
       }
+
       if (options.status) {
         query = query.eq("status", options.status);
       }

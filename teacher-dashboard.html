@@ -828,6 +828,7 @@
     let rawDemoRequests = [];
     let filteredRequests = [];
     let enrollments = [];
+    let allTeachersList = [];
     let currentPage = 1;
     const PAGE_SIZE = 10;
     let pendingCount = 0;
@@ -873,6 +874,8 @@
       const start = (currentPage - 1) * PAGE_SIZE;
       const slice = filteredRequests.slice(start, start + PAGE_SIZE);
 
+      console.log("[DEBUG] Data being rendered:", filteredRequests);
+
       if (!slice.length) {
         tbody.innerHTML = '<tr><td colspan="11"><div class="empty-state">' +
           '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>' +
@@ -882,6 +885,7 @@
       } else {
         tbody.innerHTML = slice.map(function(item, idx) {
           var realIndex = start + idx;
+          console.log("[DEBUG] Rendering request:", item.student_name);
           return '<tr style="cursor:pointer;" onclick="openDetailModal(' + realIndex + ')">' +
             '<td><div class="student-info">' +
               '<div class="student-avatar" style="background:' + color(item.id) + '">' + initials(item.student_name) + '</div>' +
@@ -907,6 +911,8 @@
           '</tr>';
         }).join('');
       }
+
+      console.log("[DEBUG] Render complete");
 
       const total = filteredRequests.length;
       const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
@@ -956,12 +962,16 @@
       const cls    = document.getElementById('batchFilter').value;
       const status = document.getElementById('statusFilter').value;
 
+      function normStr(s) {
+        return (s || '').toLowerCase().replace(/–/g, '-').replace(/\s+/g, ' ').trim();
+      }
+
       filteredRequests = rawDemoRequests.filter(function(item) {
         const mq = !q || (item.student_name && item.student_name.toLowerCase().includes(q)) ||
                          (item.parent_name && item.parent_name.toLowerCase().includes(q)) ||
                          (item.phone && item.phone.toLowerCase().includes(q)) ||
                          (item.location && item.location.toLowerCase().includes(q));
-        const mc = !cls || (item.class && item.class.toLowerCase() === cls.toLowerCase());
+        const mc = !cls || normStr(item.class) === normStr(cls);
         const ms = !status || (item.status && item.status.toLowerCase() === status.toLowerCase());
         return mq && mc && ms;
       });
@@ -1205,17 +1215,6 @@
     }
 
     function updateStatisticsUI() {
-      const isAdmin = currentTeacher && (
-        currentTeacher.role === 'admin' ||
-        currentTeacher.is_admin === true ||
-        (currentTeacher.email && currentTeacher.email.toLowerCase().includes('admin'))
-      );
-
-      const relevantRequests = rawDemoRequests.filter(function(r) {
-        if (isAdmin) return true;
-        return currentTeacher && r.assigned_teacher_id === currentTeacher.id;
-      });
-
       const counts = {
         New: 0,
         Contacted: 0,
@@ -1225,7 +1224,7 @@
         Cancelled: 0
       };
 
-      relevantRequests.forEach(function(r) {
+      rawDemoRequests.forEach(function(r) {
         const s = r.status || 'New';
         if (counts.hasOwnProperty(s)) {
           counts[s]++;
@@ -1277,7 +1276,7 @@
         return;
       }
 
-      // Fetch demo requests from Supabase
+      // Fetch demo requests from Supabase (unassigned + assigned to this teacher)
       const res = await window.getDemoRequests({ teacherId: teacherId, isAdmin: isAdmin });
 
       if (!res.success) {
@@ -1286,11 +1285,20 @@
       }
 
       const freshData = res.data || [];
+      console.log("[DEBUG] Fresh demo requests from Supabase:", freshData);
+
+      // Filter: Admin sees all; Teacher sees unassigned OR assigned to them (never another teacher)
+      const visibleData = freshData.filter(function(item) {
+        if (isAdmin) return true;
+        const isUnassigned = !item.assigned_teacher_id;
+        const isAssignedToMe = item.assigned_teacher_id === teacherId;
+        return isUnassigned || isAssignedToMe;
+      });
 
       // Detect new items to trigger toast notification (skip initial load)
       if (!isInitialLoad) {
         let hasNewItem = false;
-        freshData.forEach(function(item) {
+        visibleData.forEach(function(item) {
           if (item && item.id && !knownRequestIds.has(item.id)) {
             hasNewItem = true;
           }
@@ -1301,17 +1309,17 @@
       }
 
       // Update set of tracked IDs
-      freshData.forEach(function(item) {
+      visibleData.forEach(function(item) {
         if (item && item.id) knownRequestIds.add(item.id);
       });
       isInitialLoad = false;
 
-      rawDemoRequests = freshData;
+      rawDemoRequests = visibleData;
       filteredRequests = [...rawDemoRequests];
 
       // Update header subtitle and stats counters
       document.getElementById('studentCount').textContent = rawDemoRequests.length;
-      document.getElementById('enrolledSubtitle').textContent = rawDemoRequests.length + (isAdmin ? ' total demo requests' : ' demo requests assigned to you');
+      document.getElementById('enrolledSubtitle').textContent = rawDemoRequests.length + (isAdmin ? ' total demo requests' : ' demo requests');
 
       // Separate pending requests (status = 'New') for sidebar list
       const pendingItems = rawDemoRequests.filter(function(r){ return r.status === 'New'; });

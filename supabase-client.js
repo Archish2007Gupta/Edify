@@ -24,9 +24,10 @@
   }
 
   /**
-   * Service function to insert a demo class request into public.demo_requests
+   * Service function to insert a demo class request into public.demo_requests.
+   * Note: Public users do NOT have SELECT permission; insert succeeds without .select().
    * @param {Object} data - Payload containing demo request details
-   * @returns {Promise<{success: boolean, data?: Array, error?: any}>}
+   * @returns {Promise<{success: boolean, error?: any}>}
    */
   window.submitDemoRequest = async function (data) {
     if (!window.supabaseClient) {
@@ -53,17 +54,16 @@
     try {
       var result = await window.supabaseClient
         .from("demo_requests")
-        .insert([payload])
-        .select();
+        .insert([payload]);
 
-      console.log("[Supabase Insert Response]", result);
+      console.log("[Supabase Public Insert Response]", result);
 
       if (result.error) {
         console.error("Demo request submission error:", result.error);
         return { success: false, error: result.error };
       }
 
-      return { success: true, data: result.data };
+      return { success: true };
     } catch (err) {
       console.error("Demo request submission error:", err);
       return { success: false, error: err };
@@ -202,7 +202,8 @@
   };
 
   /**
-   * Fetch all new (unassigned, status = 'New') demo requests.
+   * ADMIN-ONLY: Fetch all unassigned new demo requests (status = 'New').
+   * Note: Enforced by PostgreSQL RLS (will return empty array for non-admin teachers).
    * @returns {Promise<{success: boolean, data: Array, error?: any}>}
    */
   window.getPendingDemoRequests = async function () {
@@ -213,56 +214,61 @@
         .select("*")
         .eq("status", "New")
         .order("created_at", { ascending: false });
-      console.log("[Teacher Data] Pending demo requests:", result);
+      console.log("[Admin Data] Pending demo requests:", result);
       if (result.error) {
-        console.error("[Teacher Data] Pending requests error:", result.error);
+        console.error("[Admin Data] Pending requests error:", result.error);
         return { success: false, data: [], error: result.error };
       }
       return { success: true, data: result.data || [] };
     } catch (err) {
-      console.error("[Teacher Data] Pending requests exception:", err);
+      console.error("[Admin Data] Pending requests exception:", err);
       return { success: false, data: [], error: err };
     }
   };
 
   /**
-   * Update the status of a demo request, schedule info, or assigned teacher.
-   * @param {string} requestId  - UUID of public.demo_requests
-   * @param {string} newStatus  - One of: New | Contacted | Accepted | Scheduled | Completed | Cancelled
-   * @param {string|null} teacherId - UUID of public.teachers (assigned when status → Accepted if unassigned)
-   * @param {string|null} [demoDate] - ISO date string
-   * @param {string|null} [demoTime] - Time string
-   * @param {string|null} [targetTeacherId] - Explicit target teacher ID for Admin re-assignment
-   * @returns {Promise<{success: boolean, data?: object, error?: any}>}
+   * Update demo request status and schedule.
+   * Teachers execute secure PostgreSQL RPC `update_teacher_demo_request` exclusively (FAIL SECURE - NO FALLBACK).
+   * Admins execute privileged assignment/reassignment.
    */
   window.updateDemoRequestStatus = async function (requestId, newStatus, teacherId, demoDate, demoTime, targetTeacherId) {
     if (!window.supabaseClient || !requestId) return { success: false };
     try {
-      var updatePayload = { status: newStatus };
-
+      // 1. If targetTeacherId is specified (Admin assignment/reassignment), use standard update (protected by RLS)
       if (targetTeacherId !== undefined) {
-        updatePayload.assigned_teacher_id = targetTeacherId;
-      } else if (teacherId && newStatus === "Accepted") {
-        updatePayload.assigned_teacher_id = teacherId;
+        var adminPayload = { status: newStatus, assigned_teacher_id: targetTeacherId };
+        if (newStatus === "Scheduled") {
+          if (demoDate) adminPayload.demo_date = demoDate;
+          if (demoTime) adminPayload.demo_time = demoTime;
+        }
+        var adminRes = await window.supabaseClient
+          .from("demo_requests")
+          .update(adminPayload)
+          .eq("id", requestId)
+          .select()
+          .single();
+        if (adminRes.error) {
+          console.error("[Admin Data] Update error:", adminRes.error);
+          return { success: false, error: adminRes.error };
+        }
+        return { success: true, data: adminRes.data };
       }
 
-      if (newStatus === "Scheduled") {
-        if (demoDate) updatePayload.demo_date = demoDate;
-        if (demoTime) updatePayload.demo_time = demoTime;
+      // 2. Call secure PostgreSQL RPC for Teacher status/schedule updates (FAIL SECURE - NO FALLBACK)
+      var rpcRes = await window.supabaseClient.rpc("update_teacher_demo_request", {
+        p_request_id: requestId,
+        p_status: newStatus,
+        p_demo_date: demoDate || null,
+        p_demo_time: demoTime || null
+      });
+
+      if (rpcRes.error) {
+        console.error("[Teacher Data] RPC update error:", rpcRes.error);
+        return { success: false, error: rpcRes.error };
       }
 
-      var result = await window.supabaseClient
-        .from("demo_requests")
-        .update(updatePayload)
-        .eq("id", requestId)
-        .select()
-        .single();
-      console.log("[Teacher Data] Status update response:", result);
-      if (result.error) {
-        console.error("[Teacher Data] Status update error:", result.error);
-        return { success: false, error: result.error };
-      }
-      return { success: true, data: result.data };
+      console.log("[Teacher Data] RPC status update response:", rpcRes);
+      return { success: true, data: rpcRes.data };
     } catch (err) {
       console.error("[Teacher Data] Status update exception:", err);
       return { success: false, error: err };
@@ -287,7 +293,7 @@
 
       if (!options.isAdmin) {
         if (options.teacherId) {
-          query = query.or("assigned_teacher_id.eq." + options.teacherId + ",assigned_teacher_id.is.null");
+          query = query.eq("assigned_teacher_id", options.teacherId);
         }
       }
       if (options.status) {

@@ -964,6 +964,14 @@
       var item = filteredRequests[index];
       if (!item) return;
 
+      var currentStatus = item.status || 'New';
+      var statuses = ['New', 'Contacted', 'Accepted', 'Scheduled', 'Completed', 'Cancelled'];
+
+      var optionsHtml = statuses.map(function(st) {
+        var sel = st === currentStatus ? ' selected' : '';
+        return '<option value="' + st + '"' + sel + '>' + st + '</option>';
+      }).join('');
+
       var modalBody = document.getElementById('modalBody');
       modalBody.innerHTML =
         '<div class="detail-grid">' +
@@ -978,11 +986,67 @@
           '<div class="detail-item"><span class="detail-label">Location / Area</span><span class="detail-value">' + (item.location || 'N/A') + '</span></div>' +
           '<div class="detail-item"><span class="detail-label">Preferred Date</span><span class="detail-value">' + formatDate(item.preferred_date) + '</span></div>' +
           '<div class="detail-item"><span class="detail-label">Preferred Time</span><span class="detail-value">' + (item.preferred_time || 'N/A') + '</span></div>' +
-          '<div class="detail-item"><span class="detail-label">Status</span><span class="detail-value">' + statusBadge(item.status) + '</span></div>' +
+          '<div class="detail-item"><span class="detail-label">Current Status</span><span class="detail-value">' + statusBadge(item.status) + '</span></div>' +
+          '<div class="detail-item"><span class="detail-label">Demo Date</span><span class="detail-value">' + formatDate(item.demo_date) + '</span></div>' +
+          '<div class="detail-item"><span class="detail-label">Demo Time</span><span class="detail-value">' + (item.demo_time || 'N/A') + '</span></div>' +
           '<div class="detail-item detail-full"><span class="detail-label">Message / Notes</span><div class="detail-message-box">' + (item.message || 'No additional notes provided.') + '</div></div>' +
+          '<div class="detail-item detail-full" style="margin-top: 14px; padding-top: 16px; border-top: 1px solid var(--rule-soft);">' +
+            '<span class="detail-label" style="margin-bottom: 8px;">Update Request Status Workflow</span>' +
+            '<div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">' +
+              '<select class="filter-select" id="modalStatusSelect" style="padding:8px 14px; font-weight:600; font-size:14.5px;" onchange="toggleScheduleFields()">' +
+                optionsHtml +
+              '</select>' +
+              '<input type="date" id="modalDemoDate" class="filter-select" style="display: none; padding:8px 14px;" value="' + (item.demo_date || '') + '">' +
+              '<input type="time" id="modalDemoTime" class="filter-select" style="display: none; padding:8px 14px;" value="' + (item.demo_time || '') + '">' +
+              '<button class="btn-sm btn-primary" onclick="updateStatusFromModal(\'' + item.id + '\')">Update Status in Supabase</button>' +
+            '</div>' +
+          '</div>' +
         '</div>';
 
       document.getElementById('detailModal').classList.add('active');
+      window.toggleScheduleFields();
+    };
+
+    window.toggleScheduleFields = function() {
+      var select = document.getElementById('modalStatusSelect');
+      var dateField = document.getElementById('modalDemoDate');
+      var timeField = document.getElementById('modalDemoTime');
+      if (select && dateField && timeField) {
+        if (select.value === 'Scheduled') {
+          dateField.style.display = 'block';
+          timeField.style.display = 'block';
+        } else {
+          dateField.style.display = 'none';
+          timeField.style.display = 'none';
+        }
+      }
+    };
+
+    window.updateStatusFromModal = async function(requestId) {
+      var select = document.getElementById('modalStatusSelect');
+      if (!select) return;
+      var newStatus = select.value;
+      var teacherId = currentTeacher ? currentTeacher.id : null;
+      var demoDate = document.getElementById('modalDemoDate') ? document.getElementById('modalDemoDate').value : null;
+      var demoTime = document.getElementById('modalDemoTime') ? document.getElementById('modalDemoTime').value : null;
+
+      if (newStatus === 'Scheduled') {
+        if (!demoDate || !demoTime) {
+          showToast('Valid Demo Date and Time are required when scheduling.', 'error');
+          return;
+        }
+      }
+
+      showToast('Updating status in Supabase...', 'info');
+
+      var res = await window.updateDemoRequestStatus(requestId, newStatus, teacherId, demoDate, demoTime);
+      if (res && res.success) {
+        showToast('Status updated to "' + newStatus + '" in Supabase database!', 'success');
+        document.getElementById('detailModal').classList.remove('active');
+        await loadDemoRequests();
+      } else {
+        showToast('Failed to update status in Supabase. Please try again.', 'error');
+      }
     };
 
     document.getElementById('closeModalBtn').addEventListener('click', function() {

@@ -225,19 +225,16 @@
     }
   };
 
-  /**
-   * Update the status of a demo request and optionally assign a teacher.
-   * @param {string} requestId  - UUID of the demo_requests row
-   * @param {string} newStatus  - One of: New | Contacted | Accepted | Scheduled | Completed | Cancelled
-   * @param {string|null} teacherId - UUID of public.teachers (assigned when status → Accepted)
-   * @returns {Promise<{success: boolean, data?: object, error?: any}>}
-   */
-  window.updateDemoRequestStatus = async function (requestId, newStatus, teacherId) {
+  window.updateDemoRequestStatus = async function (requestId, newStatus, teacherId, demoDate, demoTime) {
     if (!window.supabaseClient || !requestId) return { success: false };
     try {
       var updatePayload = { status: newStatus };
       if (teacherId && newStatus === "Accepted") {
         updatePayload.assigned_teacher_id = teacherId;
+      }
+      if (newStatus === "Scheduled") {
+        if (demoDate) updatePayload.demo_date = demoDate;
+        if (demoTime) updatePayload.demo_time = demoTime;
       }
       var result = await window.supabaseClient
         .from("demo_requests")

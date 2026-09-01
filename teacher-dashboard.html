@@ -567,7 +567,7 @@
     </a>
 
     <div class="sidebar-footer">
-      <button class="btn-logout" onclick="window.location='teacher-login.html'" aria-label="Sign out">
+      <button class="btn-logout" id="btnSignOut" aria-label="Sign out">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         Sign Out
       </button>
@@ -735,65 +735,45 @@
   <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
 
   <script>
-    /* ── DATA ──────────────────────────────────────── */
+    /* ── STATE & CONSTANTS ───────────────────────────── */
     const COLORS = ['#1e5aa8','#e67e22','#27ae60','#8e44ad','#c0392b','#16a085','#d35400','#2980b9','#e91e63','#009688'];
 
-    const allStudents = [
-      { id:1,  name:'Aarav Sharma',   email:'aarav.s@student.edify',   batch:'Class X',   progress:82, attendance:91, status:'active'   },
-      { id:2,  name:'Priya Mehta',    email:'priya.m@student.edify',   batch:'Class XII', progress:67, attendance:74, status:'at-risk'  },
-      { id:3,  name:'Rohan Gupta',    email:'rohan.g@student.edify',   batch:'Class IX',  progress:95, attendance:98, status:'active'   },
-      { id:4,  name:'Sneha Joshi',    email:'sneha.j@student.edify',   batch:'Class X',   progress:44, attendance:55, status:'at-risk'  },
-      { id:5,  name:'Kabir Singh',    email:'kabir.s@student.edify',   batch:'Class XI',  progress:78, attendance:83, status:'active'   },
-      { id:6,  name:'Diya Patel',     email:'diya.p@student.edify',    batch:'Class XII', progress:91, attendance:96, status:'active'   },
-      { id:7,  name:'Arjun Verma',    email:'arjun.v@student.edify',   batch:'Class IX',  progress:59, attendance:61, status:'inactive' },
-      { id:8,  name:'Meera Nair',     email:'meera.n@student.edify',   batch:'Class X',   progress:73, attendance:79, status:'active'   },
-      { id:9,  name:'Vivaan Shah',    email:'vivaan.s@student.edify',  batch:'Class XI',  progress:88, attendance:90, status:'active'   },
-      { id:10, name:'Ananya Reddy',   email:'ananya.r@student.edify',  batch:'Class XII', progress:34, attendance:48, status:'at-risk'  },
-      { id:11, name:'Aryan Kapoor',   email:'aryan.k@student.edify',   batch:'Class IX',  progress:70, attendance:77, status:'active'   },
-      { id:12, name:'Siya Desai',     email:'siya.d@student.edify',    batch:'Class X',   progress:55, attendance:60, status:'at-risk'  },
-      { id:13, name:'Neel Bose',      email:'neel.b@student.edify',    batch:'Class XI',  progress:85, attendance:89, status:'active'   },
-      { id:14, name:'Riya Agarwal',   email:'riya.a@student.edify',    batch:'Class XII', progress:92, attendance:95, status:'active'   },
-      { id:15, name:'Dev Kumar',      email:'dev.k@student.edify',     batch:'Class IX',  progress:40, attendance:50, status:'inactive' },
-      { id:16, name:'Trisha Sen',     email:'trisha.s@student.edify',  batch:'Class X',   progress:76, attendance:81, status:'active'   },
-      { id:17, name:'Harsh Malhotra', email:'harsh.m@student.edify',   batch:'Class XI',  progress:63, attendance:70, status:'at-risk'  },
-      { id:18, name:'Pooja Iyer',     email:'pooja.i@student.edify',   batch:'Class XII', progress:90, attendance:94, status:'active'   },
-      { id:19, name:'Sameer Jain',    email:'sameer.j@student.edify',  batch:'Class IX',  progress:50, attendance:58, status:'at-risk'  },
-      { id:20, name:'Kriti Pandey',   email:'kriti.p@student.edify',   batch:'Class X',   progress:80, attendance:86, status:'active'   },
-      { id:21, name:'Aditya Rao',     email:'aditya.r@student.edify',  batch:'Class XI',  progress:69, attendance:72, status:'active'   },
-      { id:22, name:'Shruti Saxena',  email:'shruti.s@student.edify',  batch:'Class XII', progress:87, attendance:91, status:'active'   },
-      { id:23, name:'Manav Tiwari',   email:'manav.t@student.edify',   batch:'Class IX',  progress:42, attendance:47, status:'inactive' },
-      { id:24, name:'Zara Sheikh',    email:'zara.s@student.edify',    batch:'Class X',   progress:94, attendance:97, status:'active'   },
-      { id:25, name:'Rahul Ghosh',    email:'rahul.g@student.edify',   batch:'Class XI',  progress:72, attendance:75, status:'active'   },
-      { id:26, name:'Kavya Nair',     email:'kavya.n@student.edify',   batch:'Class XII', progress:58, attendance:65, status:'at-risk'  },
-      { id:27, name:'Ishit Shah',     email:'ishit.s@student.edify',   batch:'Class IX',  progress:83, attendance:88, status:'active'   },
-      { id:28, name:'Tanishi Roy',    email:'tanishi.r@student.edify', batch:'Class X',   progress:61, attendance:68, status:'active'   },
-    ];
-
-    const enrollments = [
-      { id:101, name:'Ishaan Kapoor', email:'ishaan.k@gmail.com',  batch:'Class X',   subject:'Mathematics', date:'29 Aug 2026' },
-      { id:102, name:'Tanvi Desai',   email:'tanvi.d@gmail.com',   batch:'Class XII', subject:'Mathematics', date:'28 Aug 2026' },
-      { id:103, name:'Advait Kumar',  email:'advait.k@gmail.com',  batch:'Class XI',  subject:'Mathematics', date:'28 Aug 2026' },
-      { id:104, name:'Sanya Agarwal', email:'sanya.a@gmail.com',   batch:'Class IX',  subject:'Mathematics', date:'27 Aug 2026' },
-      { id:105, name:'Neil Bose',     email:'neil.b@gmail.com',    batch:'Class X',   subject:'Mathematics', date:'26 Aug 2026' },
-    ];
+    let currentSession = null;
+    let currentTeacher = null;
+    let allStudents = [];
+    let enrollments = [];
+    let currentPage = 1;
+    const PAGE_SIZE = 10;
+    let filteredStudents = [];
+    let pendingCount = 0;
 
     /* ── HELPERS ──────────────────────────────────── */
-    const initials = n => n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-    const color    = id => COLORS[id % COLORS.length];
+    const initials = function(n) {
+      if (!n) return "ED";
+      return n.trim().split(/\s+/).map(function(w){ return w[0]; }).join('').slice(0, 2).toUpperCase();
+    };
+
+    const color = function(id) {
+      var num = typeof id === 'number' ? id : (id ? id.charCodeAt(0) : 0);
+      return COLORS[Math.abs(num) % COLORS.length];
+    };
 
     function statusBadge(s) {
-      const m = { active: ['badge-green','● Active'], 'at-risk': ['badge-amber','⚠ At Risk'], inactive: ['badge-gray','✕ Inactive'] };
-      const [cls, label] = m[s] || ['badge-gray', s];
-      return `<span class="badge ${cls}">${label}</span>`;
+      var m = {
+        'Accepted': ['badge-green', '● Accepted'],
+        'Scheduled': ['badge-blue', '● Scheduled'],
+        'Completed': ['badge-green', '✓ Completed'],
+        'Contacted': ['badge-amber', '● Contacted'],
+        'New': ['badge-amber', '● New'],
+        'Cancelled': ['badge-red', '✕ Cancelled']
+      };
+      var res = m[s] || ['badge-gray', s || 'Active'];
+      return '<span class="badge ' + res[0] + '">' + res[1] + '</span>';
     }
+
     function progressColor(p) {
       return p >= 75 ? '#2e7d57' : p >= 50 ? '#1e5aa8' : '#c6402f';
     }
-
-    /* ── PAGINATION STATE ─────────────────────────── */
-    let currentPage = 1;
-    const PAGE_SIZE = 10;
-    let filteredStudents = [...allStudents];
 
     /* ── RENDER STUDENTS ──────────────────────────── */
     function renderStudents() {
@@ -802,44 +782,45 @@
       const slice = filteredStudents.slice(start, start + PAGE_SIZE);
 
       if (!slice.length) {
-        tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-          <p>No students match your filters.</p>
-        </div></td></tr>`;
+        tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>' +
+          '<p>No students match your filters or no assigned demo requests found.</p>' +
+          '</div></td></tr>';
       } else {
-        tbody.innerHTML = slice.map(s => `
-          <tr>
-            <td><div class="student-info">
-              <div class="student-avatar" style="background:${color(s.id)}">${initials(s.name)}</div>
-              <div>
-                <div class="student-name">${s.name}</div>
-                <div class="student-email">${s.email}</div>
-              </div>
-            </div></td>
-            <td><span class="badge badge-blue">${s.batch}</span></td>
-            <td><div class="progress-wrap">
-              <div class="progress-bar"><div class="progress-fill" style="width:${s.progress}%;background:${progressColor(s.progress)}"></div></div>
-              <span class="progress-label">${s.progress}%</span>
-            </div></td>
-            <td style="font-weight:600;color:${s.attendance>=80?'var(--pass)':s.attendance>=60?'var(--warn)':'var(--marking)'}">${s.attendance}%</td>
-            <td>${statusBadge(s.status)}</td>
-            <td><div style="display:flex;gap:4px;">
-              <button class="action-btn" title="View profile" onclick="showToast('Viewing ${s.name.replace(/'/g,"\\'")}','info')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-              </button>
-              <button class="action-btn" title="Send message" onclick="showToast('Message sent to ${s.name.replace(/'/g,"\\'")}','success')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-              </button>
-            </div></td>
-          </tr>`).join('');
+        tbody.innerHTML = slice.map(function(s) {
+          return '<tr>' +
+            '<td><div class="student-info">' +
+              '<div class="student-avatar" style="background:' + color(s.id) + '">' + initials(s.name) + '</div>' +
+              '<div>' +
+                '<div class="student-name">' + s.name + '</div>' +
+                '<div class="student-email">' + (s.email || s.phone || 'No contact info') + '</div>' +
+              '</div>' +
+            '</div></td>' +
+            '<td><span class="badge badge-blue">' + (s.batch || 'Demo') + '</span></td>' +
+            '<td><div class="progress-wrap">' +
+              '<div class="progress-bar"><div class="progress-fill" style="width:' + s.progress + '%;background:' + progressColor(s.progress) + '"></div></div>' +
+              '<span class="progress-label">' + s.progress + '%</span>' +
+            '</div></td>' +
+            '<td style="font-weight:600;color:' + (s.attendance >= 80 ? 'var(--pass)' : s.attendance >= 60 ? 'var(--warn)' : 'var(--marking)') + '">' + s.attendance + '%</td>' +
+            '<td>' + statusBadge(s.status) + '</td>' +
+            '<td><div style="display:flex;gap:4px;">' +
+              '<button class="action-btn" title="View profile" onclick="showToast(\'Viewing ' + s.name.replace(/'/g, "\\'") + '\',\'info\')">' +
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>' +
+              '</button>' +
+              '<button class="action-btn" title="Send message" onclick="showToast(\'Message sent to ' + s.name.replace(/'/g, "\\'") + '\',\'success\')">' +
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>' +
+              '</button>' +
+            '</div></td>' +
+          '</tr>';
+        }).join('');
       }
 
       const total = filteredStudents.length;
       const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
       document.getElementById('tableInfo').textContent =
-        `Showing ${Math.min(start+1,total)}–${Math.min(start+PAGE_SIZE,total)} of ${total} students`;
-      [1,2,3].forEach(p => {
-        const btn = document.getElementById(`page${p}`);
+        'Showing ' + (total ? Math.min(start + 1, total) : 0) + '–' + Math.min(start + PAGE_SIZE, total) + ' of ' + total + ' students';
+      [1, 2, 3].forEach(function(p) {
+        const btn = document.getElementById('page' + p);
         if (btn) { btn.classList.toggle('active', p === currentPage); btn.style.display = p <= pages ? '' : 'none'; }
       });
     }
@@ -849,10 +830,10 @@
       renderStudents();
     }
 
-    document.getElementById('prevPage').addEventListener('click', () => {
+    document.getElementById('prevPage').addEventListener('click', function() {
       if (currentPage > 1) { currentPage--; renderStudents(); }
     });
-    document.getElementById('nextPage').addEventListener('click', () => {
+    document.getElementById('nextPage').addEventListener('click', function() {
       const pages = Math.ceil(filteredStudents.length / PAGE_SIZE);
       if (currentPage < pages) { currentPage++; renderStudents(); }
     });
@@ -863,124 +844,218 @@
       const batch  = document.getElementById('batchFilter').value;
       const status = document.getElementById('statusFilter').value;
 
-      filteredStudents = allStudents.filter(s => {
-        const mq = !q || s.name.toLowerCase().includes(q) || s.email.toLowerCase().includes(q);
-        const mb = !batch  || s.batch  === batch;
-        const ms = !status || s.status === status;
+      filteredStudents = allStudents.filter(function(s) {
+        const mq = !q || s.name.toLowerCase().includes(q) || (s.email && s.email.toLowerCase().includes(q));
+        const mb = !batch || s.batch === batch;
+        const ms = !status || s.status.toLowerCase() === status.toLowerCase();
         return mq && mb && ms;
       });
       currentPage = 1;
       renderStudents();
     }
 
-    ['tableSearch','globalSearch','batchFilter','statusFilter'].forEach(id => {
+    ['tableSearch','globalSearch','batchFilter','statusFilter'].forEach(function(id) {
       const el = document.getElementById(id);
       if (el) { el.addEventListener('input', applyFilters); el.addEventListener('change', applyFilters); }
     });
 
     /* ── ENROLLMENTS ──────────────────────────────── */
-    let pendingCount = enrollments.length;
-
     function renderEnrollments() {
       const el = document.getElementById('enrollmentList');
       if (!enrollments.length) {
-        el.innerHTML = `<div class="empty-state">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
-          <p>No pending enrollments.</p>
-        </div>`;
+        el.innerHTML = '<div class="empty-state">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>' +
+          '<p>No pending enrollments right now.</p>' +
+        '</div>';
         return;
       }
-      el.innerHTML = enrollments.map(e => `
-        <div class="enrollment-item" id="enroll-${e.id}">
-          <div class="enrollment-top">
-            <div class="enroll-avatar" style="background:${color(e.id)}">${initials(e.name)}</div>
-            <div style="flex:1;min-width:0;">
-              <div class="enroll-name">${e.name}</div>
-              <div class="enroll-meta">${e.email} &middot; ${e.date}</div>
-            </div>
-            <span class="badge badge-amber">New</span>
-          </div>
-          <div class="enroll-course">📚 ${e.subject} — ${e.batch}</div>
-          <div class="enroll-actions">
-            <button class="btn-approve" onclick="handleEnroll(${e.id},'approve')" aria-label="Approve ${e.name}">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-              Approve
-            </button>
-            <button class="btn-decline" onclick="handleEnroll(${e.id},'decline')" aria-label="Decline ${e.name}">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-              Decline
-            </button>
-          </div>
-        </div>`).join('');
+      el.innerHTML = enrollments.map(function(e) {
+        return '<div class="enrollment-item" id="enroll-' + e.id + '">' +
+          '<div class="enrollment-top">' +
+            '<div class="enroll-avatar" style="background:' + color(e.id) + '">' + initials(e.name) + '</div>' +
+            '<div style="flex:1;min-width:0;">' +
+              '<div class="enroll-name">' + e.name + '</div>' +
+              '<div class="enroll-meta">' + (e.email || e.phone) + ' &middot; ' + e.date + '</div>' +
+            '</div>' +
+            '<span class="badge badge-amber">New</span>' +
+          '</div>' +
+          '<div class="enroll-course">📚 ' + (e.subject || 'All Subjects') + ' — ' + (e.batch || 'General') + '</div>' +
+          '<div class="enroll-actions">' +
+            '<button class="btn-approve" onclick="handleEnroll(\'' + e.id + '\',\'approve\')" aria-label="Approve ' + e.name + '">' +
+              '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>' +
+              'Approve' +
+            '</button>' +
+            '<button class="btn-decline" onclick="handleEnroll(\'' + e.id + '\',\'decline\')" aria-label="Decline ' + e.name + '">' +
+              '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+              'Decline' +
+            '</button>' +
+          '</div>' +
+        '</div>';
+      }).join('');
     }
 
-    function handleEnroll(id, action) {
-      const item   = document.getElementById(`enroll-${id}`);
-      const enroll = enrollments.find(e => e.id === id);
+    async function handleEnroll(id, action) {
+      const item   = document.getElementById('enroll-' + id);
+      const enroll = enrollments.find(function(e){ return e.id === id; });
       if (!item || !enroll) return;
-      pendingCount = Math.max(0, pendingCount - 1);
-      document.getElementById('enrollBadge').textContent = pendingCount;
-      document.getElementById('enrollSub').textContent   = `${pendingCount} pending your approval`;
 
-      if (action === 'approve') {
-        item.innerHTML = `
-          <div class="enrollment-top" style="opacity:.65;">
-            <div class="enroll-avatar" style="background:${color(id)}">${initials(enroll.name)}</div>
-            <div style="flex:1;min-width:0;">
-              <div class="enroll-name">${enroll.name}</div>
-              <div class="enroll-meta">${enroll.email}</div>
-            </div>
-            <span class="badge badge-green">✓ Approved</span>
-          </div>`;
-        showToast(`${enroll.name} approved and enrolled!`, 'success');
+      const teacherId = currentTeacher ? currentTeacher.id : null;
+      const newStatus = action === 'approve' ? 'Accepted' : 'Cancelled';
+
+      // Update in live Supabase database demo_requests
+      const res = await window.updateDemoRequestStatus(id, newStatus, teacherId);
+
+      if (res && res.success) {
+        pendingCount = Math.max(0, pendingCount - 1);
+        document.getElementById('enrollBadge').textContent = pendingCount;
+        document.getElementById('enrollSub').textContent   = pendingCount + ' pending your approval';
+
+        if (action === 'approve') {
+          item.innerHTML =
+            '<div class="enrollment-top" style="opacity:.65;">' +
+              '<div class="enroll-avatar" style="background:' + color(id) + '">' + initials(enroll.name) + '</div>' +
+              '<div style="flex:1;min-width:0;">' +
+                '<div class="enroll-name">' + enroll.name + '</div>' +
+                '<div class="enroll-meta">' + (enroll.email || enroll.phone) + '</div>' +
+              '</div>' +
+              '<span class="badge badge-green">✓ Approved</span>' +
+            '</div>';
+          showToast(enroll.name + ' approved and updated in Supabase!', 'success');
+          loadLiveData(); // refresh table
+        } else {
+          item.style.transition = 'opacity .25s';
+          item.style.opacity = '0';
+          setTimeout(function() { item.remove(); }, 250);
+          showToast(enroll.name + '\'s demo request was cancelled.', 'info');
+        }
       } else {
-        item.style.transition = 'opacity .25s';
-        item.style.opacity = '0';
-        setTimeout(() => item.remove(), 250);
-        showToast(`${enroll.name}'s request was declined.`, 'error');
+        showToast('Failed to update status in Supabase. Please try again.', 'error');
       }
     }
 
     /* ── TOAST ────────────────────────────────────── */
-    function showToast(msg, type = 'success') {
+    function showToast(msg, type) {
+      type = type || 'success';
       const icons = {
         success: '<polyline points="20 6 9 17 4 12"/>',
         error:   '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
         info:    '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>',
       };
-      const t = Object.assign(document.createElement('div'), { className: `toast ${type}` });
-      t.innerHTML = `
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[type]||icons.info}</svg>
-        <span>${msg}</span>`;
+      const t = Object.assign(document.createElement('div'), { className: 'toast ' + type });
+      t.innerHTML =
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (icons[type] || icons.info) + '</svg>' +
+        '<span>' + msg + '</span>';
       document.getElementById('toastContainer').appendChild(t);
-      setTimeout(() => { t.style.transition='opacity .3s'; t.style.opacity='0'; setTimeout(()=>t.remove(),300); }, 3500);
+      setTimeout(function() { t.style.transition='opacity .3s'; t.style.opacity='0'; setTimeout(function(){ t.remove(); },300); }, 3500);
     }
 
     /* ── GREETING & DATE ──────────────────────────── */
-    function setGreeting() {
+    function setGreeting(name) {
       const h = new Date().getHours();
       const g = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
-      document.getElementById('greetingText').textContent = `${g}, Ritu 👋`;
+      const displayName = name || 'Teacher';
+      document.getElementById('greetingText').textContent = g + ', ' + displayName + ' 👋';
       const opts = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
       document.getElementById('dateText').textContent = new Date().toLocaleDateString('en-IN', opts) + ' — Here\'s your class overview';
     }
 
+    /* ── LOAD LIVE SUPABASE DATA ──────────────────── */
+    async function loadLiveData() {
+      // 1. Fetch pending requests (status = 'New')
+      const pendingRes = await window.getPendingDemoRequests();
+      if (pendingRes.success && pendingRes.data) {
+        enrollments = pendingRes.data.map(function(row) {
+          var dt = row.created_at ? new Date(row.created_at).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : '';
+          return {
+            id: row.id,
+            name: row.student_name || row.parent_name || 'Student',
+            email: row.email,
+            phone: row.phone,
+            batch: row.class || 'General',
+            subject: row.subjects || 'All Subjects',
+            date: dt
+          };
+        });
+        pendingCount = enrollments.length;
+        document.getElementById('enrollBadge').textContent = pendingCount;
+        document.getElementById('enrollSub').textContent   = pendingCount + ' pending your approval';
+        renderEnrollments();
+      }
+
+      // 2. Fetch assigned demo requests for current teacher
+      const teacherId = currentTeacher ? currentTeacher.id : null;
+      if (teacherId) {
+        const assignedRes = await window.getAssignedDemoRequests(teacherId);
+        if (assignedRes.success && assignedRes.data) {
+          allStudents = assignedRes.data.map(function(row, idx) {
+            return {
+              id: row.id || idx + 1,
+              name: row.student_name || row.parent_name || 'Student',
+              email: row.email,
+              phone: row.phone,
+              batch: row.class || 'Class X',
+              progress: 85,
+              attendance: 90,
+              status: row.status || 'Accepted'
+            };
+          });
+          filteredStudents = [...allStudents];
+          document.getElementById('studentCount').textContent = allStudents.length;
+          document.getElementById('enrolledSubtitle').textContent = allStudents.length + ' students across all active batches';
+          renderStudents();
+        }
+      }
+    }
+
     /* ── NAV ACTIVE ───────────────────────────────── */
-    document.querySelectorAll('.nav-item').forEach(item => {
-      item.addEventListener('click', () => {
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(function(item) {
+      item.addEventListener('click', function() {
+        document.querySelectorAll('.nav-item').forEach(function(n) { n.classList.remove('active'); });
         item.classList.add('active');
       });
     });
 
-    /* ── TOOLBAR BUTTONS ──────────────────────────── */
-    document.getElementById('exportBtn').addEventListener('click', () => showToast('Student list exported as CSV.', 'success'));
-    document.getElementById('addStudentBtn').addEventListener('click', () => showToast('Add-student form coming soon!', 'info'));
+    /* ── TOOLBAR BUTTONS & SIGNOUT ───────────────── */
+    document.getElementById('exportBtn').addEventListener('click', function() { showToast('Student list exported as CSV.', 'success'); });
+    document.getElementById('addStudentBtn').addEventListener('click', function() { showToast('Add-student form coming soon!', 'info'); });
+    
+    document.getElementById('btnSignOut').addEventListener('click', async function() {
+      await window.teacherSignOut();
+      window.location.href = 'teacher-login.html';
+    });
 
-    /* ── INIT ─────────────────────────────────────── */
-    setGreeting();
-    renderStudents();
-    renderEnrollments();
+    /* ── INIT & AUTH SESSION GUARD ───────────────── */
+    (async function initDashboard() {
+      // Session verification with Supabase
+      currentSession = await window.getTeacherSession();
+      if (!currentSession) {
+        console.warn("[Teacher Dashboard] No active Supabase session. Redirecting to login...");
+        window.location.href = 'teacher-login.html';
+        return;
+      }
+
+      // Fetch teacher profile linked to Supabase Auth user ID
+      const user = currentSession.user;
+      currentTeacher = await window.getTeacherProfile(user.id);
+
+      const teacherName = (currentTeacher && currentTeacher.name) ? currentTeacher.name : (user.email ? user.email.split('@')[0] : 'Teacher');
+      const teacherRole = (currentTeacher && currentTeacher.subjects) ? currentTeacher.subjects + ' · Faculty' : 'Edify Faculty';
+      const teacherInitials = initials(teacherName);
+
+      // Update Profile UI with real Supabase user profile
+      setGreeting(teacherName);
+      document.querySelectorAll('.profile-avatar, .topbar-avatar').forEach(function(el) {
+        el.textContent = teacherInitials;
+        el.title = teacherName;
+      });
+      const pName = document.querySelector('.profile-name');
+      if (pName) pName.textContent = teacherName;
+      const pRole = document.querySelector('.profile-role');
+      if (pRole) pRole.textContent = teacherRole;
+
+      // Load live data from Supabase demo_requests table
+      await loadLiveData();
+    })();
   </script>
 </body>
 </html>

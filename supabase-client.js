@@ -69,4 +69,169 @@
       return { success: false, error: err };
     }
   };
+
+  /* ─────────────────────────────────────────────────────────────────────────
+   * TEACHER AUTH & DATA HELPERS
+   * Shared functions for teacher-login.html and teacher-dashboard.html.
+   * All functions use window.supabaseClient initialised above with
+   * VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY from env.js.
+   * ─────────────────────────────────────────────────────────────────────── */
+
+  /**
+   * Sign in a teacher with email + password via Supabase Auth.
+   * @param {string} email
+   * @param {string} password
+   * @returns {Promise<{success: boolean, data?: object, error?: any}>}
+   */
+  window.teacherSignIn = async function (email, password) {
+    if (!window.supabaseClient) {
+      return { success: false, error: new Error("Supabase client not initialized") };
+    }
+    try {
+      var result = await window.supabaseClient.auth.signInWithPassword({ email: email, password: password });
+      console.log("[Teacher Auth] Sign-in response:", result);
+      if (result.error) {
+        console.error("[Teacher Auth] Sign-in error:", result.error);
+        return { success: false, error: result.error };
+      }
+      return { success: true, data: result.data };
+    } catch (err) {
+      console.error("[Teacher Auth] Sign-in exception:", err);
+      return { success: false, error: err };
+    }
+  };
+
+  /**
+   * Sign out the current teacher session.
+   */
+  window.teacherSignOut = async function () {
+    if (!window.supabaseClient) return;
+    try {
+      await window.supabaseClient.auth.signOut();
+      console.log("[Teacher Auth] Signed out successfully.");
+    } catch (err) {
+      console.error("[Teacher Auth] Sign-out error:", err);
+    }
+  };
+
+  /**
+   * Return the current Supabase session, or null if not signed in.
+   * @returns {Promise<object|null>}
+   */
+  window.getTeacherSession = async function () {
+    if (!window.supabaseClient) return null;
+    try {
+      var result = await window.supabaseClient.auth.getSession();
+      return (result.data && result.data.session) ? result.data.session : null;
+    } catch (err) {
+      console.error("[Teacher Auth] Session fetch error:", err);
+      return null;
+    }
+  };
+
+  /**
+   * Fetch a teacher's profile row from public.teachers by their Supabase auth UID.
+   * @param {string} authUserId - UUID from auth.users
+   * @returns {Promise<object|null>}
+   */
+  window.getTeacherProfile = async function (authUserId) {
+    if (!window.supabaseClient || !authUserId) return null;
+    try {
+      var result = await window.supabaseClient
+        .from("teachers")
+        .select("*")
+        .eq("auth_user_id", authUserId)
+        .single();
+      if (result.error && result.error.code !== "PGRST116") {
+        console.error("[Teacher Auth] Profile fetch error:", result.error);
+      }
+      return result.data || null;
+    } catch (err) {
+      console.error("[Teacher Auth] Profile fetch exception:", err);
+      return null;
+    }
+  };
+
+  /**
+   * Fetch demo requests assigned to a specific teacher (Accepted / Contacted / Scheduled / Completed).
+   * @param {string} teacherId - UUID from public.teachers
+   * @returns {Promise<{success: boolean, data: Array, error?: any}>}
+   */
+  window.getAssignedDemoRequests = async function (teacherId) {
+    if (!window.supabaseClient || !teacherId) return { success: true, data: [] };
+    try {
+      var result = await window.supabaseClient
+        .from("demo_requests")
+        .select("*")
+        .eq("assigned_teacher_id", teacherId)
+        .in("status", ["Accepted", "Contacted", "Scheduled", "Completed"])
+        .order("created_at", { ascending: false });
+      console.log("[Teacher Data] Assigned demo requests:", result);
+      if (result.error) {
+        console.error("[Teacher Data] Assigned requests error:", result.error);
+        return { success: false, data: [], error: result.error };
+      }
+      return { success: true, data: result.data || [] };
+    } catch (err) {
+      console.error("[Teacher Data] Assigned requests exception:", err);
+      return { success: false, data: [], error: err };
+    }
+  };
+
+  /**
+   * Fetch all new (unassigned, status = 'New') demo requests.
+   * @returns {Promise<{success: boolean, data: Array, error?: any}>}
+   */
+  window.getPendingDemoRequests = async function () {
+    if (!window.supabaseClient) return { success: false, data: [] };
+    try {
+      var result = await window.supabaseClient
+        .from("demo_requests")
+        .select("*")
+        .eq("status", "New")
+        .order("created_at", { ascending: false });
+      console.log("[Teacher Data] Pending demo requests:", result);
+      if (result.error) {
+        console.error("[Teacher Data] Pending requests error:", result.error);
+        return { success: false, data: [], error: result.error };
+      }
+      return { success: true, data: result.data || [] };
+    } catch (err) {
+      console.error("[Teacher Data] Pending requests exception:", err);
+      return { success: false, data: [], error: err };
+    }
+  };
+
+  /**
+   * Update the status of a demo request and optionally assign a teacher.
+   * @param {string} requestId  - UUID of the demo_requests row
+   * @param {string} newStatus  - One of: New | Contacted | Accepted | Scheduled | Completed | Cancelled
+   * @param {string|null} teacherId - UUID of public.teachers (assigned when status → Accepted)
+   * @returns {Promise<{success: boolean, data?: object, error?: any}>}
+   */
+  window.updateDemoRequestStatus = async function (requestId, newStatus, teacherId) {
+    if (!window.supabaseClient || !requestId) return { success: false };
+    try {
+      var updatePayload = { status: newStatus };
+      if (teacherId && newStatus === "Accepted") {
+        updatePayload.assigned_teacher_id = teacherId;
+      }
+      var result = await window.supabaseClient
+        .from("demo_requests")
+        .update(updatePayload)
+        .eq("id", requestId)
+        .select()
+        .single();
+      console.log("[Teacher Data] Status update response:", result);
+      if (result.error) {
+        console.error("[Teacher Data] Status update error:", result.error);
+        return { success: false, error: result.error };
+      }
+      return { success: true, data: result.data };
+    } catch (err) {
+      console.error("[Teacher Data] Status update exception:", err);
+      return { success: false, error: err };
+    }
+  };
+
 })();

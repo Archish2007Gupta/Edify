@@ -1159,9 +1159,14 @@
       document.getElementById('dateText').textContent = new Date().toLocaleDateString('en-IN', opts) + ' — Here\'s your class overview';
     }
 
+    let knownRequestIds = new Set();
+    let isInitialLoad = true;
+
     /* ── LOAD LIVE SUPABASE DATA ──────────────────── */
-    window.loadDemoRequests = async function() {
-      renderLoadingState();
+    window.loadDemoRequests = async function(isSilent) {
+      if (!isSilent) {
+        renderLoadingState();
+      }
 
       const teacherId = currentTeacher ? currentTeacher.id : null;
       if (!teacherId) {
@@ -1173,20 +1178,41 @@
         return;
       }
 
-      // Fetch demo requests assigned specifically to this teacher at database level
+      // Fetch demo requests assigned specifically to this teacher or unassigned
       const res = await window.getDemoRequests({ teacherId: teacherId });
 
       if (!res.success) {
-        renderErrorState(res.error);
+        if (!isSilent) renderErrorState(res.error);
         return;
       }
 
-      rawDemoRequests = res.data || [];
+      const freshData = res.data || [];
+
+      // Detect new items to trigger toast notification (skip initial load)
+      if (!isInitialLoad) {
+        let hasNewItem = false;
+        freshData.forEach(function(item) {
+          if (item && item.id && !knownRequestIds.has(item.id)) {
+            hasNewItem = true;
+          }
+        });
+        if (hasNewItem) {
+          showToast("New demo class request received.", "info");
+        }
+      }
+
+      // Update set of tracked IDs
+      freshData.forEach(function(item) {
+        if (item && item.id) knownRequestIds.add(item.id);
+      });
+      isInitialLoad = false;
+
+      rawDemoRequests = freshData;
       filteredRequests = [...rawDemoRequests];
 
       // Update header subtitle and stats counters
       document.getElementById('studentCount').textContent = rawDemoRequests.length;
-      document.getElementById('enrolledSubtitle').textContent = rawDemoRequests.length + ' demo requests assigned to you';
+      document.getElementById('enrolledSubtitle').textContent = rawDemoRequests.length + ' demo requests available';
 
       // Separate pending requests (status = 'New') for sidebar list
       const pendingItems = rawDemoRequests.filter(function(r){ return r.status === 'New'; });
@@ -1206,7 +1232,7 @@
       document.getElementById('enrollSub').textContent   = pendingCount + ' pending your approval';
 
       renderEnrollments();
-      renderRequestsTable();
+      applyFilters();
     };
 
     /* ── NAV ACTIVE ───────────────────────────────── */
@@ -1220,7 +1246,7 @@
     /* ── TOOLBAR BUTTONS & SIGNOUT & REFRESH ──────── */
     document.getElementById('refreshBtn').addEventListener('click', async function() {
       showToast('Refreshing demo requests from Supabase...', 'info');
-      await loadDemoRequests();
+      await loadDemoRequests(false);
     });
 
     document.getElementById('exportBtn').addEventListener('click', function() {
@@ -1278,7 +1304,20 @@
       if (pRole) pRole.textContent = teacherRole;
 
       // 4. Load live demo requests from Supabase demo_requests table
-      await loadDemoRequests();
+      await loadDemoRequests(false);
+
+      // 5. Realtime subscription to public.demo_requests
+      if (typeof window.subscribeToDemoRequests === 'function') {
+        window.subscribeToDemoRequests(function(payload) {
+          console.log("[Teacher Dashboard Realtime Payload]", payload);
+          loadDemoRequests(true);
+        });
+      }
+
+      // 6. Reliable silent refetching fallback every 12 seconds
+      setInterval(function() {
+        loadDemoRequests(true);
+      }, 12000);
     })();
   </script>
 </body>

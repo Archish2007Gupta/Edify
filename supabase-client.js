@@ -271,7 +271,7 @@
         .order("created_at", { ascending: false });
 
       if (options.teacherId) {
-        query = query.eq("assigned_teacher_id", options.teacherId);
+        query = query.or("assigned_teacher_id.eq." + options.teacherId + ",assigned_teacher_id.is.null");
       }
       if (options.status) {
         query = query.eq("status", options.status);
@@ -289,6 +289,36 @@
     } catch (err) {
       console.error("[Supabase Fetch Demo Requests Exception]", err);
       return { success: false, data: [], error: err };
+    }
+  };
+
+  /**
+   * Subscribe to real-time changes on public.demo_requests table via Supabase Realtime.
+   * @param {function} callback - Callback function invoked on postgres change events
+   * @returns {object|null} Channel subscription instance
+   */
+  window.subscribeToDemoRequests = function (callback) {
+    if (!window.supabaseClient) return null;
+    try {
+      var channel = window.supabaseClient
+        .channel("public:demo_requests_changes")
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "demo_requests" },
+          function (payload) {
+            console.log("[Supabase Realtime] Event payload:", payload);
+            if (typeof callback === "function") {
+              callback(payload);
+            }
+          }
+        )
+        .subscribe(function (status) {
+          console.log("[Supabase Realtime] Channel status:", status);
+        });
+      return channel;
+    } catch (err) {
+      console.error("[Supabase Realtime] Subscription exception:", err);
+      return null;
     }
   };
 

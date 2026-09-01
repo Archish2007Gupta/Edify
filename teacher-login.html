@@ -1016,14 +1016,38 @@
       alert('Google Workspace sign-in is not yet configured.\nPlease contact the Edify admin team.');
     });
 
-    // Reveal animation on load
-    window.addEventListener('DOMContentLoaded', () => {
+    // Check URL parameters for redirect errors (e.g. unauthenticated access, expired session)
+    window.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const errType = urlParams.get('error');
+      if (errType) {
+        if (errType === 'unauthenticated' || errType === 'expired') {
+          loginAlertMsg.textContent = 'Please sign in to access the Teacher Portal.';
+          loginAlert.classList.add('show');
+        } else if (errType === 'noprofile') {
+          loginAlertMsg.textContent = 'Your account is authenticated, but no matching profile was found in public.teachers. Please contact your administrator.';
+          loginAlert.classList.add('show');
+        }
+      }
+
+      // Check if already authenticated with a valid profile
+      const session = await window.getTeacherSession();
+      if (session && session.user && !errType) {
+        const profile = await window.getTeacherProfile(session.user.id);
+        if (profile) {
+          window.location.href = 'teacher-dashboard.html';
+          return;
+        }
+      }
+
       const card = document.querySelector('.login-card');
-      card.style.cssText = 'opacity:0;transform:translateY(20px);transition:opacity .55s cubic-bezier(.2,.7,.2,1),transform .55s cubic-bezier(.2,.7,.2,1)';
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        card.style.opacity = '1';
-        card.style.transform = 'none';
-      }));
+      if (card) {
+        card.style.cssText = 'opacity:0;transform:translateY(20px);transition:opacity .55s cubic-bezier(.2,.7,.2,1),transform .55s cubic-bezier(.2,.7,.2,1)';
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          card.style.opacity = '1';
+          card.style.transform = 'none';
+        }));
+      }
     });
   </script>
 </body>

@@ -94,6 +94,23 @@
         console.error("[Teacher Auth] Sign-in error:", result.error);
         return { success: false, error: result.error };
       }
+
+      // Verify that a corresponding teacher profile exists in public.teachers
+      var user = result.data ? result.data.user : null;
+      if (user) {
+        var profile = await window.getTeacherProfile(user.id);
+        if (!profile) {
+          console.warn("[Teacher Auth] No matching row in public.teachers for auth_user_id:", user.id);
+          // Sign out unlinked user session
+          await window.supabaseClient.auth.signOut();
+          return {
+            success: false,
+            error: new Error("No teacher profile found matching this account. Please ask the administrator to link your account in public.teachers.")
+          };
+        }
+        return { success: true, data: result.data, profile: profile };
+      }
+
       return { success: true, data: result.data };
     } catch (err) {
       console.error("[Teacher Auth] Sign-in exception:", err);
@@ -231,6 +248,44 @@
     } catch (err) {
       console.error("[Teacher Data] Status update exception:", err);
       return { success: false, error: err };
+    }
+  };
+
+  /**
+   * Fetch demo requests from public.demo_requests.
+   * @param {Object} [options] - Filter options (e.g. teacherId, status)
+   * @returns {Promise<{success: boolean, data: Array, error?: any}>}
+   */
+  window.getDemoRequests = async function (options) {
+    if (!window.supabaseClient) {
+      return { success: false, data: [], error: new Error("Supabase client not initialized") };
+    }
+    try {
+      options = options || {};
+      var query = window.supabaseClient
+        .from("demo_requests")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (options.teacherId) {
+        query = query.eq("assigned_teacher_id", options.teacherId);
+      }
+      if (options.status) {
+        query = query.eq("status", options.status);
+      }
+
+      var result = await query;
+      console.log("[Supabase Fetch Demo Requests]", result);
+
+      if (result.error) {
+        console.error("[Supabase Fetch Demo Requests Error]", result.error);
+        return { success: false, data: [], error: result.error };
+      }
+
+      return { success: true, data: result.data || [] };
+    } catch (err) {
+      console.error("[Supabase Fetch Demo Requests Exception]", err);
+      return { success: false, data: [], error: err };
     }
   };
 

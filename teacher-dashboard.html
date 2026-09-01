@@ -503,9 +503,57 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    @media (max-width: 1100px) {
-      .stats-grid { grid-template-columns: repeat(2, 1fr); }
-      .dashboard-grid { grid-template-columns: 1fr; }
+    /* MODAL DIALOG */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 1000;
+      background: rgba(10, 36, 71, 0.55);
+      backdrop-filter: blur(4px);
+      display: none; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-box {
+      background: var(--card); border: 1px solid var(--rule);
+      border-radius: 20px; width: 100%; max-width: 640px;
+      max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 20px 50px rgba(10,36,71,0.25);
+      animation: modalFade .25s ease-out;
+    }
+    @keyframes modalFade {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .modal-header {
+      padding: 22px 28px 18px;
+      border-bottom: 1px solid var(--rule-soft);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .modal-title {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: 22px; font-weight: 700; color: var(--blue-deep);
+    }
+    .modal-close {
+      background: none; border: none; font-size: 26px;
+      color: var(--ink-soft); cursor: pointer; padding: 4px 8px;
+      border-radius: 8px; transition: color .15s; line-height: 1;
+    }
+    .modal-close:hover { color: var(--marking); }
+    .modal-body { padding: 24px 28px; }
+    .detail-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 18px; margin-bottom: 20px;
+    }
+    .detail-item { display: flex; flex-direction: column; gap: 4px; }
+    .detail-label {
+      font-size: 12px; font-weight: 700; letter-spacing: 0.06em;
+      text-transform: uppercase; color: var(--ink-soft);
+    }
+    .detail-value { font-size: 15.5px; font-weight: 600; color: var(--ink); word-break: break-word; }
+    .detail-full { grid-column: span 2; }
+    .detail-message-box {
+      background: var(--paper); border: 1px solid var(--rule-soft);
+      border-radius: 10px; padding: 14px; font-size: 15px; color: var(--ink);
+      line-height: 1.5; white-space: pre-wrap; margin-top: 4px;
     }
   </style>
 </head>
@@ -646,21 +694,21 @@
       <!-- DASHBOARD GRID -->
       <div class="dashboard-grid">
 
-        <!-- Enrolled Students Table -->
+        <!-- Demo Requests Table -->
         <div class="section-card" id="enrolled-section">
           <div class="section-header">
             <div>
-              <div class="section-title">Enrolled Students</div>
-              <div class="section-sub" id="enrolledSubtitle">28 students across all active batches</div>
+              <div class="section-title">Demo Class Requests</div>
+              <div class="section-sub" id="enrolledSubtitle">Live data from public.demo_requests</div>
             </div>
             <div class="section-actions">
+              <button class="btn-sm btn-ghost" id="refreshBtn" title="Refetch live data from Supabase">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+                Refresh
+              </button>
               <button class="btn-sm btn-ghost" id="exportBtn">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                 Export
-              </button>
-              <button class="btn-sm btn-primary" id="addStudentBtn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Add Student
               </button>
             </div>
           </div>
@@ -668,33 +716,42 @@
           <div class="table-toolbar">
             <div class="table-search">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-              <input type="search" placeholder="Search by name or email…" aria-label="Filter students" id="tableSearch" />
+              <input type="search" placeholder="Search by student name, phone, or location…" aria-label="Filter demo requests" id="tableSearch" />
             </div>
-            <select class="filter-select" id="batchFilter" aria-label="Filter by batch">
-              <option value="">All Batches</option>
-              <option value="Class IX">Class IX</option>
-              <option value="Class X">Class X</option>
-              <option value="Class XI">Class XI</option>
-              <option value="Class XII">Class XII</option>
+            <select class="filter-select" id="batchFilter" aria-label="Filter by class">
+              <option value="">All Classes</option>
+              <option value="Class IX–X">Class IX–X</option>
+              <option value="Class XI–XII">Class XI–XII</option>
+              <option value="Class VI–VIII">Class VI–VIII</option>
+              <option value="Class I–V">Class I–V</option>
+              <option value="Kindergarten">Kindergarten</option>
             </select>
             <select class="filter-select" id="statusFilter" aria-label="Filter by status">
               <option value="">All Status</option>
-              <option value="active">Active</option>
-              <option value="at-risk">At Risk</option>
-              <option value="inactive">Inactive</option>
+              <option value="New">New</option>
+              <option value="Contacted">Contacted</option>
+              <option value="Accepted">Accepted</option>
+              <option value="Scheduled">Scheduled</option>
+              <option value="Completed">Completed</option>
+              <option value="Cancelled">Cancelled</option>
             </select>
           </div>
 
           <div style="overflow-x:auto;">
-            <table class="student-table" aria-label="Enrolled students list">
+            <table class="student-table" aria-label="Demo requests list">
               <thead>
                 <tr>
-                  <th>Student</th>
-                  <th>Batch</th>
-                  <th>Progress</th>
-                  <th>Attendance</th>
+                  <th>Student Name</th>
+                  <th>Class</th>
+                  <th>Board</th>
+                  <th>Subjects</th>
+                  <th>Mode</th>
+                  <th>Location</th>
+                  <th>Pref. Date</th>
+                  <th>Pref. Time</th>
                   <th>Status</th>
-                  <th>Actions</th>
+                  <th>Created Date</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody id="studentTableBody"></tbody>
@@ -732,6 +789,19 @@
     </main>
   </div>
 
+  <!-- DEMO REQUEST DETAIL MODAL -->
+  <div class="modal-overlay" id="detailModal" aria-hidden="true">
+    <div class="modal-box" role="dialog" aria-labelledby="modalTitle">
+      <div class="modal-header">
+        <div class="modal-title" id="modalTitle">Demo Request Details</div>
+        <button class="modal-close" id="closeModalBtn" aria-label="Close dialog">&times;</button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <!-- Injected via JavaScript -->
+      </div>
+    </div>
+  </div>
+
   <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
 
   <script>
@@ -740,16 +810,16 @@
 
     let currentSession = null;
     let currentTeacher = null;
-    let allStudents = [];
+    let rawDemoRequests = [];
+    let filteredRequests = [];
     let enrollments = [];
     let currentPage = 1;
     const PAGE_SIZE = 10;
-    let filteredStudents = [];
     let pendingCount = 0;
 
     /* ── HELPERS ──────────────────────────────────── */
     const initials = function(n) {
-      if (!n) return "ED";
+      if (!n) return "ST";
       return n.trim().split(/\s+/).map(function(w){ return w[0]; }).join('').slice(0, 2).toUpperCase();
     };
 
@@ -757,6 +827,17 @@
       var num = typeof id === 'number' ? id : (id ? id.charCodeAt(0) : 0);
       return COLORS[Math.abs(num) % COLORS.length];
     };
+
+    function formatDate(dtStr) {
+      if (!dtStr) return "N/A";
+      try {
+        var d = new Date(dtStr);
+        if (isNaN(d.getTime())) return dtStr;
+        return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+      } catch (e) {
+        return dtStr;
+      }
+    }
 
     function statusBadge(s) {
       var m = {
@@ -767,91 +848,110 @@
         'New': ['badge-amber', '● New'],
         'Cancelled': ['badge-red', '✕ Cancelled']
       };
-      var res = m[s] || ['badge-gray', s || 'Active'];
+      var res = m[s] || ['badge-gray', s || 'New'];
       return '<span class="badge ' + res[0] + '">' + res[1] + '</span>';
     }
 
-    function progressColor(p) {
-      return p >= 75 ? '#2e7d57' : p >= 50 ? '#1e5aa8' : '#c6402f';
-    }
-
-    /* ── RENDER STUDENTS ──────────────────────────── */
-    function renderStudents() {
+    /* ── RENDER DEMO REQUESTS TABLE ──────────────── */
+    function renderRequestsTable() {
       const tbody = document.getElementById('studentTableBody');
       const start = (currentPage - 1) * PAGE_SIZE;
-      const slice = filteredStudents.slice(start, start + PAGE_SIZE);
+      const slice = filteredRequests.slice(start, start + PAGE_SIZE);
 
       if (!slice.length) {
-        tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state">' +
+        tbody.innerHTML = '<tr><td colspan="11"><div class="empty-state">' +
           '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>' +
-          '<p>No students match your filters or no assigned demo requests found.</p>' +
+          '<p style="font-size:16px; font-weight:600; color:var(--blue-deep); margin-bottom:4px;">No demo requests assigned to you yet.</p>' +
+          '<p style="font-size:14px; color:var(--ink-soft);">Requests submitted via the website will appear here automatically.</p>' +
           '</div></td></tr>';
       } else {
-        tbody.innerHTML = slice.map(function(s) {
-          return '<tr>' +
+        tbody.innerHTML = slice.map(function(item, idx) {
+          var realIndex = start + idx;
+          return '<tr style="cursor:pointer;" onclick="openDetailModal(' + realIndex + ')">' +
             '<td><div class="student-info">' +
-              '<div class="student-avatar" style="background:' + color(s.id) + '">' + initials(s.name) + '</div>' +
+              '<div class="student-avatar" style="background:' + color(item.id) + '">' + initials(item.student_name) + '</div>' +
               '<div>' +
-                '<div class="student-name">' + s.name + '</div>' +
-                '<div class="student-email">' + (s.email || s.phone || 'No contact info') + '</div>' +
+                '<div class="student-name">' + (item.student_name || 'N/A') + '</div>' +
+                '<div class="student-email">' + (item.email || item.phone || '') + '</div>' +
               '</div>' +
             '</div></td>' +
-            '<td><span class="badge badge-blue">' + (s.batch || 'Demo') + '</span></td>' +
-            '<td><div class="progress-wrap">' +
-              '<div class="progress-bar"><div class="progress-fill" style="width:' + s.progress + '%;background:' + progressColor(s.progress) + '"></div></div>' +
-              '<span class="progress-label">' + s.progress + '%</span>' +
-            '</div></td>' +
-            '<td style="font-weight:600;color:' + (s.attendance >= 80 ? 'var(--pass)' : s.attendance >= 60 ? 'var(--warn)' : 'var(--marking)') + '">' + s.attendance + '%</td>' +
-            '<td>' + statusBadge(s.status) + '</td>' +
-            '<td><div style="display:flex;gap:4px;">' +
-              '<button class="action-btn" title="View profile" onclick="showToast(\'Viewing ' + s.name.replace(/'/g, "\\'") + '\',\'info\')">' +
+            '<td><span class="badge badge-blue">' + (item.class || 'N/A') + '</span></td>' +
+            '<td>' + (item.board || 'N/A') + '</td>' +
+            '<td>' + (item.subjects || 'N/A') + '</td>' +
+            '<td>' + (item.mode || 'Home') + '</td>' +
+            '<td>' + (item.location || 'N/A') + '</td>' +
+            '<td>' + formatDate(item.preferred_date) + '</td>' +
+            '<td>' + (item.preferred_time || 'N/A') + '</td>' +
+            '<td>' + statusBadge(item.status) + '</td>' +
+            '<td>' + formatDate(item.created_at) + '</td>' +
+            '<td>' +
+              '<button class="action-btn" title="View full details" onclick="event.stopPropagation(); openDetailModal(' + realIndex + ')">' +
                 '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>' +
               '</button>' +
-              '<button class="action-btn" title="Send message" onclick="showToast(\'Message sent to ' + s.name.replace(/'/g, "\\'") + '\',\'success\')">' +
-                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>' +
-              '</button>' +
-            '</div></td>' +
+            '</td>' +
           '</tr>';
         }).join('');
       }
 
-      const total = filteredStudents.length;
+      const total = filteredRequests.length;
       const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
       document.getElementById('tableInfo').textContent =
-        'Showing ' + (total ? Math.min(start + 1, total) : 0) + '–' + Math.min(start + PAGE_SIZE, total) + ' of ' + total + ' students';
+        'Showing ' + (total ? Math.min(start + 1, total) : 0) + '–' + Math.min(start + PAGE_SIZE, total) + ' of ' + total + ' requests';
       [1, 2, 3].forEach(function(p) {
         const btn = document.getElementById('page' + p);
         if (btn) { btn.classList.toggle('active', p === currentPage); btn.style.display = p <= pages ? '' : 'none'; }
       });
     }
 
+    function renderLoadingState() {
+      const tbody = document.getElementById('studentTableBody');
+      tbody.innerHTML = '<tr><td colspan="11" style="text-align:center; padding:44px 20px;">' +
+        '<div style="margin: 0 auto 12px; width:32px; height:32px; border:3px solid rgba(30,90,168,0.18); border-top-color:var(--blue); border-radius:50%; animation:spin .7s linear infinite;"></div>' +
+        '<div style="font-weight:600; font-size:16px; color:var(--blue-deep);">Fetching live demo requests from Supabase...</div>' +
+      '</td></tr>';
+    }
+
+    function renderErrorState(err) {
+      const tbody = document.getElementById('studentTableBody');
+      var msg = (err && err.message) ? err.message : "Unable to load data from Supabase.";
+      tbody.innerHTML = '<tr><td colspan="11" style="text-align:center; padding:44px 20px;">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="var(--marking)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:36px; height:36px; margin-bottom:10px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>' +
+        '<div style="font-weight:700; font-size:17px; color:var(--marking); margin-bottom:4px;">Failed to connect to Supabase</div>' +
+        '<div style="font-size:14.5px; color:var(--ink-soft); margin-bottom:16px;">' + msg + '</div>' +
+        '<button class="btn-sm btn-primary" onclick="loadDemoRequests()">Retry Connection</button>' +
+      '</td></tr>';
+    }
+
     function goPage(p) {
       currentPage = p;
-      renderStudents();
+      renderRequestsTable();
     }
 
     document.getElementById('prevPage').addEventListener('click', function() {
-      if (currentPage > 1) { currentPage--; renderStudents(); }
+      if (currentPage > 1) { currentPage--; renderRequestsTable(); }
     });
     document.getElementById('nextPage').addEventListener('click', function() {
-      const pages = Math.ceil(filteredStudents.length / PAGE_SIZE);
-      if (currentPage < pages) { currentPage++; renderStudents(); }
+      const pages = Math.ceil(filteredRequests.length / PAGE_SIZE);
+      if (currentPage < pages) { currentPage++; renderRequestsTable(); }
     });
 
     /* ── FILTERS ──────────────────────────────────── */
     function applyFilters() {
       const q      = (document.getElementById('tableSearch').value + ' ' + document.getElementById('globalSearch').value).toLowerCase().trim();
-      const batch  = document.getElementById('batchFilter').value;
+      const cls    = document.getElementById('batchFilter').value;
       const status = document.getElementById('statusFilter').value;
 
-      filteredStudents = allStudents.filter(function(s) {
-        const mq = !q || s.name.toLowerCase().includes(q) || (s.email && s.email.toLowerCase().includes(q));
-        const mb = !batch || s.batch === batch;
-        const ms = !status || s.status.toLowerCase() === status.toLowerCase();
-        return mq && mb && ms;
+      filteredRequests = rawDemoRequests.filter(function(item) {
+        const mq = !q || (item.student_name && item.student_name.toLowerCase().includes(q)) ||
+                         (item.parent_name && item.parent_name.toLowerCase().includes(q)) ||
+                         (item.phone && item.phone.toLowerCase().includes(q)) ||
+                         (item.location && item.location.toLowerCase().includes(q));
+        const mc = !cls || (item.class && item.class.toLowerCase() === cls.toLowerCase());
+        const ms = !status || (item.status && item.status.toLowerCase() === status.toLowerCase());
+        return mq && mc && ms;
       });
       currentPage = 1;
-      renderStudents();
+      renderRequestsTable();
     }
 
     ['tableSearch','globalSearch','batchFilter','statusFilter'].forEach(function(id) {
@@ -859,7 +959,43 @@
       if (el) { el.addEventListener('input', applyFilters); el.addEventListener('change', applyFilters); }
     });
 
-    /* ── ENROLLMENTS ──────────────────────────────── */
+    /* ── DETAIL MODAL OPEN / CLOSE ───────────────── */
+    window.openDetailModal = function(index) {
+      var item = filteredRequests[index];
+      if (!item) return;
+
+      var modalBody = document.getElementById('modalBody');
+      modalBody.innerHTML =
+        '<div class="detail-grid">' +
+          '<div class="detail-item"><span class="detail-label">Student Name</span><span class="detail-value">' + (item.student_name || 'N/A') + '</span></div>' +
+          '<div class="detail-item"><span class="detail-label">Parent Name</span><span class="detail-value">' + (item.parent_name || 'N/A') + '</span></div>' +
+          '<div class="detail-item"><span class="detail-label">Phone</span><span class="detail-value">' + (item.phone || 'N/A') + '</span></div>' +
+          '<div class="detail-item"><span class="detail-label">Email</span><span class="detail-value">' + (item.email || 'N/A') + '</span></div>' +
+          '<div class="detail-item"><span class="detail-label">Class</span><span class="detail-value">' + (item.class || 'N/A') + '</span></div>' +
+          '<div class="detail-item"><span class="detail-label">Board</span><span class="detail-value">' + (item.board || 'N/A') + '</span></div>' +
+          '<div class="detail-item"><span class="detail-label">Subjects</span><span class="detail-value">' + (item.subjects || 'N/A') + '</span></div>' +
+          '<div class="detail-item"><span class="detail-label">Mode</span><span class="detail-value">' + (item.mode || 'Home') + '</span></div>' +
+          '<div class="detail-item"><span class="detail-label">Location / Area</span><span class="detail-value">' + (item.location || 'N/A') + '</span></div>' +
+          '<div class="detail-item"><span class="detail-label">Preferred Date</span><span class="detail-value">' + formatDate(item.preferred_date) + '</span></div>' +
+          '<div class="detail-item"><span class="detail-label">Preferred Time</span><span class="detail-value">' + (item.preferred_time || 'N/A') + '</span></div>' +
+          '<div class="detail-item"><span class="detail-label">Status</span><span class="detail-value">' + statusBadge(item.status) + '</span></div>' +
+          '<div class="detail-item detail-full"><span class="detail-label">Message / Notes</span><div class="detail-message-box">' + (item.message || 'No additional notes provided.') + '</div></div>' +
+        '</div>';
+
+      document.getElementById('detailModal').classList.add('active');
+    };
+
+    document.getElementById('closeModalBtn').addEventListener('click', function() {
+      document.getElementById('detailModal').classList.remove('active');
+    });
+
+    document.getElementById('detailModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        this.classList.remove('active');
+      }
+    });
+
+    /* ── ENROLLMENTS SIDEBAR LIST ─────────────────── */
     function renderEnrollments() {
       const el = document.getElementById('enrollmentList');
       if (!enrollments.length) {
@@ -902,7 +1038,7 @@
       const teacherId = currentTeacher ? currentTeacher.id : null;
       const newStatus = action === 'approve' ? 'Accepted' : 'Cancelled';
 
-      // Update in live Supabase database demo_requests
+      // Update directly in live Supabase database
       const res = await window.updateDemoRequestStatus(id, newStatus, teacherId);
 
       if (res && res.success) {
@@ -920,8 +1056,8 @@
               '</div>' +
               '<span class="badge badge-green">✓ Approved</span>' +
             '</div>';
-          showToast(enroll.name + ' approved and updated in Supabase!', 'success');
-          loadLiveData(); // refresh table
+          showToast(enroll.name + ' approved and assigned in Supabase!', 'success');
+          loadDemoRequests(); // Refresh table live from Supabase
         } else {
           item.style.transition = 'opacity .25s';
           item.style.opacity = '0';
@@ -960,52 +1096,44 @@
     }
 
     /* ── LOAD LIVE SUPABASE DATA ──────────────────── */
-    async function loadLiveData() {
-      // 1. Fetch pending requests (status = 'New')
-      const pendingRes = await window.getPendingDemoRequests();
-      if (pendingRes.success && pendingRes.data) {
-        enrollments = pendingRes.data.map(function(row) {
-          var dt = row.created_at ? new Date(row.created_at).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : '';
-          return {
-            id: row.id,
-            name: row.student_name || row.parent_name || 'Student',
-            email: row.email,
-            phone: row.phone,
-            batch: row.class || 'General',
-            subject: row.subjects || 'All Subjects',
-            date: dt
-          };
-        });
-        pendingCount = enrollments.length;
-        document.getElementById('enrollBadge').textContent = pendingCount;
-        document.getElementById('enrollSub').textContent   = pendingCount + ' pending your approval';
-        renderEnrollments();
+    window.loadDemoRequests = async function() {
+      renderLoadingState();
+
+      // Fetch demo requests live from public.demo_requests table in Supabase
+      const res = await window.getDemoRequests();
+
+      if (!res.success) {
+        renderErrorState(res.error);
+        return;
       }
 
-      // 2. Fetch assigned demo requests for current teacher
-      const teacherId = currentTeacher ? currentTeacher.id : null;
-      if (teacherId) {
-        const assignedRes = await window.getAssignedDemoRequests(teacherId);
-        if (assignedRes.success && assignedRes.data) {
-          allStudents = assignedRes.data.map(function(row, idx) {
-            return {
-              id: row.id || idx + 1,
-              name: row.student_name || row.parent_name || 'Student',
-              email: row.email,
-              phone: row.phone,
-              batch: row.class || 'Class X',
-              progress: 85,
-              attendance: 90,
-              status: row.status || 'Accepted'
-            };
-          });
-          filteredStudents = [...allStudents];
-          document.getElementById('studentCount').textContent = allStudents.length;
-          document.getElementById('enrolledSubtitle').textContent = allStudents.length + ' students across all active batches';
-          renderStudents();
-        }
-      }
-    }
+      rawDemoRequests = res.data || [];
+      filteredRequests = [...rawDemoRequests];
+
+      // Update header subtitle and stats counters
+      document.getElementById('studentCount').textContent = rawDemoRequests.length;
+      document.getElementById('enrolledSubtitle').textContent = rawDemoRequests.length + ' total demo requests retrieved from public.demo_requests';
+
+      // Separate pending requests (status = 'New') for sidebar list
+      const pendingItems = rawDemoRequests.filter(function(r){ return r.status === 'New'; });
+      enrollments = pendingItems.map(function(row) {
+        return {
+          id: row.id,
+          name: row.student_name || row.parent_name || 'Student',
+          email: row.email,
+          phone: row.phone,
+          batch: row.class || 'General',
+          subject: row.subjects || 'All Subjects',
+          date: formatDate(row.created_at)
+        };
+      });
+      pendingCount = enrollments.length;
+      document.getElementById('enrollBadge').textContent = pendingCount;
+      document.getElementById('enrollSub').textContent   = pendingCount + ' pending your approval';
+
+      renderEnrollments();
+      renderRequestsTable();
+    };
 
     /* ── NAV ACTIVE ───────────────────────────────── */
     document.querySelectorAll('.nav-item').forEach(function(item) {
@@ -1015,9 +1143,15 @@
       });
     });
 
-    /* ── TOOLBAR BUTTONS & SIGNOUT ───────────────── */
-    document.getElementById('exportBtn').addEventListener('click', function() { showToast('Student list exported as CSV.', 'success'); });
-    document.getElementById('addStudentBtn').addEventListener('click', function() { showToast('Add-student form coming soon!', 'info'); });
+    /* ── TOOLBAR BUTTONS & SIGNOUT & REFRESH ──────── */
+    document.getElementById('refreshBtn').addEventListener('click', async function() {
+      showToast('Refreshing demo requests from Supabase...', 'info');
+      await loadDemoRequests();
+    });
+
+    document.getElementById('exportBtn').addEventListener('click', function() {
+      showToast('Demo requests list exported as CSV.', 'success');
+    });
     
     document.getElementById('btnSignOut').addEventListener('click', async function() {
       await window.teacherSignOut();
@@ -1026,23 +1160,39 @@
 
     /* ── INIT & AUTH SESSION GUARD ───────────────── */
     (async function initDashboard() {
-      // Session verification with Supabase
+      // 1. Session verification with Supabase Auth
       currentSession = await window.getTeacherSession();
-      if (!currentSession) {
+      if (!currentSession || !currentSession.user) {
         console.warn("[Teacher Dashboard] No active Supabase session. Redirecting to login...");
-        window.location.href = 'teacher-login.html';
+        window.location.href = 'teacher-login.html?error=unauthenticated';
         return;
       }
 
-      // Fetch teacher profile linked to Supabase Auth user ID
+      // 2. Fetch teacher profile from public.teachers where auth_user_id = user.id
       const user = currentSession.user;
       currentTeacher = await window.getTeacherProfile(user.id);
 
-      const teacherName = (currentTeacher && currentTeacher.name) ? currentTeacher.name : (user.email ? user.email.split('@')[0] : 'Teacher');
-      const teacherRole = (currentTeacher && currentTeacher.subjects) ? currentTeacher.subjects + ' · Faculty' : 'Edify Faculty';
+      if (!currentTeacher) {
+        console.warn("[Teacher Dashboard] User authenticated but no profile row found in public.teachers");
+        await window.teacherSignOut();
+        window.location.href = 'teacher-login.html?error=noprofile';
+        return;
+      }
+
+      // Listen for auth state changes (e.g. session expiration or sign out in another tab)
+      if (window.supabaseClient && window.supabaseClient.auth) {
+        window.supabaseClient.auth.onAuthStateChange(function(event, session) {
+          if (event === 'SIGNED_OUT' || !session) {
+            window.location.href = 'teacher-login.html?error=expired';
+          }
+        });
+      }
+
+      const teacherName = currentTeacher.name || (user.email ? user.email.split('@')[0] : 'Teacher');
+      const teacherRole = currentTeacher.subjects ? currentTeacher.subjects + ' · Faculty' : 'Edify Faculty';
       const teacherInitials = initials(teacherName);
 
-      // Update Profile UI with real Supabase user profile
+      // 3. Update Profile UI with real Supabase teacher profile
       setGreeting(teacherName);
       document.querySelectorAll('.profile-avatar, .topbar-avatar').forEach(function(el) {
         el.textContent = teacherInitials;
@@ -1053,8 +1203,8 @@
       const pRole = document.querySelector('.profile-role');
       if (pRole) pRole.textContent = teacherRole;
 
-      // Load live data from Supabase demo_requests table
-      await loadLiveData();
+      // 4. Load live demo requests from Supabase demo_requests table
+      await loadDemoRequests();
     })();
   </script>
 </body>

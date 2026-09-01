@@ -295,4 +295,31 @@
     }
   };
 
+  /**
+   * Assign a teacher to a demo request row in public.demo_requests (Admin service function).
+   * @param {string} requestId - UUID of public.demo_requests
+   * @param {string} teacherId - UUID of public.teachers
+   * @returns {Promise<{success: boolean, data?: object, error?: any}>}
+   */
+  window.assignTeacherToDemoRequest = async function (requestId, teacherId) {
+    if (!window.supabaseClient || !requestId || !teacherId) return { success: false };
+    try {
+      var result = await window.supabaseClient
+        .from("demo_requests")
+        .update({ assigned_teacher_id: teacherId, status: "Accepted" })
+        .eq("id", requestId)
+        .select()
+        .single();
+      console.log("[Admin Service] Teacher assignment response:", result);
+      if (result.error) {
+        console.error("[Admin Service] Teacher assignment error:", result.error);
+        return { success: false, error: result.error };
+      }
+      return { success: true, data: result.data };
+    } catch (err) {
+      console.error("[Admin Service] Teacher assignment exception:", err);
+      return { success: false, error: err };
+    }
+  };
+
 })();

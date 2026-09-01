@@ -97,6 +97,17 @@ ON public.demo_requests
 FOR UPDATE 
 USING (true);
 
+-- Allow teachers to read demo requests assigned to their teacher profile ID
+DROP POLICY IF EXISTS "Allow teachers to read assigned demo_requests" ON public.demo_requests;
+CREATE POLICY "Allow teachers to read assigned demo_requests" 
+ON public.demo_requests 
+FOR SELECT 
+USING (
+  assigned_teacher_id IN (
+    SELECT id FROM public.teachers WHERE auth_user_id = auth.uid()
+  )
+);
+
 -- Allow public read/write to teachers for management
 DROP POLICY IF EXISTS "Allow public read to teachers" ON public.teachers;
 CREATE POLICY "Allow public read to teachers" 

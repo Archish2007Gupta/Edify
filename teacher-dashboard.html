@@ -1099,8 +1099,18 @@
     window.loadDemoRequests = async function() {
       renderLoadingState();
 
-      // Fetch demo requests live from public.demo_requests table in Supabase
-      const res = await window.getDemoRequests();
+      const teacherId = currentTeacher ? currentTeacher.id : null;
+      if (!teacherId) {
+        rawDemoRequests = [];
+        filteredRequests = [];
+        document.getElementById('studentCount').textContent = 0;
+        document.getElementById('enrolledSubtitle').textContent = 'No teacher profile linked.';
+        renderRequestsTable();
+        return;
+      }
+
+      // Fetch demo requests assigned specifically to this teacher at database level
+      const res = await window.getDemoRequests({ teacherId: teacherId });
 
       if (!res.success) {
         renderErrorState(res.error);
@@ -1112,7 +1122,7 @@
 
       // Update header subtitle and stats counters
       document.getElementById('studentCount').textContent = rawDemoRequests.length;
-      document.getElementById('enrolledSubtitle').textContent = rawDemoRequests.length + ' total demo requests retrieved from public.demo_requests';
+      document.getElementById('enrolledSubtitle').textContent = rawDemoRequests.length + ' demo requests assigned to you';
 
       // Separate pending requests (status = 'New') for sidebar list
       const pendingItems = rawDemoRequests.filter(function(r){ return r.status === 'New'; });

@@ -92,6 +92,12 @@
       console.log("[Teacher Auth] Sign-in response:", result);
       if (result.error) {
         console.error("[Teacher Auth] Sign-in error:", result.error);
+        if (result.error.message === "Email not confirmed" || result.error.error_code === "email_not_confirmed") {
+          return {
+            success: false,
+            error: new Error("Email not confirmed in Supabase. Please go to Supabase Dashboard -> Authentication -> Users and click 'Confirm Email' next to your email.")
+          };
+        }
         return { success: false, error: result.error };
       }
 

@@ -13,6 +13,10 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..700&family=Hanken+Grotesk:wght@400..700&family=Caveat:wght@600;700&display=swap"
     rel="stylesheet" />
+  <!-- Supabase Backend Client Integration -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="env.js"></script>
+  <script src="supabase-client.js"></script>
   <style>
     :root {
       --blue: #1e5aa8;
@@ -3772,16 +3776,26 @@
         <form id="leadForm" novalidate>
           <div class="form-grid">
             <div class="field">
-              <label for="parentName">Your name</label>
-              <input type="text" id="parentName" name="parentName" placeholder="Full name" autocomplete="name"
+              <label for="studentName">Student's name</label>
+              <input type="text" id="studentName" name="studentName" placeholder="Student's full name" required />
+              <span class="error-text">Enter student's name.</span>
+            </div>
+            <div class="field">
+              <label for="parentName">Parent's name</label>
+              <input type="text" id="parentName" name="parentName" placeholder="Parent's full name" autocomplete="name"
                 required />
-              <span class="error-text">Enter your name.</span>
+              <span class="error-text">Enter parent's name.</span>
             </div>
             <div class="field">
               <label for="phone">Phone number</label>
               <input type="tel" id="phone" name="phone" placeholder="10-digit mobile number" autocomplete="tel-national"
                 required />
               <span class="error-text">Enter a valid 10-digit number.</span>
+            </div>
+            <div class="field">
+              <label for="email">Email address (optional)</label>
+              <input type="email" id="email" name="email" placeholder="email@example.com" autocomplete="email" />
+              <span class="error-text">Enter a valid email address.</span>
             </div>
             <div class="field">
               <label for="studentClass">Student's class</label>
@@ -3796,8 +3810,32 @@
               <span class="error-text">Select a class.</span>
             </div>
             <div class="field">
+              <label for="board">Board</label>
+              <select id="board" name="board">
+                <option value="">Select board</option>
+                <option>CBSE</option>
+                <option>ICSE / ISC</option>
+                <option>IB / IGCSE</option>
+                <option>State Board</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="field">
               <label for="subject">Subject(s) needed</label>
               <input type="text" id="subject" name="subject" placeholder="e.g. Maths, Science" />
+            </div>
+            <div class="field">
+              <label for="preferredDate">Preferred date</label>
+              <input type="date" id="preferredDate" name="preferredDate" />
+            </div>
+            <div class="field">
+              <label for="preferredTime">Preferred time slot</label>
+              <select id="preferredTime" name="preferredTime">
+                <option value="">Select time slot</option>
+                <option>Morning (9 AM - 12 PM)</option>
+                <option>Afternoon (12 PM - 4 PM)</option>
+                <option>Evening (4 PM - 8 PM)</option>
+              </select>
             </div>
             <div class="field full">
               <label>Mode of tuition</label>
@@ -3818,8 +3856,9 @@
                 placeholder="Board, preferred timing, specific concerns…"></textarea>
             </div>
           </div>
-          <button type="submit" class="form-submit">Request my free demo class</button>
+          <button type="submit" class="form-submit" id="submitDemoBtn">Request my free demo class</button>
           <p class="form-note">By submitting, you agree to be contacted by Edify Tutorial by phone or WhatsApp.</p>
+          <div id="formErrorMessage" style="display:none; color:#d9383a; font-weight:600; font-size:14px; margin-top:12px; text-align:center;"></div>
         </form>
         <div class="form-success" id="formSuccess">
           <div class="ok" aria-hidden="true">
@@ -3829,7 +3868,7 @@
             </svg>
           </div>
           <h3>Thanks — we've got it.</h3>
-          <p>Someone from Edify Tutorial will call you within 24 hours to set up the free demo class.</p>
+          <p>Your demo class request has been received successfully. Our team will contact you shortly.</p>
         </div>
       </div>
     </div>
@@ -3951,43 +3990,128 @@
     syncArea();
 
     var form = document.getElementById("leadForm");
-    form.addEventListener("submit", function (e) {
+    var submitBtn = document.getElementById("submitDemoBtn") || form.querySelector("button[type='submit']");
+    var formSuccess = document.getElementById("formSuccess");
+    var formErrorMessage = document.getElementById("formErrorMessage");
+    var isSubmitting = false;
+
+    form.addEventListener("submit", async function (e) {
       e.preventDefault();
+      if (isSubmitting) return;
+
       var valid = true;
-      var name = document.getElementById("parentName");
-      var phone = document.getElementById("phone");
-      var studentClass = document.getElementById("studentClass");
+      var studentNameInput = document.getElementById("studentName");
+      var parentNameInput = document.getElementById("parentName");
+      var phoneInput = document.getElementById("phone");
+      var emailInput = document.getElementById("email");
+      var classInput = document.getElementById("studentClass");
+      var boardInput = document.getElementById("board");
+      var subjectInput = document.getElementById("subject");
+      var preferredDateInput = document.getElementById("preferredDate");
+      var preferredTimeInput = document.getElementById("preferredTime");
+      var areaInput = document.getElementById("area");
+      var messageInput = document.getElementById("message");
+
+      if (formErrorMessage) formErrorMessage.style.display = "none";
+
       function showError(field, show) {
+        if (!field) return;
         var err = field.parentElement.querySelector(".error-text");
         if (err) {
           err.style.display = show ? "block" : "none";
         }
         field.style.borderColor = show ? "var(--marking)" : "var(--rule)";
       }
-      if (!name.value.trim()) {
-        showError(name, true);
+
+      var studentName = studentNameInput ? studentNameInput.value.trim() : "";
+      if (studentNameInput && !studentName) {
+        showError(studentNameInput, true);
         valid = false;
-      } else {
-        showError(name, false);
+      } else if (studentNameInput) {
+        showError(studentNameInput, false);
       }
-      var phoneOk = /^[0-9]{10}$/.test(phone.value.trim());
+
+      var parentName = parentNameInput ? parentNameInput.value.trim() : "";
+      if (parentNameInput && !parentName) {
+        showError(parentNameInput, true);
+        valid = false;
+      } else if (parentNameInput) {
+        showError(parentNameInput, false);
+      }
+
+      var phoneVal = phoneInput ? phoneInput.value.trim() : "";
+      var phoneOk = /^[0-9]{10}$/.test(phoneVal);
       if (!phoneOk) {
-        showError(phone, true);
+        if (phoneInput) showError(phoneInput, true);
         valid = false;
-      } else {
-        showError(phone, false);
+      } else if (phoneInput) {
+        showError(phoneInput, false);
       }
-      if (!studentClass.value) {
-        showError(studentClass, true);
+
+      var emailVal = emailInput ? emailInput.value.trim() : "";
+      if (emailVal && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
+        if (emailInput) showError(emailInput, true);
         valid = false;
+      } else if (emailInput) {
+        showError(emailInput, false);
+      }
+
+      var classVal = classInput ? classInput.value : "";
+      if (!classVal) {
+        if (classInput) showError(classInput, true);
+        valid = false;
+      } else if (classInput) {
+        showError(classInput, false);
+      }
+
+      if (!valid) return;
+
+      isSubmitting = true;
+      var originalBtnText = submitBtn ? submitBtn.textContent : "Request my free demo class";
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Submitting request...";
+      }
+
+      var modeVal = "Home";
+      var checkedRadio = document.querySelector('input[name="mode"]:checked');
+      if (checkedRadio) modeVal = checkedRadio.value;
+
+      var payload = {
+        student_name: studentName || parentName,
+        parent_name: parentName || studentName,
+        phone: phoneVal,
+        email: emailVal || null,
+        class: classVal,
+        board: boardInput ? boardInput.value || null : null,
+        subjects: subjectInput ? subjectInput.value || null : null,
+        mode: modeVal,
+        location: areaInput ? areaInput.value || null : null,
+        preferred_date: preferredDateInput ? preferredDateInput.value || null : null,
+        preferred_time: preferredTimeInput ? preferredTimeInput.value || null : null,
+        message: messageInput ? messageInput.value || null : null
+      };
+
+      var res = await window.submitDemoRequest(payload);
+
+      if (res && res.success) {
+        form.reset();
+        form.style.display = "none";
+        if (formSuccess) {
+          formSuccess.style.display = "block";
+        }
       } else {
-        showError(studentClass, false);
+        if (formErrorMessage) {
+          formErrorMessage.textContent = "Unable to submit your request right now. Please try again or call us directly.";
+          formErrorMessage.style.display = "block";
+        }
       }
-      if (!valid) {
-        return;
+
+      isSubmitting = false;
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalBtnText;
       }
-      form.style.display = "none";
-      document.getElementById("formSuccess").style.display = "block";
     });
 
     if ("IntersectionObserver" in window) {

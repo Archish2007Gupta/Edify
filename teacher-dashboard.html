@@ -987,6 +987,29 @@
         return '<option value="' + st + '"' + sel + '>' + st + '</option>';
       }).join('');
 
+      var isAdmin = currentTeacher && (
+        currentTeacher.role === 'admin' ||
+        currentTeacher.is_admin === true ||
+        (currentTeacher.email && currentTeacher.email.toLowerCase().includes('admin'))
+      );
+
+      var assignTeacherHtml = '';
+      if (isAdmin && allTeachersList.length > 0) {
+        var teacherOptions = '<option value="">-- Unassigned --</option>' +
+          allTeachersList.map(function(t) {
+            var sel = item.assigned_teacher_id === t.id ? ' selected' : '';
+            return '<option value="' + t.id + '"' + sel + '>' + t.name + ' (' + (t.subjects || 'Faculty') + ')</option>';
+          }).join('');
+
+        assignTeacherHtml =
+          '<div style="margin-top:12px; display:flex; align-items:center; gap:10px; width:100%;">' +
+            '<span class="detail-label" style="min-width:140px;">Assign / Change Teacher:</span>' +
+            '<select class="filter-select" id="modalAssignTeacherSelect" style="padding:8px 14px; font-weight:600; font-size:14px; flex:1;">' +
+              teacherOptions +
+            '</select>' +
+          '</div>';
+      }
+
       var modalBody = document.getElementById('modalBody');
       modalBody.innerHTML =
         '<div class="detail-grid">' +
@@ -1015,6 +1038,7 @@
               '<input type="time" id="modalDemoTime" class="filter-select" style="display: none; padding:8px 14px;" value="' + (item.demo_time || '') + '">' +
               '<button class="btn-sm btn-primary" onclick="updateStatusFromModal(\'' + item.id + '\')">Update Status in Supabase</button>' +
             '</div>' +
+            assignTeacherHtml +
           '</div>' +
         '</div>';
 
@@ -1045,6 +1069,12 @@
       var demoDate = document.getElementById('modalDemoDate') ? document.getElementById('modalDemoDate').value : null;
       var demoTime = document.getElementById('modalDemoTime') ? document.getElementById('modalDemoTime').value : null;
 
+      var targetTeacherId = undefined;
+      var assignSelect = document.getElementById('modalAssignTeacherSelect');
+      if (assignSelect) {
+        targetTeacherId = assignSelect.value || null;
+      }
+
       if (newStatus === 'Scheduled') {
         if (!demoDate || !demoTime) {
           showToast('Valid Demo Date and Time are required when scheduling.', 'error');
@@ -1052,15 +1082,15 @@
         }
       }
 
-      showToast('Updating status in Supabase...', 'info');
+      showToast('Updating request in Supabase...', 'info');
 
-      var res = await window.updateDemoRequestStatus(requestId, newStatus, teacherId, demoDate, demoTime);
+      var res = await window.updateDemoRequestStatus(requestId, newStatus, teacherId, demoDate, demoTime, targetTeacherId);
       if (res && res.success) {
-        showToast('Status updated to "' + newStatus + '" in Supabase database!', 'success');
+        showToast('Demo request updated successfully in Supabase database!', 'success');
         document.getElementById('detailModal').classList.remove('active');
-        await loadDemoRequests();
+        await loadDemoRequests(false);
       } else {
-        showToast('Failed to update status in Supabase. Please try again.', 'error');
+        showToast('Failed to update status in Supabase. Please check permissions.', 'error');
       }
     };
 
@@ -1123,7 +1153,7 @@
       if (res && res.success) {
         pendingCount = Math.max(0, pendingCount - 1);
         document.getElementById('enrollBadge').textContent = pendingCount;
-        document.getElementById('enrollSub').textContent   = pendingCount + ' pending your approval';
+        document.getElementById('enrollSub').textContent   = pendingCount + ' pending approval';
 
         if (action === 'approve') {
           item.innerHTML =
@@ -1136,7 +1166,7 @@
               '<span class="badge badge-green">✓ Approved</span>' +
             '</div>';
           showToast(enroll.name + ' approved and assigned in Supabase!', 'success');
-          loadDemoRequests(); // Refresh table live from Supabase
+          loadDemoRequests(false);
         } else {
           item.style.transition = 'opacity .25s';
           item.style.opacity = '0';
@@ -1168,7 +1198,7 @@
     function setGreeting(name) {
       const h = new Date().getHours();
       const g = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
-      const displayName = name || 'Teacher';
+      const displayName = name || 'User';
       document.getElementById('greetingText').textContent = g + ', ' + displayName + ' 👋';
       const opts = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
       document.getElementById('dateText').textContent = new Date().toLocaleDateString('en-IN', opts) + ' — Here\'s your class overview';
@@ -1231,18 +1261,24 @@
       }
 
       const teacherId = currentTeacher ? currentTeacher.id : null;
-      if (!teacherId) {
+      const isAdmin = currentTeacher && (
+        currentTeacher.role === 'admin' ||
+        currentTeacher.is_admin === true ||
+        (currentTeacher.email && currentTeacher.email.toLowerCase().includes('admin'))
+      );
+
+      if (!teacherId && !isAdmin) {
         rawDemoRequests = [];
         filteredRequests = [];
         document.getElementById('studentCount').textContent = 0;
-        document.getElementById('enrolledSubtitle').textContent = 'No teacher profile linked.';
+        document.getElementById('enrolledSubtitle').textContent = 'No profile linked.';
         renderRequestsTable();
         updateStatisticsUI();
         return;
       }
 
-      // Fetch demo requests assigned specifically to this teacher or unassigned
-      const res = await window.getDemoRequests({ teacherId: teacherId });
+      // Fetch demo requests from Supabase
+      const res = await window.getDemoRequests({ teacherId: teacherId, isAdmin: isAdmin });
 
       if (!res.success) {
         if (!isSilent) renderErrorState(res.error);
@@ -1275,7 +1311,7 @@
 
       // Update header subtitle and stats counters
       document.getElementById('studentCount').textContent = rawDemoRequests.length;
-      document.getElementById('enrolledSubtitle').textContent = rawDemoRequests.length + ' demo requests available';
+      document.getElementById('enrolledSubtitle').textContent = rawDemoRequests.length + (isAdmin ? ' total demo requests' : ' demo requests assigned to you');
 
       // Separate pending requests (status = 'New') for sidebar list
       const pendingItems = rawDemoRequests.filter(function(r){ return r.status === 'New'; });
@@ -1292,7 +1328,7 @@
       });
       pendingCount = enrollments.length;
       document.getElementById('enrollBadge').textContent = pendingCount;
-      document.getElementById('enrollSub').textContent   = pendingCount + ' pending your approval';
+      document.getElementById('enrollSub').textContent   = pendingCount + ' pending approval';
 
       renderEnrollments();
       applyFilters();
@@ -1332,7 +1368,7 @@
         return;
       }
 
-      // 2. Fetch teacher profile from public.teachers where auth_user_id = user.id
+      // 2. Fetch profile from public.teachers where auth_user_id = user.id
       const user = currentSession.user;
       currentTeacher = await window.getTeacherProfile(user.id);
 
@@ -1343,7 +1379,18 @@
         return;
       }
 
-      // Listen for auth state changes (e.g. session expiration or sign out in another tab)
+      const isAdmin = currentTeacher.role === 'admin' ||
+        currentTeacher.is_admin === true ||
+        (currentTeacher.email && currentTeacher.email.toLowerCase().includes('admin'));
+
+      if (isAdmin && typeof window.getAllTeachers === 'function') {
+        const tRes = await window.getAllTeachers();
+        if (tRes && tRes.success) {
+          allTeachersList = tRes.data || [];
+        }
+      }
+
+      // Listen for auth state changes
       if (window.supabaseClient && window.supabaseClient.auth) {
         window.supabaseClient.auth.onAuthStateChange(function(event, session) {
           if (event === 'SIGNED_OUT' || !session) {
@@ -1352,11 +1399,11 @@
         });
       }
 
-      const teacherName = currentTeacher.name || (user.email ? user.email.split('@')[0] : 'Teacher');
-      const teacherRole = currentTeacher.subjects ? currentTeacher.subjects + ' · Faculty' : 'Edify Faculty';
+      const teacherName = currentTeacher.name || (user.email ? user.email.split('@')[0] : 'User');
+      const teacherRole = isAdmin ? 'System Administrator' : (currentTeacher.subjects ? currentTeacher.subjects + ' · Faculty' : 'Edify Faculty');
       const teacherInitials = initials(teacherName);
 
-      // 3. Update Profile UI with real Supabase teacher profile
+      // 3. Update Profile UI
       setGreeting(teacherName);
       document.querySelectorAll('.profile-avatar, .topbar-avatar').forEach(function(el) {
         el.textContent = teacherInitials;
@@ -1367,7 +1414,7 @@
       const pRole = document.querySelector('.profile-role');
       if (pRole) pRole.textContent = teacherRole;
 
-      // 4. Load live demo requests from Supabase demo_requests table
+      // 4. Load live demo requests from Supabase
       await loadDemoRequests(false);
 
       // 5. Realtime subscription to public.demo_requests

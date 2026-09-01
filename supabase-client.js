@@ -225,17 +225,32 @@
     }
   };
 
-  window.updateDemoRequestStatus = async function (requestId, newStatus, teacherId, demoDate, demoTime) {
+  /**
+   * Update the status of a demo request, schedule info, or assigned teacher.
+   * @param {string} requestId  - UUID of public.demo_requests
+   * @param {string} newStatus  - One of: New | Contacted | Accepted | Scheduled | Completed | Cancelled
+   * @param {string|null} teacherId - UUID of public.teachers (assigned when status → Accepted if unassigned)
+   * @param {string|null} [demoDate] - ISO date string
+   * @param {string|null} [demoTime] - Time string
+   * @param {string|null} [targetTeacherId] - Explicit target teacher ID for Admin re-assignment
+   * @returns {Promise<{success: boolean, data?: object, error?: any}>}
+   */
+  window.updateDemoRequestStatus = async function (requestId, newStatus, teacherId, demoDate, demoTime, targetTeacherId) {
     if (!window.supabaseClient || !requestId) return { success: false };
     try {
       var updatePayload = { status: newStatus };
-      if (teacherId && newStatus === "Accepted") {
+
+      if (targetTeacherId !== undefined) {
+        updatePayload.assigned_teacher_id = targetTeacherId;
+      } else if (teacherId && newStatus === "Accepted") {
         updatePayload.assigned_teacher_id = teacherId;
       }
+
       if (newStatus === "Scheduled") {
         if (demoDate) updatePayload.demo_date = demoDate;
         if (demoTime) updatePayload.demo_time = demoTime;
       }
+
       var result = await window.supabaseClient
         .from("demo_requests")
         .update(updatePayload)
@@ -255,8 +270,8 @@
   };
 
   /**
-   * Fetch demo requests from public.demo_requests.
-   * @param {Object} [options] - Filter options (e.g. teacherId, status)
+   * Fetch demo requests from public.demo_requests based on user role and options.
+   * @param {Object} [options] - Filter options (e.g. teacherId, isAdmin, status)
    * @returns {Promise<{success: boolean, data: Array, error?: any}>}
    */
   window.getDemoRequests = async function (options) {
@@ -270,8 +285,10 @@
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (options.teacherId) {
-        query = query.or("assigned_teacher_id.eq." + options.teacherId + ",assigned_teacher_id.is.null");
+      if (!options.isAdmin) {
+        if (options.teacherId) {
+          query = query.or("assigned_teacher_id.eq." + options.teacherId + ",assigned_teacher_id.is.null");
+        }
       }
       if (options.status) {
         query = query.eq("status", options.status);
@@ -288,6 +305,28 @@
       return { success: true, data: result.data || [] };
     } catch (err) {
       console.error("[Supabase Fetch Demo Requests Exception]", err);
+      return { success: false, data: [], error: err };
+    }
+  };
+
+  /**
+   * Fetch all teachers from public.teachers (Admin function).
+   * @returns {Promise<{success: boolean, data: Array, error?: any}>}
+   */
+  window.getAllTeachers = async function () {
+    if (!window.supabaseClient) return { success: false, data: [] };
+    try {
+      var result = await window.supabaseClient
+        .from("teachers")
+        .select("*")
+        .order("name", { ascending: true });
+      if (result.error) {
+        console.error("[Admin Service] Fetch teachers error:", result.error);
+        return { success: false, data: [], error: result.error };
+      }
+      return { success: true, data: result.data || [] };
+    } catch (err) {
+      console.error("[Admin Service] Fetch teachers exception:", err);
       return { success: false, data: [], error: err };
     }
   };
@@ -325,15 +364,19 @@
   /**
    * Assign a teacher to a demo request row in public.demo_requests (Admin service function).
    * @param {string} requestId - UUID of public.demo_requests
-   * @param {string} teacherId - UUID of public.teachers
+   * @param {string|null} teacherId - UUID of public.teachers
    * @returns {Promise<{success: boolean, data?: object, error?: any}>}
    */
   window.assignTeacherToDemoRequest = async function (requestId, teacherId) {
-    if (!window.supabaseClient || !requestId || !teacherId) return { success: false };
+    if (!window.supabaseClient || !requestId) return { success: false };
     try {
+      var updatePayload = { assigned_teacher_id: teacherId };
+      if (teacherId) {
+        updatePayload.status = "Accepted";
+      }
       var result = await window.supabaseClient
         .from("demo_requests")
-        .update({ assigned_teacher_id: teacherId, status: "Accepted" })
+        .update(updatePayload)
         .eq("id", requestId)
         .select()
         .single();

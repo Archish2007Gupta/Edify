@@ -1,0 +1,2372 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>
+    if (window.location.protocol.indexOf('http') === 0) {
+      document.write('<base href="/">');
+    }
+  </script>
+  <title id="pageTitle">Learning Hub — Free Educational Resources | Edify Tutorial</title>
+  <meta id="metaDescription" name="description"
+    content="Explore free educational resources, topic notes, important questions, formula sheets, and worksheets from Edify Tutorial teachers for Classes 6 to 12." />
+  <meta name="theme-color" content="#0E2E57" />
+
+  <!-- Canonical URL -->
+  <link id="canonicalUrl" rel="canonical" href="https://www.edifytutorial.com/learning-hub" />
+
+  <!-- Open Graph Meta Tags -->
+  <meta id="ogTitle" property="og:title" content="Learning Hub — Free Educational Resources | Edify Tutorial" />
+  <meta id="ogDescription" property="og:description"
+    content="Explore free educational resources, topic notes, important questions, formula sheets, and worksheets from Edify Tutorial teachers." />
+  <meta id="ogUrl" property="og:url" content="https://www.edifytutorial.com/learning-hub" />
+  <meta id="ogType" property="og:type" content="website" />
+  <meta id="ogImage" property="og:image" content="https://www.edifytutorial.com/_logo1.png" />
+
+  <!-- Structured Data JSON-LD Placeholder -->
+  <script id="structuredData" type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Edify Tutorial Learning Hub",
+    "url": "https://www.edifytutorial.com/learning-hub"
+  }
+  </script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..700&family=Hanken+Grotesk:wght@400..700&family=Caveat:wght@600;700&display=swap"
+    rel="stylesheet" />
+
+  <!-- KaTeX CSS & JS for Mathematical Formulas -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+  <!-- Shared Site Styles -->
+  <link rel="stylesheet" href="edify.css" />
+
+  <!-- Supabase Backend Client Integration -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="env.js"></script>
+  <script src="supabase-client.js"></script>
+
+  <style>
+    /* ==========================================================================
+       LEARNING HUB DEDICATED STYLES
+       Harmonized with Edify Tutorial design language
+       ========================================================================== */
+
+    :root {
+      --hub-accent: #1e5aa8;
+      --hub-accent-soft: rgba(30, 90, 168, 0.08);
+      --hub-amber-soft: rgba(245, 166, 35, 0.12);
+      --hub-card-border: rgba(14, 46, 87, 0.1);
+    }
+
+    /* Active Nav Link */
+    .nav-links a.active-link {
+      color: var(--blue-deep);
+      font-weight: 700;
+      position: relative;
+    }
+
+    .nav-links a.active-link::after {
+      content: "";
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--amber);
+      border-radius: 2px;
+    }
+
+    /* Breadcrumbs Bar */
+    .hub-breadcrumbs-bar {
+      background: #fff;
+      border-bottom: 1px solid var(--rule);
+      padding: 12px 0;
+      font-size: 13.5px;
+      color: var(--ink-soft);
+    }
+
+    .hub-breadcrumbs {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .hub-breadcrumbs li {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hub-breadcrumbs a {
+      color: var(--hub-accent);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.15s ease;
+    }
+
+    .hub-breadcrumbs a:hover {
+      color: var(--blue-deep);
+      text-decoration: underline;
+    }
+
+    .hub-breadcrumbs .crumb-sep {
+      color: var(--rule);
+      font-size: 12px;
+    }
+
+    .hub-breadcrumbs .current-crumb {
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    /* HERO SECTION */
+    .hub-hero {
+      background: linear-gradient(180deg, #ffffff 0%, var(--paper) 100%);
+      padding: clamp(36px, 5vw, 60px) 0;
+      border-bottom: 1px solid var(--rule);
+      text-align: center;
+    }
+
+    .hub-hero .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .hub-hero-title {
+      font-family: "Bricolage Grotesque", "Hanken Grotesk", sans-serif;
+      font-size: clamp(32px, 4.5vw, 54px);
+      font-weight: 700;
+      color: var(--blue-deep);
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 14px;
+    }
+
+    .hub-hero-title span {
+      color: var(--amber);
+    }
+
+    .hub-hero-lede {
+      font-size: clamp(16px, 1.6vw, 19px);
+      color: var(--ink-soft);
+      max-width: 640px;
+      margin: 0 auto 32px auto;
+      line-height: 1.5;
+    }
+
+    /* Prominent Search Bar */
+    .hub-search-wrap {
+      max-width: 720px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .hub-search-box {
+      display: flex;
+      align-items: center;
+      background: #ffffff;
+      border: 2px solid var(--blue);
+      border-radius: 50px;
+      padding: 6px 10px 6px 20px;
+      box-shadow: 0 10px 28px rgba(14, 46, 87, 0.12);
+      transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+    .hub-search-box:focus-within {
+      box-shadow: 0 12px 34px rgba(30, 90, 168, 0.2);
+      border-color: var(--blue-deep);
+    }
+
+    .hub-search-icon {
+      flex: none;
+      width: 22px;
+      height: 22px;
+      color: var(--blue);
+      margin-right: 12px;
+    }
+
+    .hub-search-input {
+      flex: 1 1 auto;
+      border: none;
+      background: transparent;
+      font-family: "Hanken Grotesk", sans-serif;
+      font-size: clamp(15px, 1.4vw, 17px);
+      color: var(--ink);
+      outline: none;
+      padding: 10px 0;
+    }
+
+    .hub-search-input::placeholder {
+      color: #8c97aa;
+    }
+
+    .hub-search-btn {
+      flex: none;
+      border-radius: 50px;
+      padding: 12px 26px;
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    .hub-search-suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
+      font-size: 13.5px;
+      color: var(--ink-soft);
+    }
+
+    .hub-search-chip {
+      background: #ffffff;
+      border: 1px solid var(--rule);
+      border-radius: 20px;
+      padding: 4px 12px;
+      color: var(--blue-deep);
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.15s ease;
+      cursor: pointer;
+    }
+
+    .hub-search-chip:hover {
+      background: var(--blue);
+      color: #ffffff;
+      border-color: var(--blue);
+    }
+
+    /* SECTION HEADERS */
+    .hub-section-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .hub-section-title {
+      font-family: "Bricolage Grotesque", "Hanken Grotesk", sans-serif;
+      font-size: clamp(22px, 2.5vw, 30px);
+      font-weight: 700;
+      color: var(--blue-deep);
+      letter-spacing: -0.01em;
+    }
+
+    .hub-section-sub {
+      font-size: 15px;
+      color: var(--ink-soft);
+      margin-top: 4px;
+    }
+
+    /* BROWSE BY CLASS CARDS */
+    .hub-class-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 18px;
+      margin-bottom: 48px;
+    }
+
+    .hub-class-card {
+      background: #ffffff;
+      border: 1px solid var(--rule);
+      border-radius: 14px;
+      padding: 22px 20px;
+      text-decoration: none;
+      color: var(--ink);
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .hub-class-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--blue), var(--amber));
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .hub-class-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(14, 46, 87, 0.08);
+      border-color: rgba(30, 90, 168, 0.3);
+    }
+
+    .hub-class-card:hover::before {
+      opacity: 1;
+    }
+
+    .hub-class-badge {
+      display: inline-block;
+      align-self: flex-start;
+      background: var(--hub-accent-soft);
+      color: var(--blue);
+      font: 700 11px/1 "Hanken Grotesk", sans-serif;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 5px 10px;
+      border-radius: 6px;
+      margin-bottom: 12px;
+    }
+
+    .hub-class-name {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--blue-deep);
+      margin-bottom: 6px;
+    }
+
+    .hub-class-count {
+      font-size: 13.5px;
+      color: var(--ink-soft);
+      margin-top: auto;
+      padding-top: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px dashed var(--rule-soft);
+    }
+
+    .hub-class-count span.arrow {
+      color: var(--blue);
+      font-weight: bold;
+      transition: transform 0.15s ease;
+    }
+
+    .hub-class-card:hover .hub-class-count span.arrow {
+      transform: translateX(4px);
+    }
+
+    /* BROWSE BY SUBJECT CHIPS */
+    .hub-subject-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 48px;
+    }
+
+    .hub-subject-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: #ffffff;
+      border: 1px solid var(--rule);
+      border-radius: 50px;
+      padding: 10px 20px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--blue-deep);
+      text-decoration: none;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .hub-subject-btn:hover,
+    .hub-subject-btn.active {
+      background: var(--blue-deep);
+      color: #ffffff;
+      border-color: var(--blue-deep);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(14, 46, 87, 0.15);
+    }
+
+    .hub-subject-count {
+      background: var(--hub-accent-soft);
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 12px;
+    }
+
+    .hub-subject-btn:hover .hub-subject-count,
+    .hub-subject-btn.active .hub-subject-count {
+      background: rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+    }
+
+    /* RESOURCE CARDS (LATEST & POPULAR) */
+    .hub-resource-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px;
+      margin-bottom: 48px;
+    }
+
+    .hub-card {
+      background: #ffffff;
+      border: 1px solid var(--rule);
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .hub-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 14px 28px rgba(14, 46, 87, 0.08);
+      border-color: rgba(30, 90, 168, 0.3);
+    }
+
+    .hub-card-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      font-size: 12px;
+    }
+
+    .hub-tag-type {
+      background: rgba(30, 90, 168, 0.1);
+      color: var(--blue);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+
+    .hub-tag-hierarchy {
+      color: var(--ink-soft);
+      font-weight: 500;
+    }
+
+    .hub-card-title {
+      font-family: "Bricolage Grotesque", "Hanken Grotesk", sans-serif;
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--blue-deep);
+      line-height: 1.35;
+      margin-bottom: 10px;
+    }
+
+    .hub-card-title a {
+      color: inherit;
+      text-decoration: none;
+      transition: color 0.15s ease;
+    }
+
+    .hub-card-title a:hover {
+      color: var(--blue);
+    }
+
+    .hub-card-chapter {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--marking);
+      margin-bottom: 10px;
+    }
+
+    .hub-card-desc {
+      font-size: 14.5px;
+      color: var(--ink-soft);
+      line-height: 1.5;
+      margin-bottom: 18px;
+      flex: 1 1 auto;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .hub-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-top: 14px;
+      border-top: 1px solid var(--rule-soft);
+      font-size: 13px;
+      color: var(--ink-soft);
+    }
+
+    .hub-author-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .hub-author-name {
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .hub-author-brand {
+      font-size: 11.5px;
+      color: var(--ink-soft);
+    }
+
+    .hub-card-read-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      font-size: 13.5px;
+      font-weight: 600;
+      border-radius: 8px;
+      background: var(--paper-2);
+      color: var(--blue-deep);
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+
+    .hub-card-read-btn:hover {
+      background: var(--blue);
+      color: #ffffff;
+    }
+
+    .hub-views-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink-soft);
+    }
+
+    /* CHAPTER GROUPING TREE */
+    .hub-chapter-section {
+      background: #ffffff;
+      border: 1px solid var(--rule);
+      border-radius: 14px;
+      padding: 24px 28px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .hub-chapter-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--rule-soft);
+    }
+
+    .hub-chapter-title {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: 21px;
+      font-weight: 700;
+      color: var(--blue-deep);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .hub-chapter-badge {
+      font-size: 12px;
+      font-weight: 600;
+      background: var(--hub-accent-soft);
+      color: var(--blue);
+      padding: 3px 10px;
+      border-radius: 12px;
+    }
+
+    .hub-topic-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .hub-topic-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border-radius: 8px;
+      transition: background 0.15s ease;
+    }
+
+    .hub-topic-item:hover {
+      background: var(--hub-accent-soft);
+    }
+
+    .hub-topic-item a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--ink);
+      font-weight: 500;
+      text-decoration: none;
+      flex: 1 1 auto;
+      font-size: 15.5px;
+    }
+
+    .hub-topic-item a:hover {
+      color: var(--blue);
+    }
+
+    .hub-topic-icon {
+      color: var(--blue);
+      flex: none;
+    }
+
+    /* ==========================================================================
+       INDIVIDUAL RESOURCE ARTICLE VIEW
+       ========================================================================== */
+    .hub-article-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 300px;
+      gap: clamp(24px, 4vw, 48px);
+      align-items: start;
+      margin-top: 24px;
+      margin-bottom: 60px;
+    }
+
+    .hub-article-main {
+      background: #ffffff;
+      border: 1px solid var(--rule);
+      border-radius: 16px;
+      padding: clamp(24px, 4vw, 44px);
+      box-shadow: var(--shadow-card);
+    }
+
+    .hub-article-header {
+      padding-bottom: 24px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .hub-article-meta-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .hub-article-title {
+      font-family: "Bricolage Grotesque", "Hanken Grotesk", sans-serif;
+      font-size: clamp(26px, 3.2vw, 38px);
+      font-weight: 700;
+      color: var(--blue-deep);
+      line-height: 1.25;
+      letter-spacing: -0.015em;
+      margin-bottom: 16px;
+    }
+
+    .hub-article-author-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 16px;
+      font-size: 14px;
+      color: var(--ink-soft);
+    }
+
+    .hub-author-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--blue);
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 15px;
+    }
+
+    /* Quick Overview Callout */
+    .hub-overview-box {
+      background: var(--paper);
+      border-left: 4px solid var(--amber);
+      border-radius: 0 10px 10px 0;
+      padding: 18px 22px;
+      margin-bottom: 28px;
+    }
+
+    .hub-overview-box h4 {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--blue-deep);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 6px;
+    }
+
+    .hub-overview-box p {
+      font-size: 15px;
+      color: var(--ink);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    /* Table of Contents */
+    .hub-toc-card {
+      background: var(--card);
+      border: 1px solid var(--rule);
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-bottom: 32px;
+    }
+
+    .hub-toc-title {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--blue-deep);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hub-toc-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .hub-toc-list li {
+      margin-bottom: 8px;
+      font-size: 14.5px;
+    }
+
+    .hub-toc-list li.toc-h3 {
+      padding-left: 18px;
+      font-size: 13.5px;
+    }
+
+    .hub-toc-list a {
+      color: var(--hub-accent);
+      text-decoration: none;
+      transition: color 0.15s ease;
+    }
+
+    .hub-toc-list a:hover {
+      color: var(--blue-deep);
+      text-decoration: underline;
+    }
+
+    /* Rich Text Content */
+    .hub-content {
+      font-size: 16.5px;
+      line-height: 1.75;
+      color: var(--ink);
+    }
+
+    .hub-content h2 {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--blue-deep);
+      margin-top: 36px;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--rule-soft);
+    }
+
+    .hub-content h3 {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--blue-deep);
+      margin-top: 26px;
+      margin-bottom: 12px;
+    }
+
+    .hub-content p {
+      margin-bottom: 18px;
+    }
+
+    .hub-content ul,
+    .hub-content ol {
+      margin-bottom: 20px;
+      padding-left: 24px;
+    }
+
+    .hub-content li {
+      margin-bottom: 8px;
+    }
+
+    .hub-content blockquote {
+      border-left: 4px solid var(--blue);
+      background: var(--hub-accent-soft);
+      padding: 14px 20px;
+      border-radius: 0 8px 8px 0;
+      margin: 20px 0;
+      font-style: italic;
+      color: var(--blue-deep);
+    }
+
+    .hub-content img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 10px;
+      margin: 20px 0;
+      border: 1px solid var(--rule);
+    }
+
+    .hub-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 24px 0;
+      font-size: 15px;
+    }
+
+    .hub-content th,
+    .hub-content td {
+      border: 1px solid var(--rule);
+      padding: 10px 14px;
+      text-align: left;
+    }
+
+    .hub-content th {
+      background: var(--paper-2);
+      color: var(--blue-deep);
+      font-weight: 700;
+    }
+
+    /* KaTeX formula rendering */
+    .ql-formula {
+      display: inline-block;
+      margin: 0 4px;
+      vertical-align: middle;
+    }
+
+    /* PDF Download Box */
+    .hub-pdf-box {
+      background: linear-gradient(135deg, rgba(30, 90, 168, 0.08) 0%, rgba(245, 166, 35, 0.1) 100%);
+      border: 1px solid rgba(30, 90, 168, 0.2);
+      border-radius: 14px;
+      padding: 24px;
+      margin-top: 36px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .hub-pdf-info h4 {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--blue-deep);
+      margin-bottom: 4px;
+    }
+
+    .hub-pdf-info p {
+      font-size: 14px;
+      color: var(--ink-soft);
+      margin: 0;
+    }
+
+    /* Article Sidebar */
+    .hub-sidebar {
+      position: sticky;
+      top: 100px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .hub-sidebar-card {
+      background: #ffffff;
+      border: 1px solid var(--rule);
+      border-radius: 14px;
+      padding: 22px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .hub-sidebar-card h3 {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--blue-deep);
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--rule-soft);
+    }
+
+    .hub-related-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .hub-related-item a {
+      color: var(--ink);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 14.5px;
+      line-height: 1.4;
+      display: block;
+      transition: color 0.15s ease;
+    }
+
+    .hub-related-item a:hover {
+      color: var(--blue);
+    }
+
+    .hub-related-meta {
+      font-size: 12px;
+      color: var(--ink-soft);
+      margin-top: 4px;
+    }
+
+    /* Free Demo CTA Banner */
+    .hub-demo-cta {
+      background: linear-gradient(135deg, var(--blue-deep) 0%, #153c6f 100%);
+      color: #ffffff;
+      border-radius: 14px;
+      padding: 26px;
+      text-align: center;
+    }
+
+    .hub-demo-cta h3 {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 10px;
+      border: none;
+      padding: 0;
+    }
+
+    .hub-demo-cta p {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.82);
+      margin-bottom: 18px;
+      line-height: 1.5;
+    }
+
+    .hub-demo-cta .btn {
+      width: 100%;
+      padding: 12px 18px;
+    }
+
+    /* EMPTY / NO RESULTS STATE */
+    .hub-empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      background: #ffffff;
+      border: 1px dashed var(--rule);
+      border-radius: 14px;
+      margin: 20px 0;
+    }
+
+    .hub-empty-icon {
+      width: 48px;
+      height: 48px;
+      color: var(--ink-soft);
+      margin-bottom: 14px;
+    }
+
+    .hub-empty-title {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--blue-deep);
+      margin-bottom: 8px;
+    }
+
+    .hub-empty-text {
+      font-size: 15px;
+      color: var(--ink-soft);
+      max-width: 460px;
+      margin: 0 auto 20px auto;
+    }
+
+    /* DEMO MODAL */
+    .hub-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(14, 46, 87, 0.65);
+      backdrop-filter: blur(4px);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .hub-modal.open {
+      display: flex;
+    }
+
+    .hub-modal-card {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 32px;
+      width: 100%;
+      max-width: 520px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+      position: relative;
+    }
+
+    .hub-modal-close {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      background: none;
+      border: none;
+      font-size: 24px;
+      color: var(--ink-soft);
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    /* Mobile adjustments */
+    @media (max-width: 900px) {
+      .hub-article-layout {
+        grid-template-columns: 1fr;
+      }
+      .hub-sidebar {
+        position: static;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ========================================================================
+       TOP NAVIGATION BAR
+       ======================================================================== -->
+  <header>
+    <div class="nav">
+      <a class="brand" href="edify-tutorial-landing.html" aria-label="Edify Tutorial — Home">
+        <img class="brand-logo" src="_logo1.png" alt="Edify Tutorial" height="38"
+          onerror="this.onerror=null; this.src='_logo2.png';" />
+      </a>
+
+      <nav class="nav-links" aria-label="Main Navigation">
+        <a href="edify-tutorial-landing.html">Home</a>
+        <a href="edify-tutorial-landing.html#subjects">Courses</a>
+        <a href="learning-hub.html" class="active-link" aria-current="page">Learning Hub</a>
+        <a href="notes.html">Notes</a>
+        <a href="edify-tutorial-landing.html#paths">About</a>
+        <a href="edify-tutorial-landing.html#lead-form">Contact</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button type="button" class="btn btn-amber" onclick="openDemoModal()">Book a free demo</button>
+      </div>
+
+      <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false"
+        aria-controls="mobileMenu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="edify-tutorial-landing.html">Home</a>
+      <a href="edify-tutorial-landing.html#subjects">Courses</a>
+      <a href="learning-hub.html" class="active-link">Learning Hub</a>
+      <a href="notes.html">Notes</a>
+      <a href="edify-tutorial-landing.html#paths">About</a>
+      <a href="edify-tutorial-landing.html#lead-form">Contact</a>
+      <button type="button" class="btn btn-amber mobile-cta" onclick="openDemoModal()">Book a free demo class</button>
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       DYNAMIC BREADCRUMBS BAR
+       ======================================================================== -->
+  <div class="hub-breadcrumbs-bar">
+    <div class="container">
+      <ul class="hub-breadcrumbs" id="hubBreadcrumbs">
+        <li><a href="learning-hub.html">Learning Hub</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MAIN APP CONTAINER (Dynamic Router Views)
+       ======================================================================== -->
+  <main id="hubMain">
+    <div style="padding: 60px 0; text-align: center;">
+      <p style="color: var(--ink-soft); font-size: 16px;">Loading Edify Learning Hub...</p>
+    </div>
+  </main>
+
+  <!-- ========================================================================
+       FOOTER
+       ======================================================================== -->
+  <footer class="footer">
+    <div class="container">
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 20px; padding: 36px 0 20px 0; border-bottom: 1px solid var(--rule-soft);">
+        <div>
+          <a class="brand" href="edify-tutorial-landing.html" aria-label="Edify Tutorial">
+            <img class="brand-logo" src="_logo1.png" alt="Edify Tutorial" height="34"
+              onerror="this.onerror=null; this.src='_logo2.png';" />
+          </a>
+          <p style="font-size: 13.5px; color: var(--ink-soft); margin-top: 8px;">
+            Premier academic coaching and free learning resources for Classes 6–12.
+          </p>
+        </div>
+        <div style="display: flex; gap: 24px; font-size: 14px; font-weight: 500;">
+          <a href="edify-tutorial-landing.html" style="color: var(--ink); text-decoration: none;">Home</a>
+          <a href="learning-hub.html" style="color: var(--blue); text-decoration: none;">Learning Hub</a>
+          <a href="notes.html" style="color: var(--ink); text-decoration: none;">Textbook Notes</a>
+          <a href="teacher-login.html" style="color: var(--ink-soft); text-decoration: none;">Teacher Portal</a>
+        </div>
+      </div>
+      <div style="padding: 20px 0; font-size: 13px; color: var(--ink-soft); text-align: center;">
+        &copy; <span id="currentYear">2026</span> Edify Tutorial. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========================================================================
+       FREE DEMO CLASS BOOKING MODAL
+       ======================================================================== -->
+  <div class="hub-modal" id="demoModal" role="dialog" aria-modal="true" aria-labelledby="demoModalTitle">
+    <div class="hub-modal-card">
+      <button type="button" class="hub-modal-close" onclick="closeDemoModal()" aria-label="Close modal">&times;</button>
+      <div style="margin-bottom: 20px;">
+        <span class="eyebrow">Free Demo Class</span>
+        <h3 id="demoModalTitle" style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; color: var(--blue-deep); margin-top: 6px;">
+          Book Your Free Demo Session
+        </h3>
+        <p style="font-size: 14.5px; color: var(--ink-soft); margin-top: 4px;">
+          Experience Edify Tutorial's interactive 1-on-1 or small-batch coaching. We will call you within 24 hours.
+        </p>
+      </div>
+
+      <form id="demoModalForm" novalidate>
+        <div class="form-grid" style="grid-template-columns: 1fr; gap: 14px;">
+          <div class="field">
+            <label for="demoStudentName">Student's full name *</label>
+            <input type="text" id="demoStudentName" required placeholder="Enter student's name" />
+            <span class="error-text" style="display: none; color: var(--marking); font-size: 12px; margin-top: 4px;">Please enter the student's name.</span>
+          </div>
+
+          <div class="field">
+            <label for="demoParentName">Parent / Guardian name</label>
+            <input type="text" id="demoParentName" placeholder="Enter parent's name" />
+          </div>
+
+          <div class="field">
+            <label for="demoPhone">Phone number (10 digits) *</label>
+            <input type="tel" id="demoPhone" required placeholder="e.g. 9876543210" maxlength="10" />
+            <span class="error-text" style="display: none; color: var(--marking); font-size: 12px; margin-top: 4px;">Please enter a valid 10-digit mobile number.</span>
+          </div>
+
+          <div class="field">
+            <label for="demoClass">Class *</label>
+            <select id="demoClass" required>
+              <option value="">Select Class</option>
+              <option value="Class 6">Class 6</option>
+              <option value="Class 7">Class 7</option>
+              <option value="Class 8">Class 8</option>
+              <option value="Class 9">Class 9</option>
+              <option value="Class 10">Class 10</option>
+              <option value="Class 11">Class 11</option>
+              <option value="Class 12">Class 12</option>
+            </select>
+            <span class="error-text" style="display: none; color: var(--marking); font-size: 12px; margin-top: 4px;">Please select student's class.</span>
+          </div>
+
+          <div class="field">
+            <label for="demoSubject">Subject(s) interested in</label>
+            <input type="text" id="demoSubject" placeholder="e.g. Mathematics, Physics, Chemistry" />
+          </div>
+
+          <div style="margin-top: 6px;">
+            <button type="submit" id="demoSubmitBtn" class="btn btn-amber" style="width: 100%; padding: 12px;">
+              Request My Free Demo Class
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <div id="demoSuccessState" style="display: none; text-align: center; padding: 20px 0;">
+        <div style="width: 50px; height: 50px; border-radius: 50%; background: rgba(30, 90, 168, 0.1); color: var(--blue); display: inline-flex; align-items: center; justify-content: center; font-size: 26px; margin-bottom: 12px;">
+          ✓
+        </div>
+        <h4 style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px; color: var(--blue-deep); margin-bottom: 6px;">
+          Demo Request Received!
+        </h4>
+        <p style="font-size: 14.5px; color: var(--ink-soft); line-height: 1.5;">
+          Thank you! Our academic coordinator will call you within 24 hours to schedule your free demo class.
+        </p>
+        <button type="button" class="btn btn-navy" style="margin-top: 18px;" onclick="closeDemoModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       CORE CLIENT ROUTER & DATA RENDERING SCRIPT
+       ======================================================================== -->
+  <script>
+    (function () {
+      "use strict";
+
+      // Set footer year
+      var yearEl = document.getElementById("currentYear");
+      if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+      // Mobile Menu Toggle
+      var navToggle = document.getElementById("navToggle");
+      var mobileMenu = document.getElementById("mobileMenu");
+      if (navToggle && mobileMenu) {
+        navToggle.addEventListener("click", function () {
+          var expanded = navToggle.getAttribute("aria-expanded") === "true";
+          navToggle.setAttribute("aria-expanded", !expanded);
+          mobileMenu.classList.toggle("open");
+        });
+      }
+
+      // Demo Modal controls
+      window.openDemoModal = function (prefillClass, prefillSubject) {
+        var modal = document.getElementById("demoModal");
+        var form = document.getElementById("demoModalForm");
+        var success = document.getElementById("demoSuccessState");
+        if (form) form.style.display = "block";
+        if (success) success.style.display = "none";
+        if (prefillClass) {
+          var classEl = document.getElementById("demoClass");
+          if (classEl) classEl.value = prefillClass;
+        }
+        if (prefillSubject) {
+          var subEl = document.getElementById("demoSubject");
+          if (subEl) subEl.value = prefillSubject;
+        }
+        if (modal) modal.classList.add("open");
+      };
+
+      window.closeDemoModal = function () {
+        var modal = document.getElementById("demoModal");
+        if (modal) modal.classList.remove("open");
+      };
+
+      // Modal Form Submit
+      var demoForm = document.getElementById("demoModalForm");
+      if (demoForm) {
+        demoForm.addEventListener("submit", async function (e) {
+          e.preventDefault();
+          var studentName = document.getElementById("demoStudentName").value.trim();
+          var parentName = document.getElementById("demoParentName").value.trim();
+          var phone = document.getElementById("demoPhone").value.trim();
+          var classVal = document.getElementById("demoClass").value;
+          var subject = document.getElementById("demoSubject").value.trim();
+          var submitBtn = document.getElementById("demoSubmitBtn");
+
+          var valid = true;
+          function checkField(input, isOk) {
+            var err = input.parentElement.querySelector(".error-text");
+            if (err) err.style.display = isOk ? "none" : "block";
+            input.style.borderColor = isOk ? "var(--rule)" : "var(--marking)";
+            if (!isOk) valid = false;
+          }
+
+          checkField(document.getElementById("demoStudentName"), !!studentName);
+          checkField(document.getElementById("demoPhone"), /^[0-9]{10}$/.test(phone));
+          checkField(document.getElementById("demoClass"), !!classVal);
+
+          if (!valid) return;
+
+          submitBtn.disabled = true;
+          submitBtn.textContent = "Submitting Request...";
+
+          var payload = {
+            student_name: studentName,
+            parent_name: parentName || studentName,
+            phone: phone,
+            class: classVal,
+            subjects: subject || null,
+            mode: "Home",
+            status: "New"
+          };
+
+          if (window.submitDemoRequest) {
+            var res = await window.submitDemoRequest(payload);
+            if (res && res.success) {
+              demoForm.reset();
+              demoForm.style.display = "none";
+              document.getElementById("demoSuccessState").style.display = "block";
+            } else {
+              alert("Could not submit request. Please try again or call Edify Tutorial directly.");
+            }
+          } else {
+            demoForm.reset();
+            demoForm.style.display = "none";
+            document.getElementById("demoSuccessState").style.display = "block";
+          }
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Request My Free Demo Class";
+        });
+      }
+
+      // ========================================================================
+      // ROUTING ARCHITECTURE
+      // Dual clean URL / query-hash router
+      // ========================================================================
+
+      /**
+       * Parse current route information from location.
+       * Supports:
+       * 1. Path: /learning-hub/class-10/physics/ohms-law-class-10
+       * 2. Search params: ?class=class-10&subject=physics&resource=ohms-law-class-10
+       * 3. Hash: #class-10/physics/ohms-law-class-10
+       */
+      function parseCurrentRoute() {
+        var path = window.location.pathname.replace(/\\/g, "/");
+        var searchParams = new URLSearchParams(window.location.search);
+        var hash = window.location.hash.replace(/^#\/?/, "");
+
+        // 1. Direct search parameter takes highest priority for explicit links
+        if (searchParams.get("slug") || searchParams.get("resource")) {
+          return {
+            view: "resource",
+            classSlug: searchParams.get("class") || "",
+            subjectSlug: searchParams.get("subject") || "",
+            resourceSlug: searchParams.get("slug") || searchParams.get("resource") || ""
+          };
+        }
+
+        // 2. Hash routing check
+        if (hash) {
+          var hashParts = hash.split("/").filter(Boolean);
+          if (hashParts.length === 1) {
+            return { view: "class", classSlug: hashParts[0] };
+          } else if (hashParts.length === 2) {
+            return { view: "class-subject", classSlug: hashParts[0], subjectSlug: hashParts[1] };
+          } else if (hashParts.length >= 3) {
+            return { view: "resource", classSlug: hashParts[0], subjectSlug: hashParts[1], resourceSlug: hashParts[2] };
+          }
+        }
+
+        // 3. Clean Path routing check (e.g. /learning-hub/class-10/physics/slug)
+        var hubIdx = path.indexOf("/learning-hub");
+        if (hubIdx !== -1) {
+          var subPath = path.substring(hubIdx + "/learning-hub".length).replace(/^\/+|\/+$/g, "");
+          if (subPath && !subPath.endsWith(".html")) {
+            var parts = subPath.split("/").filter(Boolean);
+            if (parts.length === 1) {
+              return { view: "class", classSlug: parts[0] };
+            } else if (parts.length === 2) {
+              return { view: "class-subject", classSlug: parts[0], subjectSlug: parts[1] };
+            } else if (parts.length >= 3) {
+              return { view: "resource", classSlug: parts[0], subjectSlug: parts[1], resourceSlug: parts[2] };
+            }
+          }
+        }
+
+        // 4. Query params fallback
+        if (searchParams.get("class") && searchParams.get("subject")) {
+          return { view: "class-subject", classSlug: searchParams.get("class"), subjectSlug: searchParams.get("subject") };
+        } else if (searchParams.get("class")) {
+          return { view: "class", classSlug: searchParams.get("class") };
+        }
+
+        return { view: "home" };
+      }
+
+      /**
+       * Construct a browser URL for a destination route.
+       */
+      function buildRouteUrl(route) {
+        var isHttp = window.location.protocol.indexOf("http") === 0;
+        if (isHttp) {
+          if (!route || route.view === "home") {
+            return "/learning-hub";
+          }
+          if (route.view === "class") {
+            return "/learning-hub/" + encodeURIComponent(route.classSlug);
+          }
+          if (route.view === "class-subject") {
+            return "/learning-hub/" + encodeURIComponent(route.classSlug) + "/" + encodeURIComponent(route.subjectSlug);
+          }
+          if (route.view === "resource") {
+            var cls = route.classSlug || "general";
+            var sub = route.subjectSlug || "general";
+            return "/learning-hub/" + encodeURIComponent(cls) + "/" + encodeURIComponent(sub) + "/" + encodeURIComponent(route.resourceSlug);
+          }
+          return "/learning-hub";
+        }
+
+        // Local filesystem (file://) fallback
+        if (!route || route.view === "home") {
+          return "learning-hub.html";
+        }
+        if (route.view === "class") {
+          return "learning-hub.html?class=" + encodeURIComponent(route.classSlug);
+        }
+        if (route.view === "class-subject") {
+          return "learning-hub.html?class=" + encodeURIComponent(route.classSlug) + "&subject=" + encodeURIComponent(route.subjectSlug);
+        }
+        if (route.view === "resource") {
+          var clsParam = route.classSlug ? "&class=" + encodeURIComponent(route.classSlug) : "";
+          var subParam = route.subjectSlug ? "&subject=" + encodeURIComponent(route.subjectSlug) : "";
+          return "learning-hub.html?resource=" + encodeURIComponent(route.resourceSlug) + clsParam + subParam;
+        }
+        return "learning-hub.html";
+      }
+
+      /**
+       * Navigate without full page reload.
+       */
+      window.hubNavigate = function (route, pushState) {
+        if (pushState !== false) {
+          var url = buildRouteUrl(route);
+          try {
+            history.pushState(route, "", url);
+          } catch (e) {
+            window.location.hash = "#" + (route.classSlug || "") + (route.subjectSlug ? "/" + route.subjectSlug : "") + (route.resourceSlug ? "/" + route.resourceSlug : "");
+          }
+        }
+        renderCurrentRoute();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      };
+
+      window.addEventListener("popstate", function () {
+        renderCurrentRoute();
+      });
+
+      // Helper: slugify text
+      function toSlug(s) {
+        if (!s) return "";
+        return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+      }
+
+      // Helper: format date
+      function formatDate(dateStr) {
+        if (!dateStr) return "";
+        try {
+          var d = new Date(dateStr);
+          return d.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+        } catch (e) {
+          return dateStr;
+        }
+      }
+
+      // ========================================================================
+      // SEO & STRUCTURED DATA UPDATER
+      // ========================================================================
+      function updatePageSeo(seo) {
+        var title = seo.title || "Learning Hub — Free Educational Resources | Edify Tutorial";
+        var desc = seo.description || "Explore free educational resources, topic notes, questions, and worksheets from Edify Tutorial teachers.";
+        var canonical = seo.canonical || "https://www.edifytutorial.com/learning-hub";
+
+        document.title = title;
+        var metaDesc = document.getElementById("metaDescription");
+        if (metaDesc) metaDesc.setAttribute("content", desc);
+
+        var canEl = document.getElementById("canonicalUrl");
+        if (canEl) canEl.setAttribute("href", canonical);
+
+        var ogT = document.getElementById("ogTitle");
+        if (ogT) ogT.setAttribute("content", title);
+        var ogD = document.getElementById("ogDescription");
+        if (ogD) ogD.setAttribute("content", desc);
+        var ogU = document.getElementById("ogUrl");
+        if (ogU) ogU.setAttribute("content", canonical);
+        var ogType = document.getElementById("ogType");
+        if (ogType) ogType.setAttribute("content", seo.type || "website");
+
+        // Structured data JSON-LD
+        var ldScript = document.getElementById("structuredData");
+        if (ldScript && seo.structuredData) {
+          ldScript.textContent = JSON.stringify(seo.structuredData, null, 2);
+        }
+      }
+
+      // ========================================================================
+      // BREADCRUMB BUILDER
+      // ========================================================================
+      function updateBreadcrumbs(crumbs) {
+        var bc = document.getElementById("hubBreadcrumbs");
+        if (!bc) return;
+        var html = '<li><a href="javascript:void(0)" onclick="hubNavigate({view:\'home\'})">Learning Hub</a></li>';
+
+        crumbs.forEach(function (c, idx) {
+          html += '<li class="crumb-sep">/</li>';
+          if (idx === crumbs.length - 1) {
+            html += '<li class="current-crumb" aria-current="page">' + c.label + '</li>';
+          } else {
+            html += '<li><a href="javascript:void(0)" onclick="hubNavigate(' + JSON.stringify(c.route).replace(/"/g, '&quot;') + ')">' + c.label + '</a></li>';
+          }
+        });
+
+        bc.innerHTML = html;
+      }
+
+      // ========================================================================
+      // VIEW 1: LEARNING HUB HOMEPAGE
+      // ========================================================================
+      async function renderHomeView() {
+        var main = document.getElementById("hubMain");
+        updateBreadcrumbs([]);
+        updatePageSeo({
+          title: "Learning Hub — Free Study Material, Notes & Worksheets | Edify Tutorial",
+          description: "Explore free educational resources, topic notes, questions, worksheets and study material from Edify Tutorial teachers for Classes 6 to 12.",
+          canonical: "https://www.edifytutorial.com/learning-hub",
+          type: "website"
+        });
+
+        main.innerHTML = `
+          <!-- Hero Section -->
+          <section class="hub-hero">
+            <div class="container">
+              <span class="eyebrow">Free Educational Resources</span>
+              <h1 class="hub-hero-title">Learn. Revise. <span>Understand.</span></h1>
+              <p class="hub-hero-lede">
+                Explore free educational resources, topic notes, questions, worksheets and study material from Edify Tutorial teachers.
+              </p>
+
+              <!-- Search Bar -->
+              <div class="hub-search-wrap">
+                <form class="hub-search-box" id="hubSearchForm" onsubmit="event.preventDefault(); handleHubSearch();">
+                  <svg class="hub-search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                  </svg>
+                  <input type="text" id="hubSearchInput" class="hub-search-input"
+                    placeholder="Search for a topic, subject, chapter or question..." autocomplete="off" />
+                  <button type="submit" class="btn btn-amber hub-search-btn">Search</button>
+                </form>
+                <div class="hub-search-suggestions">
+                  <span>Popular:</span>
+                  <a class="hub-search-chip" onclick="quickSearch('Ohm')">Ohm's Law</a>
+                  <a class="hub-search-chip" onclick="quickSearch('Resistance')">Resistance</a>
+                  <a class="hub-search-chip" onclick="quickSearch('Electricity')">Electricity</a>
+                  <a class="hub-search-chip" onclick="quickSearch('Quadratic')">Quadratic Equations</a>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Search Results Container (Hidden until search triggered) -->
+          <section class="section" id="hubSearchResultsSection" style="display: none; background: var(--paper-2); border-bottom: 1px solid var(--rule);">
+            <div class="container">
+              <div class="hub-section-head">
+                <div>
+                  <h2 class="hub-section-title" id="searchResultsHeader">Search Results</h2>
+                  <p class="hub-section-sub" id="searchResultsCount"></p>
+                </div>
+                <button type="button" class="btn btn-navy" style="padding: 8px 16px; font-size: 13.5px;" onclick="clearSearch()">Clear Search</button>
+              </div>
+              <div class="hub-resource-grid" id="searchResultsGrid"></div>
+            </div>
+          </section>
+
+          <!-- Browse By Class Section -->
+          <section class="section" id="browseClassSection">
+            <div class="container">
+              <div class="hub-section-head">
+                <div>
+                  <span class="eyebrow">Curriculum</span>
+                  <h2 class="hub-section-title">Browse by Class</h2>
+                  <p class="hub-section-sub">Classes with teacher-authored and admin-approved educational materials.</p>
+                </div>
+              </div>
+              <div class="hub-class-grid" id="hubClassGrid">
+                <div style="grid-column: 1/-1; text-align: center; padding: 30px; color: var(--ink-soft);">Loading available classes...</div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Browse By Subject Section -->
+          <section class="section" id="browseSubjectSection" style="background: var(--paper);">
+            <div class="container">
+              <div class="hub-section-head">
+                <div>
+                  <span class="eyebrow">Disciplines</span>
+                  <h2 class="hub-section-title">Browse by Subject</h2>
+                  <p class="hub-section-sub">Filter study materials by academic subject.</p>
+                </div>
+              </div>
+              <div class="hub-subject-grid" id="hubSubjectGrid">
+                <div style="color: var(--ink-soft);">Loading subjects...</div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Latest Resources Section -->
+          <section class="section">
+            <div class="container">
+              <div class="hub-section-head">
+                <div>
+                  <span class="eyebrow">Fresh Content</span>
+                  <h2 class="hub-section-title">Latest Resources</h2>
+                  <p class="hub-section-sub">Newly published study notes, formulas, and worksheets.</p>
+                </div>
+              </div>
+              <div class="hub-resource-grid" id="hubLatestGrid">
+                <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--ink-soft);">Loading latest resources...</div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Popular Resources Section -->
+          <section class="section" style="background: var(--paper-2); border-top: 1px solid var(--rule);">
+            <div class="container">
+              <div class="hub-section-head">
+                <div>
+                  <span class="eyebrow">Trending</span>
+                  <h2 class="hub-section-title">Popular Resources</h2>
+                  <p class="hub-section-sub">Most viewed topics by students preparing for exams.</p>
+                </div>
+              </div>
+              <div class="hub-resource-grid" id="hubPopularGrid">
+                <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--ink-soft);">Loading popular resources...</div>
+              </div>
+            </div>
+          </section>
+        `;
+
+        // Fetch hierarchy & populate Class & Subject grids
+        loadHomeHierarchy();
+
+        // Fetch Latest Resources
+        loadLatestResources();
+
+        // Fetch Popular Resources
+        loadPopularResources();
+      }
+
+      async function loadHomeHierarchy() {
+        var classGrid = document.getElementById("hubClassGrid");
+        var subjectGrid = document.getElementById("hubSubjectGrid");
+        if (!classGrid || !subjectGrid) return;
+
+        var res = await window.getLearningHubHierarchy();
+        if (!res.success || !res.data.classes.length) {
+          classGrid.innerHTML = `
+            <div class="hub-empty-state" style="grid-column: 1/-1;">
+              <h3 class="hub-empty-title">Resources Being Prepared</h3>
+              <p class="hub-empty-text">Teacher resources are currently being authored and approved. Please check back shortly!</p>
+            </div>
+          `;
+          subjectGrid.innerHTML = `<p style="color: var(--ink-soft);">No published subjects yet.</p>`;
+          return;
+        }
+
+        // Render Class Cards
+        var classCardsHtml = "";
+        res.data.classes.forEach(function (cls) {
+          var clsSlug = toSlug(cls.name);
+          var subjectNames = Object.keys(cls.subjects || {}).slice(0, 3).join(", ");
+          if (Object.keys(cls.subjects || {}).length > 3) subjectNames += ", ...";
+
+          classCardsHtml += `
+            <div class="hub-class-card" onclick="hubNavigate({view: 'class', classSlug: '${clsSlug}'})">
+              <span class="hub-class-badge">${cls.count} ${cls.count === 1 ? 'Resource' : 'Resources'}</span>
+              <h3 class="hub-class-name">${cls.name}</h3>
+              <p style="font-size: 13px; color: var(--ink-soft); line-height: 1.4; margin-bottom: 12px;">
+                ${subjectNames ? 'Subjects: ' + subjectNames : 'Comprehensive study materials'}
+              </p>
+              <div class="hub-class-count">
+                <span>View resources</span>
+                <span class="arrow">→</span>
+              </div>
+            </div>
+          `;
+        });
+        classGrid.innerHTML = classCardsHtml;
+
+        // Render Subject Chips
+        var subjectChipsHtml = "";
+        res.data.subjects.forEach(function (sub) {
+          var subSlug = toSlug(sub.name);
+          subjectChipsHtml += `
+            <button type="button" class="hub-subject-btn" onclick="quickSearch('${sub.name}')">
+              <span>${sub.name}</span>
+              <span class="hub-subject-count">${sub.count}</span>
+            </button>
+          `;
+        });
+        subjectGrid.innerHTML = subjectChipsHtml;
+      }
+
+      async function loadLatestResources() {
+        var grid = document.getElementById("hubLatestGrid");
+        if (!grid) return;
+        var res = await window.getPublicResources({ sortBy: "latest", limit: 6 });
+        if (!res.success || !res.data.length) {
+          grid.innerHTML = `<div class="hub-empty-state" style="grid-column: 1/-1;"><p class="hub-empty-text">No published resources found yet.</p></div>`;
+          return;
+        }
+        grid.innerHTML = res.data.map(renderResourceCard).join("");
+      }
+
+      async function loadPopularResources() {
+        var grid = document.getElementById("hubPopularGrid");
+        if (!grid) return;
+        var res = await window.getPublicResources({ sortBy: "popular", limit: 6 });
+        if (!res.success || !res.data.length) {
+          grid.innerHTML = `<div class="hub-empty-state" style="grid-column: 1/-1;"><p class="hub-empty-text">No popular resources available yet.</p></div>`;
+          return;
+        }
+        grid.innerHTML = res.data.map(renderResourceCard).join("");
+      }
+
+      function renderResourceCard(item) {
+        var clsSlug = toSlug(item.class_level);
+        var subSlug = toSlug(item.subject);
+        var resSlug = toSlug(item.slug);
+        var teacherName = (item.teachers && item.teachers.name) ? item.teachers.name : "Edify Master Teacher";
+        var dateFormatted = formatDate(item.published_at);
+        var views = item.views || 0;
+
+        return `
+          <div class="hub-card">
+            <div class="hub-card-meta">
+              <span class="hub-tag-type">${item.resource_type || 'Topic Notes'}</span>
+              <span class="hub-tag-hierarchy">${item.class_level} • ${item.subject}</span>
+            </div>
+            <h3 class="hub-card-title">
+              <a href="javascript:void(0)" onclick="hubNavigate({view:'resource', classSlug:'${clsSlug}', subjectSlug:'${subSlug}', resourceSlug:'${resSlug}'})">
+                ${item.title}
+              </a>
+            </h3>
+            ${item.chapter ? `<div class="hub-card-chapter">Chapter: ${item.chapter}</div>` : ''}
+            <p class="hub-card-desc">${item.description || 'Comprehensive revision and study material from Edify Tutorial.'}</p>
+            <div class="hub-card-footer">
+              <div class="hub-author-info">
+                <span class="hub-author-name">By ${teacherName}</span>
+                <span class="hub-author-brand">${dateFormatted ? dateFormatted + ' · ' : ''}Edify Tutorial</span>
+              </div>
+              <a href="javascript:void(0)" class="hub-card-read-btn" onclick="hubNavigate({view:'resource', classSlug:'${clsSlug}', subjectSlug:'${subSlug}', resourceSlug:'${resSlug}'})">
+                Read Resource →
+              </a>
+            </div>
+          </div>
+        `;
+      }
+
+      // Search Handlers
+      window.handleHubSearch = async function () {
+        var query = document.getElementById("hubSearchInput").value.trim();
+        if (!query) return;
+
+        var section = document.getElementById("hubSearchResultsSection");
+        var grid = document.getElementById("searchResultsGrid");
+        var header = document.getElementById("searchResultsHeader");
+        var countEl = document.getElementById("searchResultsCount");
+
+        if (section) section.style.display = "block";
+        if (grid) grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 30px; color: var(--ink-soft);">Searching resources for "${query}"...</div>`;
+
+        var res = await window.getPublicResources({ search: query, limit: 20 });
+
+        if (section) section.scrollIntoView({ behavior: "smooth", block: "start" });
+
+        if (!res.success || !res.data.length) {
+          header.textContent = `No results found for "${query}"`;
+          countEl.textContent = "Try searching with broader terms or check spelling.";
+          grid.innerHTML = `
+            <div class="hub-empty-state" style="grid-column: 1/-1;">
+              <svg class="hub-empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <h3 class="hub-empty-title">No resources found</h3>
+              <p class="hub-empty-text">We couldn't find any approved study materials matching "${query}". Try searching by subject like 'Physics' or class like 'Class 10'.</p>
+              <button type="button" class="btn btn-navy" onclick="clearSearch()">View all topics</button>
+            </div>
+          `;
+          return;
+        }
+
+        header.textContent = `Results for "${query}"`;
+        countEl.textContent = `Found ${res.data.length} educational ${res.data.length === 1 ? 'resource' : 'resources'}`;
+        grid.innerHTML = res.data.map(renderResourceCard).join("");
+      };
+
+      window.quickSearch = function (term) {
+        var input = document.getElementById("hubSearchInput");
+        if (input) input.value = term;
+        handleHubSearch();
+      };
+
+      window.clearSearch = function () {
+        var section = document.getElementById("hubSearchResultsSection");
+        var input = document.getElementById("hubSearchInput");
+        if (input) input.value = "";
+        if (section) section.style.display = "none";
+      };
+
+      // ========================================================================
+      // VIEW 2: CLASS LANDING PAGE (/learning-hub/class-10)
+      // ========================================================================
+      async function renderClassView(classSlug) {
+        var main = document.getElementById("hubMain");
+
+        // Format class display name (e.g. "class-10" -> "Class 10")
+        var className = classSlug.replace(/class-?/i, "Class ").replace(/\b\w/g, function (l) { return l.toUpperCase(); }).trim();
+        if (!className.startsWith("Class")) className = "Class " + className;
+
+        updateBreadcrumbs([
+          { label: className, route: { view: "class", classSlug: classSlug } }
+        ]);
+
+        updatePageSeo({
+          title: `${className} Study Resources & Notes | Edify Tutorial`,
+          description: `Download free chapter notes, important questions, formula sheets, and worksheets for ${className}. Curated by Edify Tutorial master teachers.`,
+          canonical: `https://www.edifytutorial.com/learning-hub/${classSlug}`,
+          type: "website"
+        });
+
+        main.innerHTML = `
+          <div class="container" style="padding-top: 36px; padding-bottom: 60px;">
+            <div style="margin-bottom: 36px;">
+              <span class="eyebrow">${className} Resources</span>
+              <h1 style="font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(28px, 3.8vw, 44px); font-weight: 700; color: var(--blue-deep); margin-top: 8px;">
+                ${className} Study Resources
+              </h1>
+              <p style="font-size: 16px; color: var(--ink-soft); max-width: 680px; margin-top: 8px; line-height: 1.5;">
+                Explore textbook-aligned, high-yield notes, numerical questions, formulas, and revision materials authored by Edify Tutorial teachers specifically for ${className}.
+              </p>
+            </div>
+
+            <!-- Subjects available for this class -->
+            <div style="margin-bottom: 40px;">
+              <h2 style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; font-weight: 700; color: var(--blue-deep); margin-bottom: 16px;">
+                Subjects Available for ${className}
+              </h2>
+              <div class="hub-subject-grid" id="classSubjectsGrid">
+                <div style="color: var(--ink-soft);">Finding available subjects...</div>
+              </div>
+            </div>
+
+            <!-- Latest Resources for this class -->
+            <div>
+              <h2 style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; font-weight: 700; color: var(--blue-deep); margin-bottom: 20px;">
+                Latest ${className} Resources
+              </h2>
+              <div class="hub-resource-grid" id="classResourcesGrid">
+                <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--ink-soft);">Loading ${className} resources...</div>
+              </div>
+            </div>
+          </div>
+        `;
+
+        // Fetch hierarchy to extract subjects for this class
+        var hier = await window.getLearningHubHierarchy();
+        var subjectsGrid = document.getElementById("classSubjectsGrid");
+        if (hier.success && subjectsGrid) {
+          var matchedClass = hier.data.classes.find(function (c) {
+            return toSlug(c.name) === classSlug || c.name.toLowerCase() === className.toLowerCase();
+          });
+
+          if (matchedClass && Object.keys(matchedClass.subjects || {}).length) {
+            var html = "";
+            Object.keys(matchedClass.subjects).forEach(function (sub) {
+              var subSlug = toSlug(sub);
+              var count = matchedClass.subjects[sub];
+              html += `
+                <a href="javascript:void(0)" class="hub-subject-btn" onclick="hubNavigate({view:'class-subject', classSlug:'${classSlug}', subjectSlug:'${subSlug}'})">
+                  <span>${sub}</span>
+                  <span class="hub-subject-count">${count}</span>
+                </a>
+              `;
+            });
+            subjectsGrid.innerHTML = html;
+          } else {
+            subjectsGrid.innerHTML = `<p style="color: var(--ink-soft);">No subjects currently active for ${className}.</p>`;
+          }
+        }
+
+        // Fetch resources for this class
+        var resGrid = document.getElementById("classResourcesGrid");
+        var resourcesRes = await window.getPublicResources({ classLevel: className });
+        if (!resourcesRes.success || !resourcesRes.data.length) {
+          // Fallback search with class slug
+          resourcesRes = await window.getPublicResources({ search: className });
+        }
+
+        if (resGrid) {
+          if (resourcesRes.success && resourcesRes.data.length) {
+            resGrid.innerHTML = resourcesRes.data.map(renderResourceCard).join("");
+          } else {
+            resGrid.innerHTML = `
+              <div class="hub-empty-state" style="grid-column: 1/-1;">
+                <h3 class="hub-empty-title">No resources published yet for ${className}</h3>
+                <p class="hub-empty-text">Our teachers are working on new study material for this class. Explore other classes or request a demo class!</p>
+                <button type="button" class="btn btn-navy" onclick="hubNavigate({view:'home'})">Browse all classes</button>
+              </div>
+            `;
+          }
+        }
+      }
+
+      // ========================================================================
+      // VIEW 3: CLASS + SUBJECT PAGE (/learning-hub/class-10/physics)
+      // ========================================================================
+      async function renderClassSubjectView(classSlug, subjectSlug) {
+        var main = document.getElementById("hubMain");
+
+        var className = classSlug.replace(/class-?/i, "Class ").replace(/\b\w/g, function (l) { return l.toUpperCase(); }).trim();
+        if (!className.startsWith("Class")) className = "Class " + className;
+        var subjectName = subjectSlug.replace(/-/g, " ").replace(/\b\w/g, function (l) { return l.toUpperCase(); }).trim();
+
+        updateBreadcrumbs([
+          { label: className, route: { view: "class", classSlug: classSlug } },
+          { label: subjectName, route: { view: "class-subject", classSlug: classSlug, subjectSlug: subjectSlug } }
+        ]);
+
+        updatePageSeo({
+          title: `${className} ${subjectName} Notes, Chapters & Solutions | Edify Tutorial`,
+          description: `Chapter-wise educational resources, notes, formulas, and revision materials for ${className} ${subjectName}.`,
+          canonical: `https://www.edifytutorial.com/learning-hub/${classSlug}/${subjectSlug}`,
+          type: "website"
+        });
+
+        main.innerHTML = `
+          <div class="container" style="padding-top: 36px; padding-bottom: 60px;">
+            <div style="margin-bottom: 36px;">
+              <span class="eyebrow">${className} • ${subjectName}</span>
+              <h1 style="font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(28px, 3.8vw, 44px); font-weight: 700; color: var(--blue-deep); margin-top: 8px;">
+                ${className} ${subjectName}
+              </h1>
+              <p style="font-size: 16px; color: var(--ink-soft); max-width: 680px; margin-top: 8px; line-height: 1.5;">
+                Explore resources grouped by chapter. Master concepts, study derivations, and review important questions.
+              </p>
+            </div>
+
+            <!-- Chapters & Resources Hierarchy Container -->
+            <div id="chaptersContainer">
+              <div style="text-align: center; padding: 40px; color: var(--ink-soft);">Loading ${className} ${subjectName} chapters...</div>
+            </div>
+          </div>
+        `;
+
+        // Query published resources for this class and subject
+        var res = await window.getPublicResources({ classLevel: className, subject: subjectName });
+        if (!res.success || !res.data.length) {
+          // Fallback search
+          res = await window.getPublicResources({ search: subjectName });
+        }
+
+        var container = document.getElementById("chaptersContainer");
+        if (!container) return;
+
+        if (!res.success || !res.data.length) {
+          container.innerHTML = `
+            <div class="hub-empty-state">
+              <h3 class="hub-empty-title">No resources found for ${className} ${subjectName}</h3>
+              <p class="hub-empty-text">Teacher resources for this subject are currently under review. Check back soon or view all classes.</p>
+              <button type="button" class="btn btn-navy" onclick="hubNavigate({view:'class', classSlug:'${classSlug}'})">Back to ${className}</button>
+            </div>
+          `;
+          return;
+        }
+
+        // Group resources dynamically by chapter
+        var chapterMap = {};
+        res.data.forEach(function (item) {
+          var chName = (item.chapter || "General Concepts").trim();
+          if (!chapterMap[chName]) {
+            chapterMap[chName] = [];
+          }
+          chapterMap[chName].push(item);
+        });
+
+        var html = "";
+        Object.keys(chapterMap).forEach(function (chTitle) {
+          var items = chapterMap[chTitle];
+          html += `
+            <div class="hub-chapter-section">
+              <div class="hub-chapter-header">
+                <div class="hub-chapter-title">
+                  <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--blue); flex: none;">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                  </svg>
+                  <span>${chTitle}</span>
+                </div>
+                <span class="hub-chapter-badge">${items.length} ${items.length === 1 ? 'Topic' : 'Topics'}</span>
+              </div>
+              <ul class="hub-topic-list">
+          `;
+
+          items.forEach(function (it) {
+            var itemSlug = toSlug(it.slug);
+            var itemTeacher = (it.teachers && it.teachers.name) ? it.teachers.name : "Edify Master Teacher";
+            html += `
+              <li class="hub-topic-item">
+                <a href="javascript:void(0)" onclick="hubNavigate({view:'resource', classSlug:'${classSlug}', subjectSlug:'${subjectSlug}', resourceSlug:'${itemSlug}'})">
+                  <svg class="hub-topic-icon" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                  </svg>
+                  <div>
+                    <span>${it.title}</span>
+                    <div style="font-size: 12px; color: var(--ink-soft); font-weight: normal; margin-top: 2px;">
+                      ${it.resource_type || 'Topic Notes'} • By ${itemTeacher}
+                    </div>
+                  </div>
+                </a>
+                <a href="javascript:void(0)" class="hub-card-read-btn" onclick="hubNavigate({view:'resource', classSlug:'${classSlug}', subjectSlug:'${subjectSlug}', resourceSlug:'${itemSlug}'})">
+                  Read →
+                </a>
+              </li>
+            `;
+          });
+
+          html += `
+              </ul>
+            </div>
+          `;
+        });
+
+        container.innerHTML = html;
+      }
+
+      // ========================================================================
+      // VIEW 4: INDIVIDUAL RESOURCE ARTICLE PAGE
+      // (/learning-hub/class-10/physics/ohms-law-class-10)
+      // ========================================================================
+      async function renderResourceView(classSlug, subjectSlug, resourceSlug) {
+        var main = document.getElementById("hubMain");
+
+        main.innerHTML = `
+          <div class="container" style="padding: 60px 0; text-align: center;">
+            <p style="color: var(--ink-soft); font-size: 16px;">Loading study resource...</p>
+          </div>
+        `;
+
+        // Fetch resource by slug
+        var res = await window.getPublishedResourceBySlug(resourceSlug);
+        if (!res.success || !res.data) {
+          main.innerHTML = `
+            <div class="container" style="padding: 60px 0;">
+              <div class="hub-empty-state">
+                <h2 class="hub-empty-title">Resource Not Found</h2>
+                <p class="hub-empty-text">This educational resource may not be published or the link might be outdated.</p>
+                <button type="button" class="btn btn-navy" onclick="hubNavigate({view:'home'})">Return to Learning Hub</button>
+              </div>
+            </div>
+          `;
+          return;
+        }
+
+        var item = res.data;
+        var itemClassSlug = classSlug || toSlug(item.class_level);
+        var itemSubjectSlug = subjectSlug || toSlug(item.subject);
+
+        // Track view counter securely with session debounce
+        trackResourceView(item.id);
+
+        // Update Breadcrumbs
+        var crumbs = [
+          { label: item.class_level, route: { view: "class", classSlug: itemClassSlug } },
+          { label: item.subject, route: { view: "class-subject", classSlug: itemClassSlug, subjectSlug: itemSubjectSlug } }
+        ];
+        if (item.chapter) {
+          crumbs.push({ label: item.chapter, route: { view: "class-subject", classSlug: itemClassSlug, subjectSlug: itemSubjectSlug } });
+        }
+        crumbs.push({ label: item.title, route: { view: "resource", classSlug: itemClassSlug, subjectSlug: itemSubjectSlug, resourceSlug: item.slug } });
+        updateBreadcrumbs(crumbs);
+
+        // SEO and Canonical URL
+        var seoTitle = item.seo_title || `${item.title} | ${item.class_level} ${item.subject} | Edify Tutorial`;
+        var seoDesc = item.seo_description || item.description || `Study ${item.title} for ${item.class_level} ${item.subject}. Notes and formulas from Edify Tutorial.`;
+        var canonicalUrl = `https://www.edifytutorial.com/learning-hub/${itemClassSlug}/${itemSubjectSlug}/${encodeURIComponent(item.slug)}`;
+
+        updatePageSeo({
+          title: seoTitle,
+          description: seoDesc,
+          canonical: canonicalUrl,
+          type: "article",
+          structuredData: {
+            "@context": "https://schema.org",
+            "@type": "Article",
+            "headline": item.title,
+            "description": seoDesc,
+            "datePublished": item.published_at || item.created_at,
+            "dateModified": item.updated_at || item.published_at,
+            "author": {
+              "@type": "Organization",
+              "name": "Edify Tutorial",
+              "url": "https://www.edifytutorial.com"
+            },
+            "publisher": {
+              "@type": "Organization",
+              "name": "Edify Tutorial",
+              "logo": {
+                "@type": "ImageObject",
+                "url": "https://www.edifytutorial.com/_logo1.png"
+              }
+            },
+            "mainEntityOfPage": {
+              "@type": "WebPage",
+              "@id": canonicalUrl
+            }
+          }
+        });
+
+        var teacherName = (item.teachers && item.teachers.name) ? item.teachers.name : "Edify Master Teacher";
+        var dateFormatted = formatDate(item.published_at);
+        var views = (item.views || 0) + 1; // Anticipate current view increment
+
+        main.innerHTML = `
+          <div class="container">
+            <div class="hub-article-layout">
+              <!-- Article Main Body -->
+              <article class="hub-article-main">
+                <header class="hub-article-header">
+                  <div class="hub-article-meta-top">
+                    <span class="hub-tag-type">${item.resource_type || 'Topic Notes'}</span>
+                    <span class="hub-tag-hierarchy">${item.class_level} • ${item.subject}</span>
+                    ${item.chapter ? `<span class="hub-tag-hierarchy">• Chapter: ${item.chapter}</span>` : ''}
+                  </div>
+
+                  <h1 class="hub-article-title">${item.title}</h1>
+
+                  <div class="hub-article-author-row">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                      <div class="hub-author-avatar">${teacherName.charAt(0)}</div>
+                      <div>
+                        <div style="font-weight: 600; color: var(--blue-deep);">Written by ${teacherName}</div>
+                        <div style="font-size: 12px;">Edify Tutorial Faculty</div>
+                      </div>
+                    </div>
+                    ${dateFormatted ? `<div>• Published on ${dateFormatted}</div>` : ''}
+                    <div class="hub-views-badge">
+                      <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                      <span>${views} views</span>
+                    </div>
+                  </div>
+                </header>
+
+                <!-- Quick Overview Callout -->
+                ${item.description ? `
+                  <div class="hub-overview-box">
+                    <h4>Quick Overview</h4>
+                    <p>${item.description}</p>
+                  </div>
+                ` : ''}
+
+                <!-- Dynamic Table of Contents -->
+                <div class="hub-toc-card" id="articleTocCard" style="display: none;">
+                  <div class="hub-toc-title">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                    </svg>
+                    <span>Table of Contents</span>
+                  </div>
+                  <ul class="hub-toc-list" id="articleTocList"></ul>
+                </div>
+
+                <!-- Article Rich Content Body -->
+                <div class="hub-content" id="articleContentContainer">
+                  ${item.content || '<p>No content provided for this resource.</p>'}
+                </div>
+
+                <!-- PDF Download Banner -->
+                ${item.pdf_url ? `
+                  <div class="hub-pdf-box">
+                    <div class="hub-pdf-info">
+                      <h4>Download Study Material</h4>
+                      <p>Get the complete chapter notes and solved examples in printable PDF format.</p>
+                    </div>
+                    <a href="${item.pdf_url}" target="_blank" rel="noopener" class="btn btn-amber" style="display: inline-flex; align-items: center; gap: 8px;">
+                      <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                      </svg>
+                      Download PDF
+                    </a>
+                  </div>
+                ` : ''}
+              </article>
+
+              <!-- Sidebar -->
+              <aside class="hub-sidebar">
+                <!-- Related Resources Card -->
+                <div class="hub-sidebar-card">
+                  <h3>Related Resources</h3>
+                  <ul class="hub-related-list" id="relatedResourcesList">
+                    <li style="color: var(--ink-soft); font-size: 13.5px;">Finding related topics...</li>
+                  </ul>
+                </div>
+
+                <!-- Demo Class CTA Card -->
+                <div class="hub-demo-cta">
+                  <h3>Need Help Understanding This Topic?</h3>
+                  <p>Learn 1-on-1 with experienced Edify Tutorial faculty. Clear doubts and build conceptual clarity.</p>
+                  <button type="button" class="btn btn-amber" onclick="openDemoModal('${item.class_level}', '${item.subject}')">
+                    Book a Free Demo Class
+                  </button>
+                </div>
+              </aside>
+            </div>
+          </div>
+        `;
+
+        // Generate Table of Contents from headings
+        generateArticleToc();
+
+        // Render KaTeX Formulas safely
+        renderMathFormulas();
+
+        // Load Related Resources
+        loadRelatedResources(item);
+      }
+
+      // Generate Table of Contents from h2 and h3
+      function generateArticleToc() {
+        var contentEl = document.getElementById("articleContentContainer");
+        var tocCard = document.getElementById("articleTocCard");
+        var tocList = document.getElementById("articleTocList");
+        if (!contentEl || !tocCard || !tocList) return;
+
+        var headings = contentEl.querySelectorAll("h2, h3");
+        if (headings.length < 2) {
+          tocCard.style.display = "none";
+          return;
+        }
+
+        var tocHtml = "";
+        headings.forEach(function (h, i) {
+          var id = "section-heading-" + (i + 1);
+          h.id = id;
+          var isH3 = h.tagName.toLowerCase() === "h3";
+          tocHtml += `
+            <li class="${isH3 ? 'toc-h3' : 'toc-h2'}">
+              <a href="#${id}">${h.textContent}</a>
+            </li>
+          `;
+        });
+
+        tocList.innerHTML = tocHtml;
+        tocCard.style.display = "block";
+      }
+
+      // Render KaTeX formulas
+      function renderMathFormulas() {
+        var contentEl = document.getElementById("articleContentContainer");
+        if (!contentEl) return;
+
+        // 1. Quill .ql-formula elements
+        var qlFormulas = contentEl.querySelectorAll(".ql-formula");
+        qlFormulas.forEach(function (el) {
+          var tex = el.getAttribute("data-value") || el.textContent;
+          if (tex && window.katex) {
+            try {
+              window.katex.render(tex, el, { throwOnError: false, displayMode: false });
+            } catch (e) {
+              console.warn("KaTeX render error:", e);
+            }
+          }
+        });
+
+        // 2. Auto-render $ / $$ delimiters
+        if (window.renderMathInElement) {
+          try {
+            window.renderMathInElement(contentEl, {
+              delimiters: [
+                { left: "$$", right: "$$", display: true },
+                { left: "$", right: "$", display: false }
+              ],
+              throwOnError: false
+            });
+          } catch (e) {
+            console.warn("KaTeX auto-render error:", e);
+          }
+        }
+      }
+
+      // Related resources query
+      async function loadRelatedResources(resource) {
+        var list = document.getElementById("relatedResourcesList");
+        if (!list) return;
+
+        var related = await window.getRelatedResources(resource, 4);
+        if (!related || !related.length) {
+          list.innerHTML = `<li style="color: var(--ink-soft); font-size: 13.5px;">No other resources in this chapter yet.</li>`;
+          return;
+        }
+
+        var html = "";
+        related.forEach(function (r) {
+          var cSlug = toSlug(r.class_level);
+          var sSlug = toSlug(r.subject);
+          var rSlug = toSlug(r.slug);
+          html += `
+            <li class="hub-related-item">
+              <a href="javascript:void(0)" onclick="hubNavigate({view:'resource', classSlug:'${cSlug}', subjectSlug:'${sSlug}', resourceSlug:'${rSlug}'})">
+                ${r.title}
+              </a>
+              <div class="hub-related-meta">
+                ${r.chapter ? 'Chapter: ' + r.chapter + ' • ' : ''}${r.resource_type || 'Topic Notes'}
+              </div>
+            </li>
+          `;
+        });
+        list.innerHTML = html;
+      }
+
+      // View Counter with Session Protection
+      function trackResourceView(resourceId) {
+        if (!resourceId) return;
+        var key = "edify_res_viewed_" + resourceId;
+        if (sessionStorage.getItem(key)) return;
+        sessionStorage.setItem(key, "1");
+
+        if (window.incrementResourceViews) {
+          window.incrementResourceViews(resourceId);
+        }
+      }
+
+      // ========================================================================
+      // ROUTE DISPATCHER
+      // ========================================================================
+      function renderCurrentRoute() {
+        var route = parseCurrentRoute();
+        if (route.view === "class") {
+          renderClassView(route.classSlug);
+        } else if (route.view === "class-subject") {
+          renderClassSubjectView(route.classSlug, route.subjectSlug);
+        } else if (route.view === "resource") {
+          renderResourceView(route.classSlug, route.subjectSlug, route.resourceSlug);
+        } else {
+          renderHomeView();
+        }
+      }
+
+      // Initial execution
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", renderCurrentRoute);
+      } else {
+        renderCurrentRoute();
+      }
+
+    })();
+  </script>
+</body>
+
+</html>

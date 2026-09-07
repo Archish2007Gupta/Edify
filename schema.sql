@@ -387,3 +387,377 @@ ON public.teachers
 FOR DELETE
 TO authenticated
 USING (public.is_admin());
+
+-- ------------------------------------------------------------------------------
+-- 7. LEARNING HUB RESOURCES TABLE
+-- Stores educational resources authored by teachers and reviewed by admins
+-- ------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS public.resources (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    teacher_id UUID NOT NULL REFERENCES public.teachers(id) ON DELETE CASCADE,
+    title TEXT NOT NULL,
+    slug TEXT NOT NULL,
+    description TEXT,
+    resource_type TEXT NOT NULL CHECK (resource_type IN ('Topic Notes', 'Chapter Notes', 'Important Questions', 'MCQs', 'Worksheets', 'Formula Sheets', 'Study Guides', 'Other')),
+    class_level TEXT NOT NULL,
+    subject TEXT NOT NULL,
+    chapter TEXT,
+    topic TEXT,
+    content TEXT,
+    cover_image_url TEXT,
+    pdf_url TEXT,
+    seo_title TEXT,
+    seo_description TEXT,
+    status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'under_review', 'published', 'rejected', 'archived')),
+    rejection_reason TEXT,
+    views INTEGER NOT NULL DEFAULT 0,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    published_at TIMESTAMPTZ,
+    CONSTRAINT uq_resources_slug UNIQUE (slug)
+);
+
+-- Performance Indexes
+CREATE INDEX IF NOT EXISTS idx_resources_teacher_id ON public.resources(teacher_id);
+CREATE INDEX IF NOT EXISTS idx_resources_status ON public.resources(status);
+CREATE INDEX IF NOT EXISTS idx_resources_class_subject ON public.resources(class_level, subject);
+CREATE INDEX IF NOT EXISTS idx_resources_slug ON public.resources(slug);
+CREATE INDEX IF NOT EXISTS idx_resources_created_at ON public.resources(created_at DESC);
+
+-- Automatic updated_at timestamp trigger for resources
+DROP TRIGGER IF EXISTS update_resources_updated_at ON public.resources;
+CREATE TRIGGER update_resources_updated_at
+BEFORE UPDATE ON public.resources
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
+
+-- ------------------------------------------------------------------------------
+-- 8. HARDENED SECURITY & LIFECYCLE TRIGGER FOR RESOURCES
+-- Enforces server-side author attribution, publishing locks, and status transitions
+-- ------------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION public.enforce_resource_security_and_lifecycle()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+    v_current_teacher_id UUID;
+BEGIN
+    -- Require authenticated user
+    IF auth.uid() IS NULL THEN
+        RAISE EXCEPTION 'Authentication required' USING ERRCODE = '42501';
+    END IF;
+
+    -- Admins have unrestricted moderation permissions
+    IF public.is_admin() THEN
+        -- If an admin publishes the resource, stamp published_at if not set
+        IF NEW.status = 'published' AND (TG_OP = 'INSERT' OR OLD.status IS DISTINCT FROM 'published') THEN
+            IF NEW.published_at IS NULL THEN
+                NEW.published_at := now();
+            END IF;
+        END IF;
+
+        -- Clear rejection reason when status moves out of rejected
+        IF NEW.status <> 'rejected' THEN
+            NEW.rejection_reason := NULL;
+        END IF;
+
+        RETURN NEW;
+    END IF;
+
+    -- ==========================================================================
+    -- TEACHER RULES (STRICT SERVER-SIDE RBAC)
+    -- ==========================================================================
+    v_current_teacher_id := public.get_current_teacher_id();
+    IF v_current_teacher_id IS NULL THEN
+        RAISE EXCEPTION 'User profile not linked to any registered teacher' USING ERRCODE = '42501';
+    END IF;
+
+    -- A. INSERT VALIDATION
+    IF TG_OP = 'INSERT' THEN
+        -- Force teacher_id to current teacher
+        NEW.teacher_id := v_current_teacher_id;
+
+        -- Teachers can ONLY insert as 'draft' or 'under_review'
+        IF NEW.status NOT IN ('draft', 'under_review') THEN
+            RAISE EXCEPTION 'Unauthorized: Teachers may only create resources with status draft or under_review' USING ERRCODE = '42501';
+        END IF;
+
+        -- Prevent spoofing views, published_at, or rejection_reason
+        NEW.views := 0;
+        NEW.published_at := NULL;
+        NEW.rejection_reason := NULL;
+
+        RETURN NEW;
+    END IF;
+
+    -- B. UPDATE VALIDATION
+    IF TG_OP = 'UPDATE' THEN
+        -- Resource must belong to the current teacher
+        IF OLD.teacher_id <> v_current_teacher_id THEN
+            RAISE EXCEPTION 'Unauthorized: You can only edit your own resources' USING ERRCODE = '42501';
+        END IF;
+
+        -- Teacher cannot transfer ownership
+        IF NEW.teacher_id <> OLD.teacher_id THEN
+            RAISE EXCEPTION 'Unauthorized: Cannot modify resource author' USING ERRCODE = '42501';
+        END IF;
+
+        -- Teacher cannot alter primary key or creation timestamp
+        IF NEW.id <> OLD.id OR NEW.created_at <> OLD.created_at THEN
+            RAISE EXCEPTION 'Unauthorized: Cannot modify immutable resource identifiers' USING ERRCODE = '42501';
+        END IF;
+
+        -- Teacher cannot tamper with view counter
+        NEW.views := OLD.views;
+
+        -- Teachers cannot directly publish, reject, or archive
+        IF NEW.status IN ('published', 'rejected', 'archived') THEN
+            RAISE EXCEPTION 'Unauthorized: Only administrators can publish, reject, or archive resources' USING ERRCODE = '42501';
+        END IF;
+
+        -- Published resource edit handling:
+        -- If a published resource is edited by a teacher, return it to 'under_review'
+        -- and freeze its slug to preserve existing public URLs
+        IF OLD.status = 'published' THEN
+            IF NEW.slug <> OLD.slug THEN
+                RAISE EXCEPTION 'Unauthorized: Slugs for published resources cannot be modified' USING ERRCODE = '42501';
+            END IF;
+            -- Re-route back into review workflow
+            NEW.status := 'under_review';
+            NEW.published_at := OLD.published_at;
+        END IF;
+
+        -- If resource was rejected and teacher is resubmitting for review:
+        IF NEW.status = 'under_review' THEN
+            NEW.rejection_reason := NULL;
+        ELSE
+            -- Preserve rejection reason if still in draft
+            NEW.rejection_reason := OLD.rejection_reason;
+        END IF;
+
+        RETURN NEW;
+    END IF;
+
+    -- C. DELETE VALIDATION
+    IF TG_OP = 'DELETE' THEN
+        IF OLD.teacher_id <> v_current_teacher_id THEN
+            RAISE EXCEPTION 'Unauthorized: You can only delete your own resources' USING ERRCODE = '42501';
+        END IF;
+
+        IF OLD.status <> 'draft' THEN
+            RAISE EXCEPTION 'Unauthorized: Teachers may only delete resources that are in draft status' USING ERRCODE = '42501';
+        END IF;
+
+        RETURN OLD;
+    END IF;
+
+    RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_enforce_resource_security ON public.resources;
+CREATE TRIGGER trg_enforce_resource_security
+BEFORE INSERT OR UPDATE OR DELETE ON public.resources
+FOR EACH ROW
+EXECUTE FUNCTION public.enforce_resource_security_and_lifecycle();
+
+-- ------------------------------------------------------------------------------
+-- 9. ROW LEVEL SECURITY (RLS) POLICIES FOR RESOURCES
+-- ------------------------------------------------------------------------------
+ALTER TABLE public.resources ENABLE ROW LEVEL SECURITY;
+
+-- Clean up existing policies if re-running
+DROP POLICY IF EXISTS "Allow public read published resources" ON public.resources;
+DROP POLICY IF EXISTS "Allow authenticated read resources" ON public.resources;
+DROP POLICY IF EXISTS "Allow teachers and admins insert resources" ON public.resources;
+DROP POLICY IF EXISTS "Allow teachers and admins update resources" ON public.resources;
+DROP POLICY IF EXISTS "Allow teachers delete draft resources and admin delete any" ON public.resources;
+
+-- A. PUBLIC / ANONYMOUS READ:
+-- Unauthenticated users can strictly view published resources only
+CREATE POLICY "Allow public read published resources"
+ON public.resources
+FOR SELECT
+TO anon
+USING (status = 'published');
+
+-- B. AUTHENTICATED READ:
+-- Admins view all resources; Teachers view their own resources + any published resources
+CREATE POLICY "Allow authenticated read resources"
+ON public.resources
+FOR SELECT
+TO authenticated
+USING (
+  public.is_admin() OR
+  teacher_id = public.get_current_teacher_id() OR
+  status = 'published'
+);
+
+-- C. INSERT:
+-- Teachers can insert their own resources (status 'draft' or 'under_review'); Admins can insert any
+CREATE POLICY "Allow teachers and admins insert resources"
+ON public.resources
+FOR INSERT
+TO authenticated
+WITH CHECK (
+  public.is_admin() OR (
+    teacher_id = public.get_current_teacher_id() AND
+    status IN ('draft', 'under_review')
+  )
+);
+
+-- D. UPDATE:
+-- Teachers update their own resources; Admins update any resource
+CREATE POLICY "Allow teachers and admins update resources"
+ON public.resources
+FOR UPDATE
+TO authenticated
+USING (
+  public.is_admin() OR
+  teacher_id = public.get_current_teacher_id()
+)
+WITH CHECK (
+  public.is_admin() OR (
+    teacher_id = public.get_current_teacher_id() AND
+    status IN ('draft', 'under_review')
+  )
+);
+
+-- E. DELETE:
+-- Teachers can only delete their own draft resources; Admins can delete any resource
+CREATE POLICY "Allow teachers delete draft resources and admin delete any"
+ON public.resources
+FOR DELETE
+TO authenticated
+USING (
+  public.is_admin() OR (
+    teacher_id = public.get_current_teacher_id() AND
+    status = 'draft'
+  )
+);
+
+-- ------------------------------------------------------------------------------
+-- 10. SUPABASE STORAGE SETUP FOR LEARNING RESOURCES (COVERS & PDFS)
+-- ------------------------------------------------------------------------------
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('learning-resources', 'learning-resources', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- Storage RLS: Public read access
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'objects' AND policyname = 'Public Access for learning-resources'
+  ) THEN
+    CREATE POLICY "Public Access for learning-resources"
+    ON storage.objects FOR SELECT
+    USING (bucket_id = 'learning-resources');
+  END IF;
+END $$;
+
+-- Storage RLS: Authenticated users can upload
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'objects' AND policyname = 'Authenticated users can upload learning-resources'
+  ) THEN
+    CREATE POLICY "Authenticated users can upload learning-resources"
+    ON storage.objects FOR INSERT
+    TO authenticated
+    WITH CHECK (bucket_id = 'learning-resources');
+  END IF;
+END $$;
+
+-- ------------------------------------------------------------------------------
+-- 11. SECURE VIEW COUNTER FUNCTION (PHASE 2)
+-- Allows public / anon users to increment views by +1 on published resources only
+-- ------------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION public.increment_resource_views(p_resource_id UUID)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+    UPDATE public.resources
+    SET views = COALESCE(views, 0) + 1
+    WHERE id = p_resource_id AND status = 'published';
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.increment_resource_views(UUID) TO anon, authenticated;
+
+-- ------------------------------------------------------------------------------
+-- 12. SAMPLE PUBLISHED RESOURCES SEED FOR VERIFICATION
+-- Ensures test resources (Ohm's Law and Resistance) exist under Class 10 Physics Electricity
+-- ------------------------------------------------------------------------------
+DO $$
+DECLARE
+    v_teacher_id UUID;
+BEGIN
+    -- Select the first available teacher or admin
+    SELECT id INTO v_teacher_id FROM public.teachers ORDER BY created_at ASC LIMIT 1;
+
+    IF v_teacher_id IS NOT NULL THEN
+        -- Seed Resource 1: Ohm's Law
+        INSERT INTO public.resources (
+            teacher_id, title, slug, description, resource_type, class_level, subject, chapter, topic,
+            content, cover_image_url, pdf_url, seo_title, seo_description, status, views, published_at
+        ) VALUES (
+            v_teacher_id,
+            'Ohm''s Law – Definition, Formula & Examples',
+            'ohms-law-definition-formula-examples-class-10',
+            'Learn the fundamental relationship between voltage, current, and resistance in electrical circuits, with mathematical formulations, V-I graph analysis, and solved numerical problems.',
+            'Topic Notes',
+            'Class 10',
+            'Physics',
+            'Electricity',
+            'Ohm''s Law',
+            '<h2>1. What is Ohm''s Law?</h2><p>Ohm''s law is one of the most fundamental principles in electricity. It was formulated by the German physicist <strong>Georg Simon Ohm</strong> in 1827.</p><p>According to Ohm''s Law: <em>"At constant temperature, the electric current flowing through a conductor is directly proportional to the potential difference across its ends."</em></p><h2>2. Formula & Mathematical Expression</h2><p>Mathematically, if <em>V</em> is the potential difference and <em>I</em> is the current:</p><p><span class="ql-formula" data-value="V \propto I">V \propto I</span></p><p><span class="ql-formula" data-value="V = I \times R">V = I \times R</span></p><p>Where <strong>R</strong> is the constant of proportionality known as the <strong>Resistance</strong> of the conductor. The SI unit of resistance is <strong>Ohm (Ω)</strong>.</p><h2>3. Explanation & Concept</h2><p>Resistance can be thought of as the opposition offered by the atoms of a conductor to the flow of free electrons. When a voltage is applied, free electrons collide with fixed positive ions, slowing their drift velocity.</p><h2>4. V-I Characteristic Graph</h2><p>For an ohmic conductor (like a metallic wire), the graph plotted between Potential Difference (V) on the y-axis and Current (I) on the x-axis is a <strong>straight line passing through the origin</strong>. The slope of this V-I graph represents the resistance of the conductor:</p><p><span class="ql-formula" data-value="\text{Slope} = \frac{\Delta V}{\Delta I} = R">\text{Slope} = \frac{\Delta V}{\Delta I} = R</span></p><h2>5. Solved Example</h2><p><strong>Question:</strong> A heating element is connected to a 220V power supply and draws a current of 5 Amperes. Calculate the resistance of the heating element.</p><p><strong>Solution:</strong></p><ul><li>Given: Potential Difference, <span class="ql-formula" data-value="V = 220\text{ V}">V = 220\text{ V}</span></li><li>Current, <span class="ql-formula" data-value="I = 5\text{ A}">I = 5\text{ A}</span></li><li>Formula: <span class="ql-formula" data-value="R = \frac{V}{I} = \frac{220}{5} = 44\,\Omega">R = \frac{V}{I} = \frac{220}{5} = 44\,\Omega</span></li><li><strong>Answer:</strong> The resistance of the element is <strong>44 Ω</strong>.</li></ul><h2>6. Important Points & Limitations</h2><ul><li>Ohm''s law is valid only when physical conditions like <strong>temperature and pressure remain constant</strong>.</li><li>It does not apply to non-ohmic devices such as semiconductor diodes, transistors, and electrolytes.</li></ul><h2>7. Frequently Asked Questions (FAQs)</h2><p><strong>Q1: What is 1 Ohm?</strong><br>1 Ohm is the resistance of a conductor when a potential difference of 1 Volt produces a current of 1 Ampere through it.</p>',
+            NULL,
+            'https://example.com/notes/class10-ohms-law.pdf',
+            'Ohm''s Law – Definition, Formula & Examples | Class 10 Physics | Edify Tutorial',
+            'Master Ohm''s Law for Class 10 Physics. Complete explanation, formula derivation, V-I graphs, and solved numerical questions.',
+            'published',
+            128,
+            now()
+        )
+        ON CONFLICT (slug) DO UPDATE
+        SET status = 'published',
+            views = EXCLUDED.views,
+            published_at = COALESCE(public.resources.published_at, now());
+
+        -- Seed Resource 2: Resistance
+        INSERT INTO public.resources (
+            teacher_id, title, slug, description, resource_type, class_level, subject, chapter, topic,
+            content, cover_image_url, pdf_url, seo_title, seo_description, status, views, published_at
+        ) VALUES (
+            v_teacher_id,
+            'Resistance – Formula and Explanation',
+            'resistance-formula-and-explanation-class-10',
+            'Comprehensive guide on electrical resistance, factors affecting resistance of a conductor, resistivity formula, and series vs parallel combinations.',
+            'Topic Notes',
+            'Class 10',
+            'Physics',
+            'Electricity',
+            'Resistance',
+            '<h2>1. What is Electrical Resistance?</h2><p>Electrical resistance is the property of a conductor by virtue of which it opposes the flow of electric charges (electrons) through it.</p><h2>2. Formula for Resistance</h2><p>From Ohm''s law, resistance is the ratio of potential difference to current:</p><p><span class="ql-formula" data-value="R = \frac{V}{I}">R = \frac{V}{I}</span></p><h2>3. Factors on Which Resistance Depends</h2><p>The resistance of a uniform conductor depends on four key factors:</p><ol><li><strong>Length of the conductor (L):</strong> Resistance is directly proportional to length: <span class="ql-formula" data-value="R \propto L">R \propto L</span>.</li><li><strong>Area of cross-section (A):</strong> Resistance is inversely proportional to cross-sectional area: <span class="ql-formula" data-value="R \propto \frac{1}{A}">R \propto \frac{1}{A}</span>.</li><li><strong>Nature of material:</strong> Different materials have different electrical resistivities (<span class="ql-formula" data-value="\rho">\rho</span>).</li><li><strong>Temperature:</strong> Resistance of metallic conductors increases with increase in temperature.</li></ol><h2>4. Combined Formula & Resistivity</h2><p>Combining the above relations:</p><p><span class="ql-formula" data-value="R = \rho \frac{L}{A}">R = \rho \frac{L}{A}</span></p><p>Where <span class="ql-formula" data-value="\rho">\rho</span> is the <strong>electrical resistivity</strong> (or specific resistance) of the material. The SI unit of resistivity is <strong>Ohm-metre (Ω·m)</strong>.</p><h2>5. Solved Example</h2><p><strong>Question:</strong> A wire of length 2 m and cross-sectional area <span class="ql-formula" data-value="1 \times 10^{-6}\text{ m}^2">1 \times 10^{-6}\text{ m}^2</span> has a resistance of 0.04 Ω. Find its resistivity.</p><p><strong>Solution:</strong></p><p><span class="ql-formula" data-value="\rho = \frac{R \times A}{L} = \frac{0.04 \times 10^{-6}}{2} = 2 \times 10^{-8}\,\Omega\cdot\text{m}">\rho = \frac{R \times A}{L} = \frac{0.04 \times 10^{-6}}{2} = 2 \times 10^{-8}\,\Omega\cdot\text{m}</span></p>',
+            NULL,
+            'https://example.com/notes/class10-resistance.pdf',
+            'Resistance – Formula and Explanation | Class 10 Physics | Edify Tutorial',
+            'Understand electrical resistance, factors affecting resistance, resistivity, and Ohm''s law for Class 10 CBSE/ICSE board exams.',
+            'published',
+            84,
+            now()
+        )
+        ON CONFLICT (slug) DO UPDATE
+        SET status = 'published',
+            views = EXCLUDED.views,
+            published_at = COALESCE(public.resources.published_at, now());
+    END IF;
+END $$;
+

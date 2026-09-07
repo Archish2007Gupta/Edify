@@ -15,6 +15,12 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="env.js"></script>
   <script src="supabase-client.js"></script>
+  <!-- KaTeX for formulas -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <!-- Quill 2 Rich Text Editor -->
+  <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
   <style>
     :root {
       --blue: #1e5aa8;
@@ -556,6 +562,166 @@
       border-radius: 10px; padding: 14px; font-size: 15px; color: var(--ink);
       line-height: 1.5; white-space: pre-wrap; margin-top: 4px;
     }
+
+    /* ── LEARNING HUB STYLES ────────────────────────── */
+    .dashboard-view { display: none; }
+    .dashboard-view.active { display: block; animation: fadeIn .2s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    .hub-tabs-nav {
+      display: flex; gap: 8px; border-bottom: 2px solid var(--rule-soft);
+      margin-bottom: 26px; padding-bottom: 0;
+    }
+    .hub-tab-btn {
+      padding: 12px 20px; font-family: "Hanken Grotesk", sans-serif;
+      font-size: 15.5px; font-weight: 600; color: var(--ink-soft);
+      background: none; border: none; cursor: pointer; border-bottom: 3px solid transparent;
+      margin-bottom: -2px; transition: all .15s; display: inline-flex; align-items: center; gap: 8px;
+    }
+    .hub-tab-btn:hover { color: var(--blue); }
+    .hub-tab-btn.active {
+      color: var(--blue-deep); border-bottom-color: var(--amber); font-weight: 700;
+    }
+    .hub-tab-badge {
+      font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 20px;
+      background: rgba(30,90,168,.1); color: var(--blue);
+    }
+    .hub-tab-badge.warn { background: var(--amber-soft); color: var(--amber-deep); }
+    .hub-tab-badge.red { background: #fef0ef; color: var(--marking); }
+
+    .hub-stat-chips {
+      display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 22px;
+    }
+    .hub-chip {
+      background: var(--card); border: 1px solid var(--rule); border-radius: 10px;
+      padding: 10px 16px; display: flex; align-items: center; gap: 10px;
+      font-size: 14.5px; font-weight: 600; color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.03);
+    }
+    .hub-chip-num {
+      padding: 2px 8px; border-radius: 6px; font-size: 13px; font-weight: 700;
+    }
+
+    /* Resource badges */
+    .res-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px; border-radius: 6px; font-size: 13px; font-weight: 700; white-space: nowrap;
+    }
+    .res-badge-draft { background: #f0eee8; color: var(--ink-soft); border: 1px solid var(--rule); }
+    .res-badge-under_review { background: rgba(30,90,168,.12); color: var(--blue); }
+    .res-badge-published { background: var(--pass-soft); color: var(--pass); }
+    .res-badge-rejected { background: #fef0ef; color: var(--marking); }
+    .res-badge-archived { background: #eee; color: #555; }
+
+    /* Forms */
+    .hub-form-card {
+      background: var(--card); border: 1px solid var(--rule);
+      border-radius: 18px; padding: 28px 32px; box-shadow: 0 2px 10px rgba(0,0,0,.04);
+      margin-bottom: 30px;
+    }
+    .form-row {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 18px; margin-bottom: 18px;
+    }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.col-full { grid-column: 1 / -1; }
+    .form-label {
+      font-size: 12px; font-weight: 700; letter-spacing: 0.07em;
+      text-transform: uppercase; color: var(--ink-soft);
+    }
+    .form-label span.req { color: var(--marking); margin-left: 2px; }
+    .form-control {
+      font-family: "Hanken Grotesk", sans-serif; font-size: 15.5px;
+      color: var(--ink); background: var(--card); border: 1.5px solid var(--rule);
+      border-radius: 10px; padding: 10px 14px; outline: none; transition: border-color .15s, box-shadow .15s;
+    }
+    .form-control:focus {
+      border-color: var(--blue); box-shadow: 0 0 0 3px rgba(30,90,168,.12);
+    }
+    textarea.form-control { resize: vertical; min-height: 80px; line-height: 1.5; }
+
+    /* Quill custom styling */
+    .quill-wrap {
+      border: 1.5px solid var(--rule); border-radius: 12px; overflow: hidden;
+      background: #fff; transition: border-color .15s;
+    }
+    .quill-wrap:focus-within {
+      border-color: var(--blue); box-shadow: 0 0 0 3px rgba(30,90,168,.12);
+    }
+    .ql-toolbar.ql-snow {
+      background: var(--paper); border: none !important;
+      border-bottom: 1px solid var(--rule) !important; padding: 10px 14px;
+    }
+    .ql-container.ql-snow {
+      border: none !important; min-height: 280px; max-height: 520px;
+      overflow-y: auto; font-family: "Hanken Grotesk", system-ui, sans-serif !important;
+      font-size: 16px !important; line-height: 1.65 !important; color: var(--ink);
+    }
+
+    /* SEO card */
+    .seo-card {
+      background: linear-gradient(135deg, rgba(30,90,168,.04) 0%, rgba(245,166,35,.05) 100%);
+      border: 1.5px dashed rgba(30,90,168,.25); border-radius: 14px;
+      padding: 22px; margin-top: 24px;
+    }
+    .seo-card-header {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;
+    }
+    .seo-card-title {
+      font-size: 15px; font-weight: 700; color: var(--blue-deep); display: flex; align-items: center; gap: 8px;
+    }
+    .url-preview-bar {
+      background: var(--blue-deeper); color: var(--on-dark);
+      padding: 10px 14px; border-radius: 8px; font-family: monospace; font-size: 13.5px;
+      word-break: break-all; margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+    }
+    .url-preview-bar svg { width: 16px; height: 16px; color: var(--amber); flex-shrink: 0; }
+
+    /* Alert banners */
+    .hub-alert {
+      padding: 14px 18px; border-radius: 12px; margin-bottom: 20px;
+      display: flex; align-items: flex-start; gap: 12px; font-size: 14.5px; line-height: 1.5;
+    }
+    .hub-alert.error {
+      background: #fef0ef; border: 1.5px solid rgba(198,64,47,.25); color: var(--marking);
+    }
+    .hub-alert.warn {
+      background: var(--warn-soft); border: 1.5px solid rgba(217,119,6,.3); color: var(--amber-deep);
+    }
+    .hub-alert.info {
+      background: rgba(30,90,168,.08); border: 1.5px solid rgba(30,90,168,.2); color: var(--blue-deep);
+    }
+    .hub-alert svg { width: 20px; height: 20px; flex-shrink: 0; margin-top: 2px; }
+
+    /* Preview Modal Content */
+    .preview-article {
+      max-width: 780px; margin: 0 auto; color: var(--ink);
+    }
+    .preview-cover-img {
+      width: 100%; max-height: 280px; object-fit: cover; border-radius: 12px;
+      margin-bottom: 20px; border: 1px solid var(--rule-soft);
+    }
+    .preview-meta-chips {
+      display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px;
+    }
+    .preview-body-content {
+      line-height: 1.75; font-size: 17px; margin-top: 20px;
+    }
+    .preview-body-content h1, .preview-body-content h2, .preview-body-content h3 {
+      font-family: "Bricolage Grotesque", sans-serif; color: var(--blue-deep);
+      margin: 22px 0 10px;
+    }
+    .preview-body-content p { margin-bottom: 14px; }
+    .preview-body-content ul, .preview-body-content ol { padding-left: 24px; margin-bottom: 14px; }
+    .preview-body-content img { max-width: 100%; border-radius: 8px; }
+    .preview-body-content table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+    .preview-body-content table th, .preview-body-content table td {
+      border: 1px solid var(--rule); padding: 8px 12px;
+    }
+    .preview-pdf-card {
+      background: var(--paper); border: 1.5px solid var(--rule); border-radius: 12px;
+      padding: 14px 18px; display: flex; align-items: center; justify-content: space-between;
+      margin-top: 24px;
+    }
   </style>
 </head>
 
@@ -595,6 +761,22 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
       New Enrollments
       <span class="nav-badge" id="enrollBadge">5</span>
+    </a>
+
+    <p class="nav-section-label">Learning Hub</p>
+    <a class="nav-item" id="nav-learning-hub" href="#learning-hub">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      My Resources
+      <span class="nav-badge" id="resourcesCountBadge" style="display:none;">0</span>
+    </a>
+    <a class="nav-item" id="nav-create-resource" href="#create-resource">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      Create Resource
+    </a>
+    <a class="nav-item" id="nav-resource-review" href="#resource-review" style="display:none;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Resource Review
+      <span class="nav-badge" id="reviewBadge" style="display:none; background:var(--marking);">0</span>
     </a>
 
     <p class="nav-section-label">Academics</p>
@@ -647,6 +829,9 @@
 
     <!-- Content -->
     <main class="content">
+
+      <!-- OVERVIEW DASHBOARD VIEW -->
+      <div id="view-dashboard" class="dashboard-view active">
 
       <!-- STATS -->
       <div class="stats-grid">
@@ -800,6 +985,399 @@
           <div class="enrollment-list" id="enrollmentList"></div>
         </div>
       </div>
+      </div><!-- /view-dashboard -->
+
+      <!-- LEARNING HUB VIEW -->
+      <div id="view-learning-hub" class="dashboard-view">
+        
+        <!-- Tab Navigation Bar -->
+        <div class="hub-tabs-nav">
+          <button class="hub-tab-btn active" id="tab-btn-my-resources" onclick="switchHubTab('my-resources')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            My Resources
+            <span class="hub-tab-badge" id="tabBadgeMyResources">0</span>
+          </button>
+          <button class="hub-tab-btn" id="tab-btn-create-edit" onclick="switchHubTab('create-edit')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            <span id="tabCreateEditTitle">Create New Resource</span>
+          </button>
+          <button class="hub-tab-btn" id="tab-btn-review" onclick="switchHubTab('review')" style="display:none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            Resource Review Queue
+            <span class="hub-tab-badge red" id="tabBadgeReviewQueue">0</span>
+          </button>
+        </div>
+
+        <!-- 1. MY RESOURCES SUBVIEW -->
+        <div id="subview-my-resources">
+          <div class="section-card" style="margin-bottom: 24px;">
+            <div class="section-header">
+              <div>
+                <div class="section-title">Educational Resources Library</div>
+                <div class="section-sub">Author, manage, and submit teaching resources, notes, worksheets and study materials.</div>
+              </div>
+              <div class="section-actions">
+                <button class="btn-sm btn-ghost" id="refreshResourcesBtn" onclick="loadTeacherResources(false)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+                  Refresh
+                </button>
+                <button class="btn-sm btn-primary" onclick="openCreateResourceForm()">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  Create Resource
+                </button>
+              </div>
+            </div>
+
+            <!-- Summary Chips -->
+            <div style="padding: 16px 24px; background: var(--paper); border-bottom: 1px solid var(--rule-soft); display: flex; flex-wrap: wrap; gap: 10px;">
+              <div class="hub-chip">
+                <span>Total Resources</span>
+                <span class="hub-chip-num" style="background: rgba(30,90,168,.1); color: var(--blue);" id="chipTotal">0</span>
+              </div>
+              <div class="hub-chip">
+                <span>Drafts</span>
+                <span class="hub-chip-num" style="background: #f0eee8; color: var(--ink-soft);" id="chipDrafts">0</span>
+              </div>
+              <div class="hub-chip">
+                <span>Under Review</span>
+                <span class="hub-chip-num" style="background: rgba(30,90,168,.12); color: var(--blue);" id="chipReview">0</span>
+              </div>
+              <div class="hub-chip">
+                <span>Published</span>
+                <span class="hub-chip-num" style="background: var(--pass-soft); color: var(--pass);" id="chipPublished">0</span>
+              </div>
+              <div class="hub-chip">
+                <span>Needs Revision</span>
+                <span class="hub-chip-num" style="background: #fef0ef; color: var(--marking);" id="chipRejected">0</span>
+              </div>
+            </div>
+
+            <!-- Filters Toolbar -->
+            <div class="table-toolbar">
+              <div class="table-search">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="search" placeholder="Search by title, chapter, topic..." id="resourceSearchInput" oninput="applyResourceFilters()" />
+              </div>
+              <select class="filter-select" id="resourceClassFilter" onchange="applyResourceFilters()">
+                <option value="">All Classes</option>
+                <option value="Class 6">Class 6</option>
+                <option value="Class 7">Class 7</option>
+                <option value="Class 8">Class 8</option>
+                <option value="Class 9">Class 9</option>
+                <option value="Class 10">Class 10</option>
+                <option value="Class 11">Class 11</option>
+                <option value="Class 12">Class 12</option>
+                <option value="Kindergarten">Kindergarten</option>
+              </select>
+              <select class="filter-select" id="resourceSubjectFilter" onchange="applyResourceFilters()">
+                <option value="">All Subjects</option>
+                <option value="Mathematics">Mathematics</option>
+                <option value="Physics">Physics</option>
+                <option value="Chemistry">Chemistry</option>
+                <option value="Biology">Biology</option>
+                <option value="Science">Science (General)</option>
+                <option value="English">English</option>
+                <option value="Social Science">Social Science</option>
+                <option value="Computer Science">Computer Science</option>
+                <option value="Other">Other</option>
+              </select>
+              <select class="filter-select" id="resourceTypeFilter" onchange="applyResourceFilters()">
+                <option value="">All Resource Types</option>
+                <option value="Topic Notes">Topic Notes</option>
+                <option value="Chapter Notes">Chapter Notes</option>
+                <option value="Important Questions">Important Questions</option>
+                <option value="MCQs">MCQs</option>
+                <option value="Worksheets">Worksheets</option>
+                <option value="Formula Sheets">Formula Sheets</option>
+                <option value="Study Guides">Study Guides</option>
+                <option value="Other">Other</option>
+              </select>
+              <select class="filter-select" id="resourceStatusFilter" onchange="applyResourceFilters()">
+                <option value="">All Statuses</option>
+                <option value="draft">Draft</option>
+                <option value="under_review">Under Review</option>
+                <option value="published">Published</option>
+                <option value="rejected">Needs Revision</option>
+                <option value="archived">Archived</option>
+              </select>
+            </div>
+
+            <!-- Table of Resources -->
+            <div style="overflow-x:auto;">
+              <table class="student-table" id="resourcesTable">
+                <thead>
+                  <tr>
+                    <th>Resource Title</th>
+                    <th>Type</th>
+                    <th>Class &amp; Subject</th>
+                    <th>Chapter / Topic</th>
+                    <th>Status</th>
+                    <th>Last Updated</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="resourcesTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. CREATE / EDIT RESOURCE SUBVIEW -->
+        <div id="subview-create-edit" style="display:none;">
+          <div class="hub-form-card">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:22px; padding-bottom:16px; border-bottom:1px solid var(--rule-soft);">
+              <div>
+                <h2 style="font-family:'Bricolage Grotesque', sans-serif; font-size:22px; color:var(--blue-deep);" id="formTitle">Create New Educational Resource</h2>
+                <p style="font-size:14.5px; color:var(--ink-soft); margin-top:2px;">Draft and submit quality content for Edify's Learning Hub.</p>
+              </div>
+              <button class="btn-sm btn-ghost" onclick="switchHubTab('my-resources')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                Back to My Resources
+              </button>
+            </div>
+
+            <!-- Dynamic Rejection Feedback Banner (if editing a rejected resource) -->
+            <div id="rejectionFeedbackBanner" class="hub-alert error" style="display:none;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <div>
+                <strong style="display:block; font-size:15px; margin-bottom:4px;">Admin Feedback / Rejection Reason:</strong>
+                <span id="rejectionReasonText"></span>
+              </div>
+            </div>
+
+            <!-- Editing Published Resource Notice Banner -->
+            <div id="editingPublishedBanner" class="hub-alert warn" style="display:none;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              <div>
+                <strong>Editing Live Resource:</strong> Saving modifications will return this resource to <strong>Under Review</strong> status so administrators can verify updates before they appear publicly. The URL slug is locked.
+              </div>
+            </div>
+
+            <form id="resourceForm" onsubmit="event.preventDefault();">
+              <input type="hidden" id="resourceEditId" value="" />
+
+              <!-- Row 1: Title & Type -->
+              <div class="form-row">
+                <div class="form-group col-full">
+                  <label class="form-label">Resource Title <span class="req">*</span></label>
+                  <input type="text" class="form-control" id="formResourceTitle" placeholder="e.g. Ohm's Law, Resistance & Series-Parallel Circuits" required oninput="handleTitleChange()" />
+                </div>
+              </div>
+
+              <!-- Row 2: Type, Class, Subject -->
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Resource Type <span class="req">*</span></label>
+                  <select class="form-control" id="formResourceType" required>
+                    <option value="Topic Notes">Topic Notes</option>
+                    <option value="Chapter Notes">Chapter Notes</option>
+                    <option value="Important Questions">Important Questions</option>
+                    <option value="MCQs">MCQs</option>
+                    <option value="Worksheets">Worksheets</option>
+                    <option value="Formula Sheets">Formula Sheets</option>
+                    <option value="Study Guides">Study Guides</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Class Level <span class="req">*</span></label>
+                  <select class="form-control" id="formClassLevel" required onchange="handleClassChange()">
+                    <option value="Class 10">Class 10</option>
+                    <option value="Class 9">Class 9</option>
+                    <option value="Class 11">Class 11</option>
+                    <option value="Class 12">Class 12</option>
+                    <option value="Class 8">Class 8</option>
+                    <option value="Class 7">Class 7</option>
+                    <option value="Class 6">Class 6</option>
+                    <option value="Kindergarten">Kindergarten</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Subject <span class="req">*</span></label>
+                  <select class="form-control" id="formSubject" required onchange="updateSlugPreview()">
+                    <option value="Physics">Physics</option>
+                    <option value="Mathematics">Mathematics</option>
+                    <option value="Chemistry">Chemistry</option>
+                    <option value="Biology">Biology</option>
+                    <option value="Science">Science (General)</option>
+                    <option value="English">English</option>
+                    <option value="Social Science">Social Science</option>
+                    <option value="Computer Science">Computer Science</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Row 3: Chapter & Topic -->
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Chapter</label>
+                  <input type="text" class="form-control" id="formChapter" placeholder="e.g. Chapter 12: Electricity" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Topic</label>
+                  <input type="text" class="form-control" id="formTopic" placeholder="e.g. Ohm's Law and V-I Characteristics" />
+                </div>
+              </div>
+
+              <!-- Row 4: Short Description -->
+              <div class="form-row">
+                <div class="form-group col-full">
+                  <label class="form-label">Short Description / Summary</label>
+                  <textarea class="form-control" id="formDescription" rows="2" placeholder="Brief summary of what this educational material covers, learning objectives, and concepts..." oninput="handleDescriptionChange()"></textarea>
+                </div>
+              </div>
+
+              <!-- Row 5: Rich Text Content Editor -->
+              <div class="form-row">
+                <div class="form-group col-full">
+                  <label class="form-label">Resource Content <span class="req">*</span></label>
+                  <div class="quill-wrap">
+                    <div id="quillEditorContainer"></div>
+                  </div>
+                  <small style="color:var(--ink-soft); font-size:12.5px; margin-top:4px;">
+                    Supports Headings, Bold, Italic, Bullet/Numbered Lists, Tables, Images, Links, and Mathematical Formulas (KaTeX).
+                  </small>
+                </div>
+              </div>
+
+              <!-- Row 6: Attachments (Cover Image & PDF) -->
+              <div class="form-row" style="margin-top:10px;">
+                <!-- Cover Image -->
+                <div class="form-group">
+                  <label class="form-label">Cover Image (Optional)</label>
+                  <div style="display:flex; gap:8px;">
+                    <input type="url" class="form-control" id="formCoverImageUrl" placeholder="https://... or upload below" oninput="updateCoverPreview()" />
+                    <label class="btn-sm btn-ghost" style="cursor:pointer; white-space:nowrap;">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                      Upload
+                      <input type="file" id="coverImageFileInput" accept="image/*" style="display:none;" onchange="uploadCoverFile(this)" />
+                    </label>
+                  </div>
+                  <div id="coverImagePreviewBox" style="margin-top:8px; display:none;">
+                    <img id="coverPreviewImg" src="" alt="Cover Preview" style="height:70px; border-radius:8px; border:1px solid var(--rule); object-fit:cover;" />
+                  </div>
+                </div>
+
+                <!-- PDF File -->
+                <div class="form-group">
+                  <label class="form-label">Downloadable PDF Document (Optional)</label>
+                  <div style="display:flex; gap:8px;">
+                    <input type="url" class="form-control" id="formPdfUrl" placeholder="https://... or upload PDF" oninput="updatePdfPreview()" />
+                    <label class="btn-sm btn-ghost" style="cursor:pointer; white-space:nowrap;">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                      Upload
+                      <input type="file" id="pdfFileInput" accept="application/pdf" style="display:none;" onchange="uploadPdfFile(this)" />
+                    </label>
+                  </div>
+                  <div id="pdfPreviewBox" style="margin-top:8px; display:none;">
+                    <span class="badge badge-blue">📄 PDF Attached</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Row 7: SEO & Permanent Slug Section -->
+              <div class="seo-card">
+                <div class="seo-card-header">
+                  <div class="seo-card-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px; color:var(--blue);"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                    SEO &amp; Permanent Public URL Structure
+                  </div>
+                  <label style="font-size:13px; color:var(--ink-soft); display:flex; align-items:center; gap:6px; cursor:pointer;">
+                    <input type="checkbox" id="autoSlugCheckbox" checked onchange="toggleAutoSlug(this.checked)" />
+                    Auto-generate slug
+                  </label>
+                </div>
+
+                <div class="url-preview-bar">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                  <span id="urlPreviewText">/learning-hub/class-10/physics/resource-slug</span>
+                </div>
+
+                <div class="form-row" style="margin-bottom:0;">
+                  <div class="form-group">
+                    <label class="form-label">URL Slug <span class="req">*</span></label>
+                    <input type="text" class="form-control" id="formSlug" placeholder="ohms-law-class-10" required oninput="updateSlugPreview()" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">SEO Meta Title</label>
+                    <input type="text" class="form-control" id="formSeoTitle" placeholder="SEO page title" />
+                  </div>
+                </div>
+                <div class="form-group" style="margin-top:14px;">
+                  <label class="form-label">SEO Meta Description</label>
+                  <input type="text" class="form-control" id="formSeoDescription" placeholder="Search engine description" />
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div style="display:flex; align-items:center; justify-content:flex-end; gap:12px; margin-top:28px; padding-top:20px; border-top:1px solid var(--rule-soft);">
+                <button type="button" class="btn-sm btn-ghost" onclick="switchHubTab('my-resources')">Cancel</button>
+                <button type="button" class="btn-sm btn-ghost" id="btnSaveDraft" onclick="saveResourceAction('draft')">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                  Save as Draft
+                </button>
+                <button type="button" class="btn-sm btn-primary" id="btnSubmitReview" onclick="saveResourceAction('under_review')">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                  Submit for Review
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- 3. ADMIN REVIEW QUEUE SUBVIEW -->
+        <div id="subview-review" style="display:none;">
+          <div class="section-card">
+            <div class="section-header">
+              <div>
+                <div class="section-title">Admin Moderation: Resource Review Queue</div>
+                <div class="section-sub">Inspect and review submitted educational resources from teachers before approving them for the public Learning Hub.</div>
+              </div>
+              <div class="section-actions">
+                <button class="btn-sm btn-ghost" onclick="loadReviewQueue()">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+                  Refresh Queue
+                </button>
+              </div>
+            </div>
+
+            <!-- Review Status Filter -->
+            <div class="table-toolbar">
+              <div class="table-search">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="search" placeholder="Search review items..." id="reviewSearchInput" oninput="filterReviewQueue()" />
+              </div>
+              <select class="filter-select" id="reviewStatusSelect" onchange="filterReviewQueue()">
+                <option value="under_review">Pending Review (under_review)</option>
+                <option value="published">Published Resources</option>
+                <option value="rejected">Rejected / Needs Revision</option>
+                <option value="archived">Archived</option>
+                <option value="all">All Resources</option>
+              </select>
+            </div>
+
+            <!-- Review Table -->
+            <div style="overflow-x:auto;">
+              <table class="student-table" id="reviewTable">
+                <thead>
+                  <tr>
+                    <th>Resource Title</th>
+                    <th>Author Teacher</th>
+                    <th>Class &amp; Subject</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Submitted / Updated</th>
+                    <th>Moderation Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="reviewTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /view-learning-hub -->
 
     </main>
   </div>
@@ -813,6 +1391,45 @@
       </div>
       <div class="modal-body" id="modalBody">
         <!-- Injected via JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <!-- RESOURCE PREVIEW MODAL -->
+  <div class="modal-overlay" id="resourcePreviewModal" aria-hidden="true">
+    <div class="modal-box" style="max-width: 840px;" role="dialog" aria-labelledby="previewModalTitle">
+      <div class="modal-header">
+        <div class="modal-title" id="previewModalTitle">Resource Preview</div>
+        <button class="modal-close" onclick="closeResourcePreview()" aria-label="Close dialog">&times;</button>
+      </div>
+      <div class="modal-body" id="resourcePreviewContent">
+        <!-- Injected via JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN REJECT FEEDBACK MODAL -->
+  <div class="modal-overlay" id="resourceRejectModal" aria-hidden="true">
+    <div class="modal-box" style="max-width: 540px;" role="dialog" aria-labelledby="rejectModalTitle">
+      <div class="modal-header">
+        <div class="modal-title" id="rejectModalTitle" style="color:var(--marking);">Reject Resource with Feedback</div>
+        <button class="modal-close" onclick="closeRejectModal()" aria-label="Close dialog">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:14.5px; color:var(--ink-soft); margin-bottom:14px; line-height:1.5;">
+          Please state clearly why this resource cannot be published yet and what changes the teacher needs to make.
+        </p>
+        <input type="hidden" id="rejectResourceId" value="" />
+        <div class="form-group">
+          <label class="form-label">Feedback / Revision Reason <span class="req">*</span></label>
+          <textarea class="form-control" id="rejectReasonInput" rows="4" placeholder="e.g. Please format the mathematical derivations and add 3 practice MCQs."></textarea>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+          <button class="btn-sm btn-ghost" onclick="closeRejectModal()">Cancel</button>
+          <button class="btn-sm" style="background:var(--marking); color:#fff; border:none;" onclick="submitRejectFeedback()">
+            Confirm Rejection
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -1343,13 +1960,813 @@
       updateStatisticsUI();
     };
 
-    /* ── NAV ACTIVE ───────────────────────────────── */
-    document.querySelectorAll('.nav-item').forEach(function(item) {
-      item.addEventListener('click', function() {
-        document.querySelectorAll('.nav-item').forEach(function(n) { n.classList.remove('active'); });
-        item.classList.add('active');
+    /* ── LEARNING HUB STATE & FUNCTIONS ───────────── */
+    let teacherResources = [];
+    let filteredTeacherResources = [];
+    let reviewQueueResources = [];
+    let isAutoSlug = true;
+    let quillEditor = null;
+    let currentHubTab = 'my-resources';
+
+    function initQuillEditor() {
+      if (quillEditor) return;
+      var el = document.getElementById('quillEditorContainer');
+      if (!el || typeof Quill === 'undefined') return;
+
+      quillEditor = new Quill('#quillEditorContainer', {
+        theme: 'snow',
+        placeholder: 'Enter lesson notes, detailed explanations, formulas, examples, questions and answers...',
+        modules: {
+          toolbar: [
+            [{ 'header': [1, 2, 3, false] }],
+            ['bold', 'italic', 'underline', 'strike'],
+            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+            ['blockquote', 'code-block'],
+            ['link', 'image', 'formula'],
+            ['clean']
+          ]
+        }
       });
+    }
+
+    function switchMainView(viewName) {
+      var viewDash = document.getElementById('view-dashboard');
+      var viewHub = document.getElementById('view-learning-hub');
+      var globalSearch = document.getElementById('globalSearch');
+
+      // Update Nav active
+      document.querySelectorAll('.nav-item').forEach(function(n) { n.classList.remove('active'); });
+
+      if (viewName === 'dashboard') {
+        if (viewDash) { viewDash.style.display = 'block'; viewDash.classList.add('active'); }
+        if (viewHub) { viewHub.style.display = 'none'; viewHub.classList.remove('active'); }
+        var nDash = document.getElementById('nav-dashboard');
+        if (nDash) nDash.classList.add('active');
+        if (currentTeacher) setGreeting(currentTeacher.name);
+        if (globalSearch) globalSearch.placeholder = "Search students…";
+      } else if (viewName === 'learning-hub') {
+        if (viewDash) { viewDash.style.display = 'none'; viewDash.classList.remove('active'); }
+        if (viewHub) { viewHub.style.display = 'block'; viewHub.classList.add('active'); }
+        var nHub = document.getElementById('nav-learning-hub');
+        if (nHub) nHub.classList.add('active');
+        document.getElementById('greetingText').textContent = "Learning Hub Resources 📚";
+        document.getElementById('dateText').textContent = "Create, edit and manage educational notes and study guides";
+        if (globalSearch) globalSearch.placeholder = "Search resources…";
+        switchHubTab('my-resources');
+      } else if (viewName === 'create-resource') {
+        if (viewDash) { viewDash.style.display = 'none'; viewDash.classList.remove('active'); }
+        if (viewHub) { viewHub.style.display = 'block'; viewHub.classList.add('active'); }
+        var nCreate = document.getElementById('nav-create-resource');
+        if (nCreate) nCreate.classList.add('active');
+        document.getElementById('greetingText').textContent = "Author Resource ✏️";
+        document.getElementById('dateText').textContent = "Prepare educational content for publication";
+        openCreateResourceForm();
+      } else if (viewName === 'resource-review') {
+        if (viewDash) { viewDash.style.display = 'none'; viewDash.classList.remove('active'); }
+        if (viewHub) { viewHub.style.display = 'block'; viewHub.classList.add('active'); }
+        var nReview = document.getElementById('nav-resource-review');
+        if (nReview) nReview.classList.add('active');
+        document.getElementById('greetingText').textContent = "Admin Resource Review 🛡️";
+        document.getElementById('dateText').textContent = "Verify and publish educational resources submitted by teachers";
+        switchHubTab('review');
+      }
+    }
+
+    function switchHubTab(tabName) {
+      currentHubTab = tabName;
+      var subMy = document.getElementById('subview-my-resources');
+      var subCreate = document.getElementById('subview-create-edit');
+      var subReview = document.getElementById('subview-review');
+
+      var btnMy = document.getElementById('tab-btn-my-resources');
+      var btnCreate = document.getElementById('tab-btn-create-edit');
+      var btnReview = document.getElementById('tab-btn-review');
+
+      if (btnMy) btnMy.classList.toggle('active', tabName === 'my-resources');
+      if (btnCreate) btnCreate.classList.toggle('active', tabName === 'create-edit');
+      if (btnReview) btnReview.classList.toggle('active', tabName === 'review');
+
+      if (subMy) subMy.style.display = tabName === 'my-resources' ? 'block' : 'none';
+      if (subCreate) subCreate.style.display = tabName === 'create-edit' ? 'block' : 'none';
+      if (subReview) subReview.style.display = tabName === 'review' ? 'block' : 'none';
+
+      if (tabName === 'create-edit') {
+        initQuillEditor();
+      } else if (tabName === 'review') {
+        loadReviewQueue();
+      } else if (tabName === 'my-resources') {
+        loadTeacherResources(true);
+      }
+    }
+
+    function resStatusBadge(status) {
+      var map = {
+        'draft': ['res-badge-draft', '✏️ Draft'],
+        'under_review': ['res-badge-under_review', '⏳ Under Review'],
+        'published': ['res-badge-published', '✓ Published'],
+        'rejected': ['res-badge-rejected', '✕ Needs Revision'],
+        'archived': ['res-badge-archived', '📦 Archived']
+      };
+      var info = map[status] || ['res-badge-draft', status || 'Draft'];
+      return '<span class="res-badge ' + info[0] + '">' + info[1] + '</span>';
+    }
+
+    /* ── LOAD & RENDER TEACHER RESOURCES ─────────── */
+    window.loadTeacherResources = async function(isSilent) {
+      const teacherId = currentTeacher ? currentTeacher.id : null;
+      if (!teacherId) return;
+
+      const tbody = document.getElementById('resourcesTableBody');
+      if (!isSilent && tbody) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:36px;">' +
+          '<div style="margin: 0 auto 10px; width:28px; height:28px; border:3px solid rgba(30,90,168,0.18); border-top-color:var(--blue); border-radius:50%; animation:spin .7s linear infinite;"></div>' +
+          '<div style="font-weight:600; font-size:15px; color:var(--blue-deep);">Loading educational resources...</div>' +
+          '</td></tr>';
+      }
+
+      const res = await window.getResources({ teacherId: teacherId, isAdmin: false });
+      if (!res.success) {
+        if (!isSilent && tbody) {
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:28px; color:var(--marking);">' +
+            'Failed to load resources from Supabase. Ensure public.resources table exists.' +
+            '</td></tr>';
+        }
+        return;
+      }
+
+      teacherResources = res.data || [];
+      filteredTeacherResources = [...teacherResources];
+
+      // Update badge in sidebar and tab
+      const countEl = document.getElementById('resourcesCountBadge');
+      if (countEl) {
+        countEl.textContent = teacherResources.length;
+        countEl.style.display = teacherResources.length ? 'inline-block' : 'none';
+      }
+      const tabBadge = document.getElementById('tabBadgeMyResources');
+      if (tabBadge) tabBadge.textContent = teacherResources.length;
+
+      // Update summary chips
+      let drafts = 0, underReview = 0, published = 0, rejected = 0;
+      teacherResources.forEach(function(r) {
+        if (r.status === 'draft') drafts++;
+        else if (r.status === 'under_review') underReview++;
+        else if (r.status === 'published') published++;
+        else if (r.status === 'rejected') rejected++;
+      });
+      document.getElementById('chipTotal').textContent = teacherResources.length;
+      document.getElementById('chipDrafts').textContent = drafts;
+      document.getElementById('chipReview').textContent = underReview;
+      document.getElementById('chipPublished').textContent = published;
+      document.getElementById('chipRejected').textContent = rejected;
+
+      applyResourceFilters();
+    };
+
+    window.applyResourceFilters = function() {
+      const q = (document.getElementById('resourceSearchInput').value || '').toLowerCase().trim();
+      const cls = document.getElementById('resourceClassFilter').value;
+      const sub = document.getElementById('resourceSubjectFilter').value;
+      const type = document.getElementById('resourceTypeFilter').value;
+      const status = document.getElementById('resourceStatusFilter').value;
+
+      filteredTeacherResources = teacherResources.filter(function(r) {
+        const mq = !q || (r.title && r.title.toLowerCase().includes(q)) ||
+                         (r.chapter && r.chapter.toLowerCase().includes(q)) ||
+                         (r.topic && r.topic.toLowerCase().includes(q)) ||
+                         (r.description && r.description.toLowerCase().includes(q));
+        const mc = !cls || r.class_level === cls;
+        const ms = !sub || r.subject === sub;
+        const mt = !type || r.resource_type === type;
+        const mst = !status || r.status === status;
+        return mq && mc && ms && mt && mst;
+      });
+
+      renderTeacherResources();
+    };
+
+    function renderTeacherResources() {
+      const tbody = document.getElementById('resourcesTableBody');
+      if (!tbody) return;
+
+      if (!filteredTeacherResources.length) {
+        tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>' +
+          '<p style="font-size:16px; font-weight:600; color:var(--blue-deep); margin-bottom:4px;">No resources created yet.</p>' +
+          '<p style="font-size:14px; color:var(--ink-soft); margin-bottom:16px;">Create notes, formulas, or practice sheets to publish to the Learning Hub.</p>' +
+          '<button class="btn-sm btn-primary" onclick="openCreateResourceForm()">Create Your First Resource</button>' +
+          '</div></td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = filteredTeacherResources.map(function(r) {
+        const canSubmit = r.status === 'draft' || r.status === 'rejected';
+        const canDelete = r.status === 'draft';
+        const submitBtnHtml = canSubmit ?
+          '<button class="action-btn" title="Submit for Admin Review" onclick="event.stopPropagation(); submitForReviewAction(\'' + r.id + '\')">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--blue);"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>' +
+          '</button>' : '';
+
+        const deleteBtnHtml = canDelete ?
+          '<button class="action-btn" title="Delete Draft" onclick="event.stopPropagation(); deleteResourceAction(\'' + r.id + '\')">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--marking);"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>' +
+          '</button>' : '';
+
+        return '<tr style="cursor:pointer;" onclick="openResourcePreview(\'' + r.id + '\')">' +
+          '<td>' +
+            '<div style="font-weight:600; color:var(--ink); font-size:16px;">' + (r.title || 'Untitled Resource') + '</div>' +
+            '<div style="font-size:12.5px; color:var(--ink-soft); font-family:monospace; margin-top:2px;">/' + (r.slug || '') + '</div>' +
+          '</td>' +
+          '<td><span class="badge badge-blue" style="font-size:12.5px;">' + (r.resource_type || 'Topic Notes') + '</span></td>' +
+          '<td><strong>' + (r.class_level || '') + '</strong> &middot; ' + (r.subject || '') + '</td>' +
+          '<td>' +
+            '<div style="font-size:14.5px; font-weight:500;">' + (r.chapter || 'General') + '</div>' +
+            (r.topic ? '<div style="font-size:13px; color:var(--ink-soft);">' + r.topic + '</div>' : '') +
+          '</td>' +
+          '<td>' + resStatusBadge(r.status) + '</td>' +
+          '<td style="font-size:14px; color:var(--ink-soft);">' + formatDate(r.updated_at) + '</td>' +
+          '<td>' +
+            '<div style="display:flex; align-items:center; gap:4px;" onclick="event.stopPropagation();">' +
+              '<button class="action-btn" title="Preview Resource" onclick="openResourcePreview(\'' + r.id + '\')">' +
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>' +
+              '</button>' +
+              '<button class="action-btn" title="Edit Resource" onclick="openEditResource(\'' + r.id + '\')">' +
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>' +
+              '</button>' +
+              submitBtnHtml +
+              deleteBtnHtml +
+            '</div>' +
+          '</td>' +
+        '</tr>';
+      }).join('');
+    }
+
+    /* ── FORM HANDLING: CREATE & EDIT ─────────────── */
+    window.openCreateResourceForm = function() {
+      document.getElementById('resourceEditId').value = '';
+      document.getElementById('resourceForm').reset();
+      document.getElementById('formTitle').textContent = "Create New Educational Resource";
+      document.getElementById('tabCreateEditTitle').textContent = "Create New Resource";
+      document.getElementById('rejectionFeedbackBanner').style.display = 'none';
+      document.getElementById('editingPublishedBanner').style.display = 'none';
+
+      var slugInput = document.getElementById('formSlug');
+      if (slugInput) { slugInput.disabled = false; }
+      document.getElementById('coverImagePreviewBox').style.display = 'none';
+      document.getElementById('pdfPreviewBox').style.display = 'none';
+
+      initQuillEditor();
+      if (quillEditor) { quillEditor.root.innerHTML = ''; }
+
+      isAutoSlug = true;
+      document.getElementById('autoSlugCheckbox').checked = true;
+      updateSlugPreview();
+      switchHubTab('create-edit');
+    };
+
+    window.openEditResource = async function(id) {
+      let r = teacherResources.find(function(item) { return item.id === id; });
+      if (!r && typeof window.getResourceById === 'function') {
+        const fetchRes = await window.getResourceById(id);
+        if (fetchRes && fetchRes.success) r = fetchRes.data;
+      }
+      if (!r) {
+        showToast("Resource not found.", "error");
+        return;
+      }
+
+      initQuillEditor();
+
+      document.getElementById('resourceEditId').value = r.id;
+      document.getElementById('formResourceTitle').value = r.title || '';
+      document.getElementById('formResourceType').value = r.resource_type || 'Topic Notes';
+      document.getElementById('formClassLevel').value = r.class_level || 'Class 10';
+      document.getElementById('formSubject').value = r.subject || 'Physics';
+      document.getElementById('formChapter').value = r.chapter || '';
+      document.getElementById('formTopic').value = r.topic || '';
+      document.getElementById('formDescription').value = r.description || '';
+      document.getElementById('formCoverImageUrl').value = r.cover_image_url || '';
+      document.getElementById('formPdfUrl').value = r.pdf_url || '';
+      document.getElementById('formSlug').value = r.slug || '';
+      document.getElementById('formSeoTitle').value = r.seo_title || '';
+      document.getElementById('formSeoDescription').value = r.seo_description || '';
+
+      if (quillEditor) {
+        quillEditor.root.innerHTML = r.content || '';
+      }
+
+      updateCoverPreview();
+      updatePdfPreview();
+      updateSlugPreview();
+
+      // Handle Rejection feedback
+      var rejBanner = document.getElementById('rejectionFeedbackBanner');
+      if (r.status === 'rejected' && r.rejection_reason) {
+        document.getElementById('rejectionReasonText').textContent = r.rejection_reason;
+        rejBanner.style.display = 'flex';
+      } else {
+        rejBanner.style.display = 'none';
+      }
+
+      // Handle Published Lock Notice
+      var pubBanner = document.getElementById('editingPublishedBanner');
+      var slugInput = document.getElementById('formSlug');
+      if (r.status === 'published') {
+        pubBanner.style.display = 'flex';
+        if (slugInput) slugInput.disabled = true; // Lock slug for published resources
+      } else {
+        pubBanner.style.display = 'none';
+        if (slugInput) slugInput.disabled = false;
+      }
+
+      isAutoSlug = false;
+      document.getElementById('autoSlugCheckbox').checked = false;
+
+      document.getElementById('formTitle').textContent = "Edit Resource: " + r.title;
+      document.getElementById('tabCreateEditTitle').textContent = "Edit: " + (r.title.length > 22 ? r.title.slice(0, 20) + '…' : r.title);
+
+      switchHubTab('create-edit');
+    };
+
+    window.saveResourceAction = async function(targetStatus) {
+      const teacherId = currentTeacher ? currentTeacher.id : null;
+      if (!teacherId) {
+        showToast("Error: No authenticated teacher profile found.", "error");
+        return;
+      }
+
+      const editId = document.getElementById('resourceEditId').value;
+      const title = (document.getElementById('formResourceTitle').value || '').trim();
+      const type = document.getElementById('formResourceType').value;
+      const classLevel = document.getElementById('formClassLevel').value;
+      const subject = document.getElementById('formSubject').value;
+      const chapter = (document.getElementById('formChapter').value || '').trim();
+      const topic = (document.getElementById('formTopic').value || '').trim();
+      const desc = (document.getElementById('formDescription').value || '').trim();
+      const coverUrl = (document.getElementById('formCoverImageUrl').value || '').trim();
+      const pdfUrl = (document.getElementById('formPdfUrl').value || '').trim();
+      const slug = (document.getElementById('formSlug').value || window.generateSlug(title, classLevel)).trim();
+      const seoTitle = (document.getElementById('formSeoTitle').value || title).trim();
+      const seoDesc = (document.getElementById('formSeoDescription').value || desc).trim();
+
+      const contentHtml = quillEditor ? quillEditor.root.innerHTML : '';
+
+      if (!title) {
+        showToast("Resource title is required.", "error");
+        document.getElementById('formResourceTitle').focus();
+        return;
+      }
+      if (!slug) {
+        showToast("URL slug is required.", "error");
+        document.getElementById('formSlug').focus();
+        return;
+      }
+      if (!contentHtml || contentHtml === '<p><br></p>') {
+        showToast("Resource content cannot be empty.", "error");
+        return;
+      }
+
+      const payload = {
+        teacher_id: teacherId,
+        title: title,
+        slug: slug,
+        description: desc || null,
+        resource_type: type,
+        class_level: classLevel,
+        subject: subject,
+        chapter: chapter || null,
+        topic: topic || null,
+        content: contentHtml,
+        cover_image_url: coverUrl || null,
+        pdf_url: pdfUrl || null,
+        seo_title: seoTitle || title,
+        seo_description: seoDesc || null,
+        status: targetStatus
+      };
+
+      const actionMsg = targetStatus === 'under_review' ? 'Submitting for Admin Review...' : 'Saving Draft...';
+      showToast(actionMsg, 'info');
+
+      let res;
+      if (editId) {
+        res = await window.updateResource(editId, payload);
+      } else {
+        res = await window.createResource(payload);
+      }
+
+      if (res && res.success) {
+        const successMsg = targetStatus === 'under_review'
+          ? "Resource successfully submitted for Admin Review!"
+          : "Resource saved as Draft successfully!";
+        showToast(successMsg, 'success');
+        await loadTeacherResources(false);
+        switchHubTab('my-resources');
+      } else {
+        const errDetail = (res && res.error && res.error.message) ? res.error.message : "Database error";
+        if (errDetail.indexOf("duplicate key") !== -1 || errDetail.indexOf("uq_resources_slug") !== -1) {
+          showToast("A resource with this URL slug already exists. Please choose a unique slug.", "error");
+        } else {
+          showToast("Failed to save resource: " + errDetail, "error");
+        }
+      }
+    };
+
+    window.submitForReviewAction = async function(id) {
+      showToast("Submitting resource for Admin Review...", "info");
+      const res = await window.submitResourceForReview(id);
+      if (res && res.success) {
+        showToast("Resource submitted for Admin Review!", "success");
+        await loadTeacherResources(true);
+      } else {
+        showToast("Failed to submit resource: " + ((res && res.error) ? res.error.message : "Error"), "error");
+      }
+    };
+
+    window.deleteResourceAction = async function(id) {
+      if (!confirm("Are you sure you want to permanently delete this draft resource?")) return;
+      showToast("Deleting resource...", "info");
+      const res = await window.deleteResource(id);
+      if (res && res.success) {
+        showToast("Draft resource deleted.", "info");
+        await loadTeacherResources(true);
+      } else {
+        showToast("Failed to delete: " + ((res && res.error) ? res.error.message : "Error"), "error");
+      }
+    };
+
+    /* ── SEO & SLUG HELPERS ───────────────────────── */
+    window.handleTitleChange = function() {
+      const title = document.getElementById('formResourceTitle').value;
+      const classLevel = document.getElementById('formClassLevel').value;
+      if (isAutoSlug && typeof window.generateSlug === 'function') {
+        const genSlug = window.generateSlug(title, classLevel);
+        document.getElementById('formSlug').value = genSlug;
+      }
+      var seoTitle = document.getElementById('formSeoTitle');
+      if (seoTitle && !seoTitle.value) {
+        seoTitle.placeholder = title || "SEO page title";
+      }
+      updateSlugPreview();
+    };
+
+    window.handleClassChange = function() {
+      if (isAutoSlug) {
+        handleTitleChange();
+      } else {
+        updateSlugPreview();
+      }
+    };
+
+    window.handleDescriptionChange = function() {
+      const desc = document.getElementById('formDescription').value;
+      var seoDesc = document.getElementById('formSeoDescription');
+      if (seoDesc && !seoDesc.value) {
+        seoDesc.placeholder = desc || "Search engine description";
+      }
+    };
+
+    window.updateSlugPreview = function() {
+      const cls = (document.getElementById('formClassLevel').value || 'class-10').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      const sub = (document.getElementById('formSubject').value || 'physics').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      const slug = document.getElementById('formSlug').value || 'resource-slug';
+      document.getElementById('urlPreviewText').textContent = '/learning-hub/' + cls + '/' + sub + '/' + slug;
+    };
+
+    window.toggleAutoSlug = function(checked) {
+      isAutoSlug = checked;
+      if (checked) {
+        handleTitleChange();
+      }
+    };
+
+    /* ── FILE ATTACHMENTS (COVERS & PDFS) ──────────── */
+    window.updateCoverPreview = function() {
+      const url = document.getElementById('formCoverImageUrl').value;
+      const box = document.getElementById('coverImagePreviewBox');
+      const img = document.getElementById('coverPreviewImg');
+      if (url && box && img) {
+        img.src = url;
+        box.style.display = 'block';
+      } else if (box) {
+        box.style.display = 'none';
+      }
+    };
+
+    window.updatePdfPreview = function() {
+      const url = document.getElementById('formPdfUrl').value;
+      const box = document.getElementById('pdfPreviewBox');
+      if (url && box) {
+        box.style.display = 'block';
+      } else if (box) {
+        box.style.display = 'none';
+      }
+    };
+
+    window.uploadCoverFile = async function(input) {
+      if (!input.files || !input.files[0]) return;
+      const file = input.files[0];
+      showToast("Uploading cover image to Supabase...", "info");
+      const res = await window.uploadResourceFile(file, "covers");
+      if (res && res.success && res.publicUrl) {
+        document.getElementById('formCoverImageUrl').value = res.publicUrl;
+        updateCoverPreview();
+        showToast("Cover image uploaded successfully!", "success");
+      } else {
+        showToast("Upload to Supabase storage bucket failed. You can also paste an image URL directly.", "error");
+      }
+    };
+
+    window.uploadPdfFile = async function(input) {
+      if (!input.files || !input.files[0]) return;
+      const file = input.files[0];
+      showToast("Uploading PDF document to Supabase...", "info");
+      const res = await window.uploadResourceFile(file, "pdfs");
+      if (res && res.success && res.publicUrl) {
+        document.getElementById('formPdfUrl').value = res.publicUrl;
+        updatePdfPreview();
+        showToast("PDF document uploaded successfully!", "success");
+      } else {
+        showToast("Upload to Supabase storage bucket failed. You can also paste a PDF URL directly.", "error");
+      }
+    };
+
+    /* ── ADMIN REVIEW QUEUE ───────────────────────── */
+    window.loadReviewQueue = async function() {
+      const statusSelect = document.getElementById('reviewStatusSelect');
+      const filterVal = statusSelect ? statusSelect.value : 'under_review';
+      const statusParam = filterVal === 'all' ? null : filterVal;
+
+      const tbody = document.getElementById('reviewTableBody');
+      if (tbody) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:32px;">' +
+          '<div style="margin: 0 auto 10px; width:28px; height:28px; border:3px solid rgba(30,90,168,0.18); border-top-color:var(--blue); border-radius:50%; animation:spin .7s linear infinite;"></div>' +
+          '<div style="font-weight:600; font-size:15px; color:var(--blue-deep);">Fetching submitted resources for review...</div>' +
+          '</td></tr>';
+      }
+
+      const res = await window.getResources({ isAdmin: true, status: statusParam });
+      if (!res.success) {
+        if (tbody) {
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:24px; color:var(--marking);">Unable to load review queue.</td></tr>';
+        }
+        return;
+      }
+
+      reviewQueueResources = res.data || [];
+
+      // Update badge count of under_review items
+      const pendingReviewCount = reviewQueueResources.filter(function(r) { return r.status === 'under_review'; }).length;
+      const rBadge = document.getElementById('reviewBadge');
+      if (rBadge) {
+        rBadge.textContent = pendingReviewCount;
+        rBadge.style.display = pendingReviewCount ? 'inline-block' : 'none';
+      }
+      const tabBadgeReview = document.getElementById('tabBadgeReviewQueue');
+      if (tabBadgeReview) tabBadgeReview.textContent = pendingReviewCount;
+
+      renderReviewQueue();
+    };
+
+    window.filterReviewQueue = function() {
+      loadReviewQueue();
+    };
+
+    function renderReviewQueue() {
+      const tbody = document.getElementById('reviewTableBody');
+      if (!tbody) return;
+
+      const q = (document.getElementById('reviewSearchInput').value || '').toLowerCase().trim();
+      const filtered = reviewQueueResources.filter(function(r) {
+        if (!q) return true;
+        const author = r.teachers ? (r.teachers.name || '') : '';
+        return (r.title && r.title.toLowerCase().includes(q)) ||
+               (author.toLowerCase().includes(q)) ||
+               (r.subject && r.subject.toLowerCase().includes(q));
+      });
+
+      if (!filtered.length) {
+        tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>' +
+          '<p style="font-size:16px; font-weight:600; color:var(--blue-deep); margin-bottom:4px;">No resources in this review status.</p>' +
+          '<p style="font-size:14px; color:var(--ink-soft);">Submitted resources awaiting admin review will appear here automatically.</p>' +
+          '</div></td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(function(r) {
+        const teacherName = r.teachers ? r.teachers.name : 'Unknown Faculty';
+        const teacherEmail = r.teachers ? (r.teachers.email || '') : '';
+
+        const isPublished = r.status === 'published';
+        const isArchived = r.status === 'archived';
+
+        return '<tr style="cursor:pointer;" onclick="openResourcePreview(\'' + r.id + '\')">' +
+          '<td>' +
+            '<div style="font-weight:600; color:var(--ink); font-size:16px;">' + (r.title || 'Untitled') + '</div>' +
+            '<div style="font-size:12.5px; color:var(--ink-soft); font-family:monospace; margin-top:2px;">/' + (r.slug || '') + '</div>' +
+          '</td>' +
+          '<td>' +
+            '<div style="font-weight:600; color:var(--ink);">' + teacherName + '</div>' +
+            '<div style="font-size:12.5px; color:var(--ink-soft);">' + teacherEmail + '</div>' +
+          '</td>' +
+          '<td><strong>' + (r.class_level || '') + '</strong> &middot; ' + (r.subject || '') + '</td>' +
+          '<td><span class="badge badge-blue" style="font-size:12px;">' + (r.resource_type || '') + '</span></td>' +
+          '<td>' + resStatusBadge(r.status) + '</td>' +
+          '<td style="font-size:13.5px; color:var(--ink-soft);">' + formatDate(r.updated_at) + '</td>' +
+          '<td>' +
+            '<div style="display:flex; align-items:center; gap:6px;" onclick="event.stopPropagation();">' +
+              '<button class="btn-sm btn-ghost" style="padding:6px 10px; font-size:13px;" onclick="openResourcePreview(\'' + r.id + '\')" title="Inspect complete resource">' +
+                'Preview' +
+              '</button>' +
+              (!isPublished ?
+                '<button class="btn-sm" style="background:var(--pass); color:#fff; padding:6px 12px; font-size:13px; border:none;" onclick="adminApproveAction(\'' + r.id + '\')" title="Approve & Publish">' +
+                  'Approve' +
+                '</button>' : '') +
+              (r.status !== 'rejected' ?
+                '<button class="btn-sm btn-ghost" style="color:var(--marking); border-color:var(--marking); padding:6px 10px; font-size:13px;" onclick="openRejectModal(\'' + r.id + '\')" title="Reject with Feedback">' +
+                  'Reject' +
+                '</button>' : '') +
+              (!isArchived ?
+                '<button class="btn-sm btn-ghost" style="color:var(--ink-soft); padding:6px 8px; font-size:13px;" onclick="adminArchiveAction(\'' + r.id + '\')" title="Archive">' +
+                  'Archive' +
+                '</button>' : '') +
+            '</div>' +
+          '</td>' +
+        '</tr>';
+      }).join('');
+    }
+
+    window.adminApproveAction = async function(id) {
+      if (!confirm("Approve and publish this educational resource to the Learning Hub?")) return;
+      showToast("Publishing resource...", "info");
+      const res = await window.reviewResource(id, { status: 'published' });
+      if (res && res.success) {
+        showToast("Resource approved and published!", "success");
+        await loadReviewQueue();
+        await loadTeacherResources(true);
+      } else {
+        showToast("Failed to approve: " + ((res && res.error) ? res.error.message : "Error"), "error");
+      }
+    };
+
+    window.adminArchiveAction = async function(id) {
+      if (!confirm("Archive this resource? It will no longer be visible on the public website.")) return;
+      showToast("Archiving resource...", "info");
+      const res = await window.reviewResource(id, { status: 'archived' });
+      if (res && res.success) {
+        showToast("Resource archived.", "info");
+        await loadReviewQueue();
+        await loadTeacherResources(true);
+      } else {
+        showToast("Failed to archive: " + ((res && res.error) ? res.error.message : "Error"), "error");
+      }
+    };
+
+    window.openRejectModal = function(id) {
+      document.getElementById('rejectResourceId').value = id;
+      document.getElementById('rejectReasonInput').value = '';
+      document.getElementById('resourceRejectModal').classList.add('active');
+    };
+
+    window.closeRejectModal = function() {
+      document.getElementById('resourceRejectModal').classList.remove('active');
+    };
+
+    window.submitRejectFeedback = async function() {
+      const id = document.getElementById('rejectResourceId').value;
+      const reason = (document.getElementById('rejectReasonInput').value || '').trim();
+      if (!reason) {
+        showToast("Please provide specific revision feedback for the teacher.", "error");
+        document.getElementById('rejectReasonInput').focus();
+        return;
+      }
+
+      showToast("Rejecting resource with feedback...", "info");
+      const res = await window.reviewResource(id, { status: 'rejected', rejectionReason: reason });
+      if (res && res.success) {
+        closeRejectModal();
+        showToast("Resource rejected. Feedback returned to author teacher.", "info");
+        await loadReviewQueue();
+        await loadTeacherResources(true);
+      } else {
+        showToast("Failed to update status: " + ((res && res.error) ? res.error.message : "Error"), "error");
+      }
+    };
+
+    /* ── RESOURCE PREVIEW MODAL ───────────────────── */
+    window.openResourcePreview = async function(id) {
+      let r = teacherResources.find(function(item) { return item.id === id; });
+      if (!r) {
+        r = reviewQueueResources.find(function(item) { return item.id === id; });
+      }
+      if (!r && typeof window.getResourceById === 'function') {
+        const fetchRes = await window.getResourceById(id);
+        if (fetchRes && fetchRes.success) r = fetchRes.data;
+      }
+      if (!r) {
+        showToast("Resource not found.", "error");
+        return;
+      }
+
+      const teacherName = r.teachers ? r.teachers.name : (currentTeacher ? currentTeacher.name : 'Faculty');
+      const teacherEmail = r.teachers ? (r.teachers.email || '') : '';
+
+      const coverHtml = r.cover_image_url ?
+        '<img src="' + r.cover_image_url + '" class="preview-cover-img" alt="Cover" />' : '';
+
+      const pdfHtml = r.pdf_url ?
+        '<div class="preview-pdf-card">' +
+          '<div style="display:flex; align-items:center; gap:12px;">' +
+            '<div style="width:40px;height:40px;background:rgba(30,90,168,.1);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--blue);">' +
+              '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>' +
+            '</div>' +
+            '<div>' +
+              '<div style="font-weight:600;font-size:15px;color:var(--ink);">Downloadable PDF Document</div>' +
+              '<div style="font-size:13px;color:var(--ink-soft);">Official study material for offline practice</div>' +
+            '</div>' +
+          '</div>' +
+          '<a href="' + r.pdf_url + '" target="_blank" rel="noopener" class="btn-sm btn-primary">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' +
+            'Download PDF' +
+          '</a>' +
+        '</div>' : '';
+
+      const contentBox = document.getElementById('resourcePreviewContent');
+      contentBox.innerHTML =
+        '<article class="preview-article">' +
+          coverHtml +
+          '<div class="preview-meta-chips">' +
+            '<span class="badge badge-blue">' + (r.resource_type || 'Topic Notes') + '</span>' +
+            '<span class="badge badge-green">' + (r.class_level || '') + '</span>' +
+            '<span class="badge badge-amber">' + (r.subject || '') + '</span>' +
+            resStatusBadge(r.status) +
+          '</div>' +
+          '<h1 style="font-family:\'Bricolage Grotesque\',sans-serif; font-size:28px; color:var(--blue-deep); margin-bottom:10px; line-height:1.2;">' +
+            (r.title || 'Untitled Resource') +
+          '</h1>' +
+          '<div style="font-size:14px; color:var(--ink-soft); display:flex; gap:16px; flex-wrap:wrap; padding-bottom:16px; border-bottom:1px solid var(--rule-soft);">' +
+            '<span>Author: <strong>' + teacherName + '</strong> (' + teacherEmail + ')</span>' +
+            (r.chapter ? '<span>Chapter: <strong>' + r.chapter + '</strong></span>' : '') +
+            (r.topic ? '<span>Topic: <strong>' + r.topic + '</strong></span>' : '') +
+            '<span>Updated: ' + formatDate(r.updated_at) + '</span>' +
+          '</div>' +
+          (r.description ?
+            '<div style="background:var(--paper); border-left:4px solid var(--amber); border-radius:0 8px 8px 0; padding:14px 18px; margin:20px 0; font-size:15.5px; color:var(--ink); font-style:italic;">' +
+              r.description +
+            '</div>' : '') +
+          '<div class="preview-body-content ql-snow"><div class="ql-editor" style="padding:0;">' +
+            (r.content || '<p>No written content.</p>') +
+          '</div></div>' +
+          pdfHtml +
+        '</article>';
+
+      document.getElementById('resourcePreviewModal').classList.add('active');
+    };
+
+    window.closeResourcePreview = function() {
+      document.getElementById('resourcePreviewModal').classList.remove('active');
+    };
+
+    // Close preview modal on backdrop click
+    document.getElementById('resourcePreviewModal').addEventListener('click', function(e) {
+      if (e.target === this) closeResourcePreview();
     });
+    document.getElementById('resourceRejectModal').addEventListener('click', function(e) {
+      if (e.target === this) closeRejectModal();
+    });
+
+    /* ── NAV ACTIONS & VIEW SWITCHER ──────────────── */
+    document.getElementById('nav-dashboard').addEventListener('click', function(e) {
+      e.preventDefault();
+      switchMainView('dashboard');
+    });
+    document.getElementById('nav-students').addEventListener('click', function(e) {
+      e.preventDefault();
+      switchMainView('dashboard');
+      var el = document.getElementById('enrolled-section');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    });
+    document.getElementById('nav-enroll').addEventListener('click', function(e) {
+      e.preventDefault();
+      switchMainView('dashboard');
+      var el = document.getElementById('enrollments-section');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    });
+    document.getElementById('nav-learning-hub').addEventListener('click', function(e) {
+      e.preventDefault();
+      switchMainView('learning-hub');
+    });
+    document.getElementById('nav-create-resource').addEventListener('click', function(e) {
+      e.preventDefault();
+      switchMainView('create-resource');
+    });
+    var navRev = document.getElementById('nav-resource-review');
+    if (navRev) {
+      navRev.addEventListener('click', function(e) {
+        e.preventDefault();
+        switchMainView('resource-review');
+      });
+    }
 
     /* ── TOOLBAR BUTTONS & SIGNOUT & REFRESH ──────── */
     document.getElementById('refreshBtn').addEventListener('click', async function() {
@@ -1425,7 +2842,34 @@
       // 4. Load live demo requests from Supabase
       await loadDemoRequests(false);
 
-      // 5. Realtime subscription to public.demo_requests
+      // 5. Setup Learning Hub & Admin features
+      if (isAdmin) {
+        var navReview = document.getElementById('nav-resource-review');
+        if (navReview) navReview.style.display = 'flex';
+        var tabReview = document.getElementById('tab-btn-review');
+        if (tabReview) tabReview.style.display = 'inline-flex';
+        await loadReviewQueue();
+      }
+
+      await loadTeacherResources(false);
+
+      // 6. Handle Hash-based navigation
+      function handleHashNav() {
+        var hash = (window.location.hash || '').toLowerCase();
+        if (hash === '#learning-hub' || hash.startsWith('#learning-hub')) {
+          switchMainView('learning-hub');
+        } else if (hash === '#create-resource') {
+          switchMainView('create-resource');
+        } else if (hash === '#resource-review' && isAdmin) {
+          switchMainView('resource-review');
+        } else if (hash === '#enrolled-section' || hash === '#enrollments-section') {
+          switchMainView('dashboard');
+        }
+      }
+      window.addEventListener('hashchange', handleHashNav);
+      handleHashNav();
+
+      // 7. Realtime subscription to public.demo_requests
       if (typeof window.subscribeToDemoRequests === 'function') {
         window.subscribeToDemoRequests(function(payload) {
           console.log("[Teacher Dashboard Realtime Payload]", payload);
@@ -1433,9 +2877,14 @@
         });
       }
 
-      // 6. Reliable silent refetching fallback every 12 seconds
+      // 8. Reliable silent refetching fallback every 12 seconds
       setInterval(function() {
         loadDemoRequests(true);
+        if (currentHubTab === 'my-resources') {
+          loadTeacherResources(true);
+        } else if (currentHubTab === 'review' && isAdmin) {
+          loadReviewQueue();
+        }
       }, 12000);
     })();
   </script>

@@ -397,4 +397,728 @@
     }
   };
 
+  /* ─────────────────────────────────────────────────────────────────────────
+   * LEARNING HUB / EDUCATIONAL RESOURCES SERVICES
+   * Service functions for teachers and administrators to manage resources.
+   * ─────────────────────────────────────────────────────────────────────── */
+
+  /**
+   * Helper: Generate a URL-friendly slug from title and class level.
+   * Example: "Ohm's Law & Circuits", "Class 10" -> "ohms-law-circuits-class-10"
+   */
+  window.generateSlug = function (title, classLevel) {
+    if (!title) return "";
+    var base = title.toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+
+    if (classLevel) {
+      var clsNorm = classLevel.toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+      // Only append if not already in slug
+      if (clsNorm && base.indexOf(clsNorm) === -1) {
+        base = base + "-" + clsNorm;
+      }
+    }
+    return base;
+  };
+
+  /**
+   * Fetch educational resources with filtering.
+   * @param {Object} [options] - Filters: { teacherId, status, classLevel, subject, search, isAdmin }
+   * @returns {Promise<{success: boolean, data: Array, error?: any}>}
+   */
+  window.getResources = async function (options) {
+    if (!window.supabaseClient) {
+      return { success: false, data: [], error: new Error("Supabase client not initialized") };
+    }
+    try {
+      options = options || {};
+      var query = window.supabaseClient
+        .from("resources")
+        .select("*, teachers:teacher_id(id, name, email, subjects)")
+        .order("updated_at", { ascending: false });
+
+      if (options.teacherId && !options.isAdmin) {
+        query = query.eq("teacher_id", options.teacherId);
+      }
+
+      if (options.status) {
+        if (Array.isArray(options.status)) {
+          query = query.in("status", options.status);
+        } else if (options.status !== "all") {
+          query = query.eq("status", options.status);
+        }
+      }
+
+      if (options.classLevel) {
+        query = query.eq("class_level", options.classLevel);
+      }
+
+      if (options.subject) {
+        query = query.eq("subject", options.subject);
+      }
+
+      if (options.resourceType) {
+        query = query.eq("resource_type", options.resourceType);
+      }
+
+      if (options.search) {
+        var s = options.search.trim();
+        query = query.or("title.ilike.%" + s + "%,chapter.ilike.%" + s + "%,topic.ilike.%" + s + "%,description.ilike.%" + s + "%");
+      }
+
+      var result = await query;
+      if (result.error) {
+        console.error("[Learning Hub] Fetch resources error:", result.error);
+        return { success: false, data: [], error: result.error };
+      }
+      return { success: true, data: result.data || [] };
+    } catch (err) {
+      console.error("[Learning Hub] Fetch resources exception:", err);
+      return { success: false, data: [], error: err };
+    }
+  };
+
+  /**
+   * Fetch a single resource by UUID with teacher information.
+   * @param {string} id - UUID
+   * @returns {Promise<{success: boolean, data?: object, error?: any}>}
+   */
+  window.getResourceById = async function (id) {
+    if (!window.supabaseClient || !id) {
+      return { success: false, error: new Error("Invalid resource ID") };
+    }
+    try {
+      var result = await window.supabaseClient
+        .from("resources")
+        .select("*, teachers:teacher_id(id, name, email, subjects)")
+        .eq("id", id)
+        .single();
+
+      if (result.error) {
+        console.error("[Learning Hub] Fetch resource error:", result.error);
+        return { success: false, error: result.error };
+      }
+      return { success: true, data: result.data };
+    } catch (err) {
+      console.error("[Learning Hub] Fetch resource exception:", err);
+      return { success: false, error: err };
+    }
+  };
+
+  /**
+   * Create a new educational resource.
+   * @param {Object} resourceData
+   * @returns {Promise<{success: boolean, data?: object, error?: any}>}
+   */
+  window.createResource = async function (resourceData) {
+    if (!window.supabaseClient) {
+      return { success: false, error: new Error("Supabase client not initialized") };
+    }
+    try {
+      var slug = (resourceData.slug || window.generateSlug(resourceData.title, resourceData.class_level)).trim();
+      var payload = {
+        teacher_id: resourceData.teacher_id,
+        title: resourceData.title,
+        slug: slug,
+        description: resourceData.description || null,
+        resource_type: resourceData.resource_type || "Topic Notes",
+        class_level: resourceData.class_level,
+        subject: resourceData.subject,
+        chapter: resourceData.chapter || null,
+        topic: resourceData.topic || null,
+        content: resourceData.content || null,
+        cover_image_url: resourceData.cover_image_url || null,
+        pdf_url: resourceData.pdf_url || null,
+        seo_title: resourceData.seo_title || resourceData.title,
+        seo_description: resourceData.seo_description || resourceData.description || null,
+        status: resourceData.status || "draft"
+      };
+
+      var result = await window.supabaseClient
+        .from("resources")
+        .insert([payload])
+        .select()
+        .single();
+
+      if (result.error) {
+        console.error("[Learning Hub] Create resource error:", result.error);
+        return { success: false, error: result.error };
+      }
+      return { success: true, data: result.data };
+    } catch (err) {
+      console.error("[Learning Hub] Create resource exception:", err);
+      return { success: false, error: err };
+    }
+  };
+
+  /**
+   * Update an existing educational resource.
+   * @param {string} id - UUID
+   * @param {Object} updateData
+   * @returns {Promise<{success: boolean, data?: object, error?: any}>}
+   */
+  window.updateResource = async function (id, updateData) {
+    if (!window.supabaseClient || !id) {
+      return { success: false, error: new Error("Invalid resource ID") };
+    }
+    try {
+      var payload = Object.assign({}, updateData);
+      delete payload.id;
+      delete payload.created_at;
+      delete payload.teachers;
+
+      var result = await window.supabaseClient
+        .from("resources")
+        .update(payload)
+        .eq("id", id)
+        .select()
+        .single();
+
+      if (result.error) {
+        console.error("[Learning Hub] Update resource error:", result.error);
+        return { success: false, error: result.error };
+      }
+      return { success: true, data: result.data };
+    } catch (err) {
+      console.error("[Learning Hub] Update resource exception:", err);
+      return { success: false, error: err };
+    }
+  };
+
+  /**
+   * Delete a draft resource.
+   * @param {string} id - UUID
+   * @returns {Promise<{success: boolean, error?: any}>}
+   */
+  window.deleteResource = async function (id) {
+    if (!window.supabaseClient || !id) {
+      return { success: false, error: new Error("Invalid resource ID") };
+    }
+    try {
+      var result = await window.supabaseClient
+        .from("resources")
+        .delete()
+        .eq("id", id);
+
+      if (result.error) {
+        console.error("[Learning Hub] Delete resource error:", result.error);
+        return { success: false, error: result.error };
+      }
+      return { success: true };
+    } catch (err) {
+      console.error("[Learning Hub] Delete resource exception:", err);
+      return { success: false, error: err };
+    }
+  };
+
+  /**
+   * Submit a resource for admin review.
+   * Transitions status from 'draft' or 'rejected' to 'under_review'.
+   * @param {string} id - UUID
+   * @returns {Promise<{success: boolean, data?: object, error?: any}>}
+   */
+  window.submitResourceForReview = async function (id) {
+    return window.updateResource(id, { status: "under_review" });
+  };
+
+  /**
+   * Moderation action by Admin (Approve / Reject / Archive).
+   * @param {string} id - UUID
+   * @param {Object} reviewData - { status: 'published'|'rejected'|'archived', rejectionReason?: string }
+   * @returns {Promise<{success: boolean, data?: object, error?: any}>}
+   */
+  window.reviewResource = async function (id, reviewData) {
+    if (!window.supabaseClient || !id || !reviewData) {
+      return { success: false, error: new Error("Invalid review parameters") };
+    }
+    var updatePayload = {
+      status: reviewData.status
+    };
+    if (reviewData.status === "rejected") {
+      updatePayload.rejection_reason = reviewData.rejectionReason || "Please review and revise the submitted content.";
+    } else if (reviewData.status === "published") {
+      updatePayload.rejection_reason = null;
+      updatePayload.published_at = new Date().toISOString();
+    }
+    return window.updateResource(id, updatePayload);
+  };
+
+  /**
+   * Upload an optional file (cover image or PDF) to Supabase Storage bucket `learning-resources`.
+   * @param {File} file - Browser File object
+   * @param {string} folder - 'covers' | 'pdfs'
+   * @returns {Promise<{success: boolean, publicUrl?: string, error?: any}>}
+   */
+  window.uploadResourceFile = async function (file, folder) {
+    if (!window.supabaseClient || !file) {
+      return { success: false, error: new Error("Invalid file or client not initialized") };
+    }
+    try {
+      folder = folder || "general";
+      var cleanName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
+      var filePath = folder + "/" + Date.now() + "_" + cleanName;
+
+      var uploadResult = await window.supabaseClient.storage
+        .from("learning-resources")
+        .upload(filePath, file, { cacheControl: "3600", upsert: true });
+
+      if (uploadResult.error) {
+        console.warn("[Learning Hub Storage] Upload error:", uploadResult.error);
+        return { success: false, error: uploadResult.error };
+      }
+
+      var urlResult = window.supabaseClient.storage
+        .from("learning-resources")
+        .getPublicUrl(filePath);
+
+      var publicUrl = urlResult.data ? urlResult.data.publicUrl : "";
+      return { success: true, publicUrl: publicUrl };
+    } catch (err) {
+      console.error("[Learning Hub Storage] Upload exception:", err);
+      return { success: false, error: err };
+    }
+  };
+
+  // ============================================================================
+  // PHASE 2: PUBLIC LEARNING HUB CLIENT FUNCTIONS
+  // ============================================================================
+
+  var DEFAULT_SEED_RESOURCES = [
+    {
+      id: "seed-ohm-1",
+      title: "Ohm's Law – Definition, Formula & Examples",
+      slug: "ohms-law-class-10",
+      description: "Learn the fundamental relationship between voltage, current, and resistance in electrical circuits, with mathematical formulations, V-I graph analysis, and solved numerical problems.",
+      resource_type: "Topic Notes",
+      class_level: "Class 10",
+      subject: "Physics",
+      chapter: "Electricity",
+      topic: "Ohm's Law",
+      content: `<h2>1. What is Ohm's Law?</h2><p>Ohm's law is one of the most fundamental principles in electricity. It was formulated by the German physicist <strong>Georg Simon Ohm</strong> in 1827.</p><p>According to Ohm's Law: <em>"At constant temperature, the electric current flowing through a conductor is directly proportional to the potential difference across its ends."</em></p><h2>2. Formula & Mathematical Expression</h2><p>Mathematically, if <em>V</em> is the potential difference and <em>I</em> is the current:</p><p><span class="ql-formula" data-value="V \\propto I">V \\propto I</span></p><p><span class="ql-formula" data-value="V = I \\times R">V = I \\times R</span></p><p>Where <strong>R</strong> is the constant of proportionality known as the <strong>Resistance</strong> of the conductor. The SI unit of resistance is <strong>Ohm (Ω)</strong>.</p><h2>3. Explanation & Concept</h2><p>Resistance can be thought of as the opposition offered by the atoms of a conductor to the flow of free electrons. When a voltage is applied, free electrons collide with fixed positive ions, slowing their drift velocity.</p><h2>4. V-I Characteristic Graph</h2><p>For an ohmic conductor (like a metallic wire), the graph plotted between Potential Difference (V) on the y-axis and Current (I) on the x-axis is a <strong>straight line passing through the origin</strong>. The slope of this V-I graph represents the resistance of the conductor:</p><p><span class="ql-formula" data-value="\\text{Slope} = \\frac{\\Delta V}{\\Delta I} = R">\\text{Slope} = \\frac{\\Delta V}{\\Delta I} = R</span></p><h2>5. Solved Example</h2><p><strong>Question:</strong> A heating element is connected to a 220V power supply and draws a current of 5 Amperes. Calculate the resistance of the heating element.</p><p><strong>Solution:</strong></p><ul><li>Given: Potential Difference, <span class="ql-formula" data-value="V = 220\\text{ V}">V = 220\\text{ V}</span></li><li>Current, <span class="ql-formula" data-value="I = 5\\text{ A}">I = 5\\text{ A}</span></li><li>Formula: <span class="ql-formula" data-value="R = \\frac{V}{I} = \\frac{220}{5} = 44\\,\\Omega">R = \\frac{V}{I} = \\frac{220}{5} = 44\\,\\Omega</span></li><li><strong>Answer:</strong> The resistance of the element is <strong>44 Ω</strong>.</li></ul><h2>6. Important Points & Limitations</h2><ul><li>Ohm's law is valid only when physical conditions like <strong>temperature and pressure remain constant</strong>.</li><li>It does not apply to non-ohmic devices such as semiconductor diodes, transistors, and electrolytes.</li></ul><h2>7. Frequently Asked Questions (FAQs)</h2><p><strong>Q1: What is 1 Ohm?</strong><br>1 Ohm is the resistance of a conductor when a potential difference of 1 Volt produces a current of 1 Ampere through it.</p>`,
+      cover_image_url: null,
+      pdf_url: "https://example.com/notes/class10-ohms-law.pdf",
+      seo_title: "Ohm's Law – Definition, Formula & Examples | Class 10 Physics | Edify Tutorial",
+      seo_description: "Master Ohm's Law for Class 10 Physics. Complete explanation, formula derivation, V-I graphs, and solved numerical questions.",
+      status: "published",
+      views: 142,
+      published_at: "2026-09-01T10:00:00.000Z",
+      created_at: "2026-09-01T10:00:00.000Z",
+      teachers: { name: "Er. Rohit Verma", subjects: "Physics, Mathematics" }
+    },
+    {
+      id: "seed-ohm-2",
+      title: "Resistance – Formula and Explanation",
+      slug: "resistance-formula-and-explanation-class-10",
+      description: "Comprehensive guide on electrical resistance, factors affecting resistance of a conductor, resistivity formula, and series vs parallel combinations.",
+      resource_type: "Topic Notes",
+      class_level: "Class 10",
+      subject: "Physics",
+      chapter: "Electricity",
+      topic: "Resistance",
+      content: `<h2>1. What is Electrical Resistance?</h2><p>Electrical resistance is the property of a conductor by virtue of which it opposes the flow of electric charges (electrons) through it.</p><h2>2. Formula for Resistance</h2><p>From Ohm's law, resistance is the ratio of potential difference to current:</p><p><span class="ql-formula" data-value="R = \\frac{V}{I}">R = \\frac{V}{I}</span></p><h2>3. Factors on Which Resistance Depends</h2><p>The resistance of a uniform conductor depends on four key factors:</p><ol><li><strong>Length of the conductor (L):</strong> Resistance is directly proportional to length: <span class="ql-formula" data-value="R \\propto L">R \\propto L</span>.</li><li><strong>Area of cross-section (A):</strong> Resistance is inversely proportional to cross-sectional area: <span class="ql-formula" data-value="R \\propto \\frac{1}{A}">R \\propto \\frac{1}{A}</span>.</li><li><strong>Nature of material:</strong> Different materials have different electrical resistivities (<span class="ql-formula" data-value="\\rho">\\rho</span>).</li><li><strong>Temperature:</strong> Resistance of metallic conductors increases with increase in temperature.</li></ol><h2>4. Combined Formula & Resistivity</h2><p>Combining the above relations:</p><p><span class="ql-formula" data-value="R = \\rho \\frac{L}{A}">R = \\rho \\frac{L}{A}</span></p><p>Where <span class="ql-formula" data-value="\\rho">\\rho</span> is the <strong>electrical resistivity</strong> (or specific resistance) of the material. The SI unit of resistivity is <strong>Ohm-metre (Ω·m)</strong>.</p><h2>5. Solved Example</h2><p><strong>Question:</strong> A wire of length 2 m and cross-sectional area <span class="ql-formula" data-value="1 \\times 10^{-6}\\text{ m}^2">1 \\times 10^{-6}\\text{ m}^2</span> has a resistance of 0.04 Ω. Find its resistivity.</p><p><strong>Solution:</strong></p><p><span class="ql-formula" data-value="\\rho = \\frac{R \\times A}{L} = \\frac{0.04 \\times 10^{-6}}{2} = 2 \\times 10^{-8}\\,\\Omega\\cdot\\text{m}">\\rho = \\frac{R \\times A}{L} = \\frac{0.04 \\times 10^{-6}}{2} = 2 \\times 10^{-8}\\,\\Omega\\cdot\\text{m}</span></p>`,
+      cover_image_url: null,
+      pdf_url: "https://example.com/notes/class10-resistance.pdf",
+      seo_title: "Resistance – Formula and Explanation | Class 10 Physics | Edify Tutorial",
+      seo_description: "Understand electrical resistance, factors affecting resistance, resistivity, and Ohm's law for Class 10 CBSE/ICSE board exams.",
+      status: "published",
+      views: 98,
+      published_at: "2026-09-02T11:30:00.000Z",
+      created_at: "2026-09-02T11:30:00.000Z",
+      teachers: { name: "Er. Rohit Verma", subjects: "Physics, Mathematics" }
+    }
+  ];
+
+  function filterSeedResources(options) {
+    options = options || {};
+    var list = DEFAULT_SEED_RESOURCES.slice();
+
+    if (options.classLevel) {
+      list = list.filter(function (r) { return r.class_level.toLowerCase() === options.classLevel.toLowerCase(); });
+    }
+    if (options.subject) {
+      list = list.filter(function (r) { return r.subject.toLowerCase() === options.subject.toLowerCase(); });
+    }
+    if (options.chapter) {
+      list = list.filter(function (r) { return (r.chapter || "").toLowerCase() === options.chapter.toLowerCase(); });
+    }
+    if (options.resourceType) {
+      list = list.filter(function (r) { return (r.resource_type || "").toLowerCase() === options.resourceType.toLowerCase(); });
+    }
+    if (options.excludeId) {
+      list = list.filter(function (r) { return r.id !== options.excludeId; });
+    }
+    if (options.search) {
+      var s = options.search.toLowerCase();
+      list = list.filter(function (r) {
+        return r.title.toLowerCase().indexOf(s) !== -1 ||
+          (r.description && r.description.toLowerCase().indexOf(s) !== -1) ||
+          (r.chapter && r.chapter.toLowerCase().indexOf(s) !== -1) ||
+          (r.topic && r.topic.toLowerCase().indexOf(s) !== -1) ||
+          r.subject.toLowerCase().indexOf(s) !== -1 ||
+          r.class_level.toLowerCase().indexOf(s) !== -1;
+      });
+    }
+
+    if (options.sortBy === "popular") {
+      list.sort(function (a, b) { return (b.views || 0) - (a.views || 0); });
+    } else {
+      list.sort(function (a, b) { return new Date(b.published_at) - new Date(a.published_at); });
+    }
+
+    if (options.limit && options.limit > 0) {
+      list = list.slice(0, options.limit);
+    }
+    return list;
+  }
+
+  /**
+   * Fetch published resources for public viewing.
+   * Strips private teacher data and strictly filters status = 'published'.
+   * @param {Object} [options] - { classLevel, subject, chapter, resourceType, search, sortBy ('latest'|'popular'), limit, excludeId }
+   * @returns {Promise<{success: boolean, data: Array, count?: number, error?: any}>}
+   */
+  window.getPublicResources = async function (options) {
+    options = options || {};
+    if (!window.supabaseClient) {
+      return { success: true, data: filterSeedResources(options) };
+    }
+    try {
+      var query = window.supabaseClient
+        .from("resources")
+        .select("id, title, slug, description, resource_type, class_level, subject, chapter, topic, cover_image_url, pdf_url, views, published_at, created_at, teachers:teacher_id(name, subjects)")
+        .eq("status", "published");
+
+      if (options.classLevel) {
+        query = query.eq("class_level", options.classLevel);
+      }
+
+      if (options.subject) {
+        query = query.eq("subject", options.subject);
+      }
+
+      if (options.chapter) {
+        query = query.eq("chapter", options.chapter);
+      }
+
+      if (options.resourceType) {
+        query = query.eq("resource_type", options.resourceType);
+      }
+
+      if (options.excludeId) {
+        query = query.neq("id", options.excludeId);
+      }
+
+      if (options.search) {
+        var s = options.search.trim();
+        query = query.or("title.ilike.%" + s + "%,chapter.ilike.%" + s + "%,topic.ilike.%" + s + "%,description.ilike.%" + s + "%,subject.ilike.%" + s + "%,class_level.ilike.%" + s + "%,resource_type.ilike.%" + s + "%");
+      }
+
+      if (options.sortBy === "popular") {
+        query = query.order("views", { ascending: false }).order("published_at", { ascending: false });
+      } else {
+        query = query.order("published_at", { ascending: false });
+      }
+
+      if (options.limit && options.limit > 0) {
+        query = query.limit(options.limit);
+      }
+
+      var result = await query;
+      if (result.error) {
+        console.warn("[Public Learning Hub] Supabase query notice, using seed data fallback:", result.error.message);
+        return { success: true, data: filterSeedResources(options) };
+      }
+      var data = result.data || [];
+      if (data.length === 0 && !options.search && !options.classLevel && !options.subject) {
+        // If live DB has no published resources yet, fallback to seed resources for demonstration
+        data = filterSeedResources(options);
+      }
+      return { success: true, data: data };
+    } catch (err) {
+      console.warn("[Public Learning Hub] Exception, using seed data fallback:", err);
+      return { success: true, data: filterSeedResources(options) };
+    }
+  };
+
+  /**
+   * Fetch a single published resource by its slug.
+   * @param {string} slug
+   * @returns {Promise<{success: boolean, data?: object, error?: any}>}
+   */
+  window.getPublishedResourceBySlug = async function (slug) {
+    if (!slug) {
+      return { success: false, error: new Error("Invalid resource slug") };
+    }
+    var cleanSlug = slug.trim().toLowerCase();
+
+    // Check seed fallback first if matching
+    var matchedSeed = DEFAULT_SEED_RESOURCES.find(function (r) {
+      return r.slug === cleanSlug || cleanSlug.indexOf(r.slug) !== -1 || r.slug.indexOf(cleanSlug) !== -1;
+    });
+
+    if (!window.supabaseClient) {
+      if (matchedSeed) return { success: true, data: matchedSeed };
+      return { success: false, error: new Error("Resource not found") };
+    }
+
+    try {
+      var result = await window.supabaseClient
+        .from("resources")
+        .select("id, title, slug, description, resource_type, class_level, subject, chapter, topic, content, cover_image_url, pdf_url, seo_title, seo_description, views, published_at, created_at, updated_at, teachers:teacher_id(name, subjects)")
+        .eq("status", "published")
+        .eq("slug", cleanSlug)
+        .single();
+
+      if (result.error) {
+        if (matchedSeed) {
+          return { success: true, data: matchedSeed };
+        }
+        return { success: false, error: result.error };
+      }
+      return { success: true, data: result.data };
+    } catch (err) {
+      if (matchedSeed) {
+        return { success: true, data: matchedSeed };
+      }
+      return { success: false, error: err };
+    }
+  };
+
+  /**
+   * Increment view counter securely through the Supabase RPC function.
+   * @param {string} resourceId - UUID
+   * @returns {Promise<{success: boolean, error?: any}>}
+   */
+  window.incrementResourceViews = async function (resourceId) {
+    if (!window.supabaseClient || !resourceId) {
+      return { success: false, error: new Error("Invalid resource ID") };
+    }
+    try {
+      var result = await window.supabaseClient.rpc("increment_resource_views", {
+        p_resource_id: resourceId
+      });
+
+      if (result.error) {
+        console.warn("[Learning Hub] Increment views RPC error:", result.error);
+        return { success: false, error: result.error };
+      }
+      return { success: true };
+    } catch (err) {
+      console.warn("[Learning Hub] Increment views exception:", err);
+      return { success: false, error: err };
+    }
+  };
+
+  /**
+   * Fetch hierarchy of published resources (classes, subjects, chapters) dynamically.
+   * @returns {Promise<{success: boolean, data: {classes: Array, subjects: Array, chaptersByClassSubject: Object, totalPublished: number}, error?: any}>}
+   */
+  window.getLearningHubHierarchy = async function () {
+    if (!window.supabaseClient) {
+      return { success: false, data: { classes: [], subjects: [], chaptersByClassSubject: {}, totalPublished: 0 }, error: new Error("Supabase client not initialized") };
+    }
+    try {
+      var result = await window.supabaseClient
+        .from("resources")
+        .select("id, class_level, subject, chapter, topic, resource_type, views, published_at")
+        .eq("status", "published");
+
+      var records = [];
+      if (result && !result.error && result.data && result.data.length > 0) {
+        records = result.data;
+      } else {
+        records = DEFAULT_SEED_RESOURCES;
+      }
+
+      var classMap = {};
+      var subjectMap = {};
+      var chaptersByClassSubject = {};
+
+      records.forEach(function (rec) {
+        var cls = rec.class_level || "Other";
+        var sub = rec.subject || "General";
+        var ch = (rec.chapter || "").trim();
+
+        // Count for class
+        if (!classMap[cls]) {
+          classMap[cls] = { name: cls, count: 0, subjects: {} };
+        }
+        classMap[cls].count++;
+        classMap[cls].subjects[sub] = (classMap[cls].subjects[sub] || 0) + 1;
+
+        // Count for subject
+        if (!subjectMap[sub]) {
+          subjectMap[sub] = { name: sub, count: 0, classes: {} };
+        }
+        subjectMap[sub].count++;
+        subjectMap[sub].classes[cls] = (subjectMap[sub].classes[cls] || 0) + 1;
+
+        // Group by class and subject
+        var key = cls.toLowerCase().replace(/[^a-z0-9]/g, "-") + "/" + sub.toLowerCase().replace(/[^a-z0-9]/g, "-");
+        if (!chaptersByClassSubject[key]) {
+          chaptersByClassSubject[key] = {
+            classLevel: cls,
+            subject: sub,
+            chapters: {},
+            total: 0
+          };
+        }
+        chaptersByClassSubject[key].total++;
+        if (ch) {
+          if (!chaptersByClassSubject[key].chapters[ch]) {
+            chaptersByClassSubject[key].chapters[ch] = { name: ch, resources: [] };
+          }
+          chaptersByClassSubject[key].chapters[ch].resources.push(rec);
+        } else {
+          var unassigned = "General Topics";
+          if (!chaptersByClassSubject[key].chapters[unassigned]) {
+            chaptersByClassSubject[key].chapters[unassigned] = { name: unassigned, resources: [] };
+          }
+          chaptersByClassSubject[key].chapters[unassigned].resources.push(rec);
+        }
+      });
+
+      // Sort classes numerically if Class X, otherwise alphabetically
+      function sortClassNames(a, b) {
+        var numA = parseInt((a.name.match(/\d+/) || [0])[0], 10);
+        var numB = parseInt((b.name.match(/\d+/) || [0])[0], 10);
+        if (numA && numB) return numA - numB;
+        return a.name.localeCompare(b.name);
+      }
+
+      var classesList = Object.values(classMap).sort(sortClassNames);
+      var subjectsList = Object.values(subjectMap).sort(function (a, b) {
+        return a.name.localeCompare(b.name);
+      });
+
+      return {
+        success: true,
+        data: {
+          classes: classesList,
+          subjects: subjectsList,
+          chaptersByClassSubject: chaptersByClassSubject,
+          totalPublished: records.length
+        }
+      };
+    } catch (err) {
+      console.error("[Learning Hub Hierarchy] Exception:", err);
+      return { success: false, data: { classes: [], subjects: [], chaptersByClassSubject: {}, totalPublished: 0 }, error: err };
+    }
+  };
+
+  /**
+   * Fetch related published resources for an individual article.
+   * Prioritizes same class + subject + chapter, with fallback to same class + subject.
+   * @param {Object} resource - Current resource object
+   * @param {number} [limit=4]
+   * @returns {Promise<Array>}
+   */
+  window.getRelatedResources = async function (resource, limit) {
+    if (!resource || !window.supabaseClient) return [];
+    limit = limit || 4;
+    try {
+      // 1. First attempt: match same chapter
+      if (resource.chapter) {
+        var chResult = await window.getPublicResources({
+          classLevel: resource.class_level,
+          subject: resource.subject,
+          chapter: resource.chapter,
+          excludeId: resource.id,
+          limit: limit
+        });
+        if (chResult.success && chResult.data.length >= limit) {
+          return chResult.data;
+        }
+        var found = chResult.success ? chResult.data : [];
+        // 2. Fill remaining from same class + subject
+        var subResult = await window.getPublicResources({
+          classLevel: resource.class_level,
+          subject: resource.subject,
+          excludeId: resource.id,
+          limit: limit * 2
+        });
+        if (subResult.success) {
+          var seenIds = new Set(found.map(function (r) { return r.id; }));
+          subResult.data.forEach(function (r) {
+            if (!seenIds.has(r.id) && found.length < limit) {
+              seenIds.add(r.id);
+              found.push(r);
+            }
+          });
+        }
+        return found;
+      } else {
+        var genResult = await window.getPublicResources({
+          classLevel: resource.class_level,
+          subject: resource.subject,
+          excludeId: resource.id,
+          limit: limit
+        });
+        return genResult.success ? genResult.data : [];
+      }
+    } catch (err) {
+      console.warn("[Learning Hub Related] Exception:", err);
+      return [];
+    }
+  };
+
+  /**
+   * Generate sitemap.xml representation for all published resources.
+   * @param {string} [baseUrl] - Base URL of the website
+   * @returns {Promise<string>}
+   */
+  window.generateSitemapXml = async function (baseUrl) {
+    baseUrl = baseUrl || "https://www.edifytutorial.com";
+    if (baseUrl.endsWith("/")) baseUrl = baseUrl.slice(0, -1);
+
+    var res = await window.getPublicResources({ limit: 1000 });
+    var items = res.success ? res.data : [];
+
+    var xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+    xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+
+    // Core static hub URLs
+    xml += '  <url>\n    <loc>' + baseUrl + '/learning-hub</loc>\n    <changefreq>daily</changefreq>\n    <priority>0.9</priority>\n  </url>\n';
+
+    var classSet = new Set();
+    var classSubjectSet = new Set();
+
+    items.forEach(function (item) {
+      var clsSlug = (item.class_level || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+      var subSlug = (item.subject || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+      if (clsSlug) classSet.add(clsSlug);
+      if (clsSlug && subSlug) classSubjectSet.add(clsSlug + "/" + subSlug);
+    });
+
+    classSet.forEach(function (cls) {
+      xml += '  <url>\n    <loc>' + baseUrl + '/learning-hub/' + cls + '</loc>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>\n';
+    });
+
+    classSubjectSet.forEach(function (cs) {
+      xml += '  <url>\n    <loc>' + baseUrl + '/learning-hub/' + cs + '</loc>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>\n';
+    });
+
+    items.forEach(function (item) {
+      var clsSlug = (item.class_level || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+      var subSlug = (item.subject || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+      var url = baseUrl + '/learning-hub/' + clsSlug + '/' + subSlug + '/' + encodeURIComponent(item.slug);
+      var lastMod = (item.published_at || new Date().toISOString()).split("T")[0];
+
+      xml += '  <url>\n';
+      xml += '    <loc>' + url + '</loc>\n';
+      xml += '    <lastmod>' + lastMod + '</lastmod>\n';
+      xml += '    <changefreq>monthly</changefreq>\n';
+      xml += '    <priority>0.7</priority>\n';
+      xml += '  </url>\n';
+    });
+
+    xml += '</urlset>';
+    return xml;
+  };
+
 })();

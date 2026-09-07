@@ -1,0 +1,17 @@
+{
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/edify-tutorial-landing.html"
+    },
+    {
+      "source": "/learning-hub",
+      "destination": "/learning-hub.html"
+    },
+    {
+      "source": "/learning-hub/(.*)",
+      "destination": "/learning-hub.html"
+    }
+  ]
+}

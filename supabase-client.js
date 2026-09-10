@@ -1082,7 +1082,10 @@
     var xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
     xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
 
-    // Core static hub URLs
+    // 1. Website Homepage
+    xml += '  <url>\n    <loc>' + baseUrl + '/</loc>\n    <changefreq>weekly</changefreq>\n    <priority>1.0</priority>\n  </url>\n';
+
+    // 2. Core static hub URL
     xml += '  <url>\n    <loc>' + baseUrl + '/learning-hub</loc>\n    <changefreq>daily</changefreq>\n    <priority>0.9</priority>\n  </url>\n';
 
     var classSet = new Set();
@@ -1095,23 +1098,29 @@
       if (clsSlug && subSlug) classSubjectSet.add(clsSlug + "/" + subSlug);
     });
 
+    // 3. Class landing pages
     classSet.forEach(function (cls) {
       xml += '  <url>\n    <loc>' + baseUrl + '/learning-hub/' + cls + '</loc>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>\n';
     });
 
+    // 4. Class + Subject landing pages
     classSubjectSet.forEach(function (cs) {
       xml += '  <url>\n    <loc>' + baseUrl + '/learning-hub/' + cs + '</loc>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>\n';
     });
 
+    // 5. Individual Published Resources
     items.forEach(function (item) {
       var clsSlug = (item.class_level || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
       var subSlug = (item.subject || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
       var url = baseUrl + '/learning-hub/' + clsSlug + '/' + subSlug + '/' + encodeURIComponent(item.slug);
-      var lastMod = (item.published_at || new Date().toISOString()).split("T")[0];
+      var rawDate = item.updated_at || item.published_at;
+      var lastMod = rawDate ? rawDate.split("T")[0] : null;
 
       xml += '  <url>\n';
       xml += '    <loc>' + url + '</loc>\n';
-      xml += '    <lastmod>' + lastMod + '</lastmod>\n';
+      if (lastMod) {
+        xml += '    <lastmod>' + lastMod + '</lastmod>\n';
+      }
       xml += '    <changefreq>monthly</changefreq>\n';
       xml += '    <priority>0.7</priority>\n';
       xml += '  </url>\n';

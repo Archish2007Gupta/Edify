@@ -66,7 +66,7 @@ async function fetchPublishedResources() {
               subject: 'Physics',
               chapter: 'Electricity',
               topic: "Ohm's Law",
-              published_at: new Date().toISOString()
+              published_at: '2026-09-01T10:00:00.000Z'
             },
             {
               id: 'seed-res-2',
@@ -76,7 +76,7 @@ async function fetchPublishedResources() {
               subject: 'Physics',
               chapter: 'Electricity',
               topic: 'Resistance',
-              published_at: new Date().toISOString()
+              published_at: '2026-09-02T11:30:00.000Z'
             }
           ]);
         }
@@ -100,17 +100,24 @@ function cleanSlug(text) {
     .replace(/^-+|-+$/g, '');
 }
 
-async function generate() {
+async function generate(providedResources, customOutPath) {
   console.log('Generating sitemap for Edify Learning Hub...');
   try {
-    const resources = await fetchPublishedResources();
+    const resources = providedResources || await fetchPublishedResources();
     console.log(`Found ${resources.length} published resources.`);
 
     const base = siteBaseUrl.replace(/\/+$/, '');
     let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
     xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
 
-    // Static public portal URL
+    // 1. Website Homepage
+    xml += '  <url>\n';
+    xml += `    <loc>${base}/</loc>\n`;
+    xml += '    <changefreq>weekly</changefreq>\n';
+    xml += '    <priority>1.0</priority>\n';
+    xml += '  </url>\n';
+
+    // 2. Learning Hub Portal Homepage
     xml += '  <url>\n';
     xml += `    <loc>${base}/learning-hub</loc>\n`;
     xml += '    <changefreq>daily</changefreq>\n';
@@ -127,7 +134,7 @@ async function generate() {
       if (c && s) classSubjects.add(`${c}/${s}`);
     });
 
-    // Class landing pages
+    // 3. Dynamic Class landing pages (only for classes with published resources)
     classes.forEach((c) => {
       xml += '  <url>\n';
       xml += `    <loc>${base}/learning-hub/${c}</loc>\n`;
@@ -136,7 +143,7 @@ async function generate() {
       xml += '  </url>\n';
     });
 
-    // Class + Subject landing pages
+    // 4. Dynamic Class + Subject landing pages (only for subjects with published resources)
     classSubjects.forEach((cs) => {
       xml += '  <url>\n';
       xml += `    <loc>${base}/learning-hub/${cs}</loc>\n`;
@@ -145,16 +152,19 @@ async function generate() {
       xml += '  </url>\n';
     });
 
-    // Individual Resource pages
+    // 5. Individual Published Resource pages
     resources.forEach((r) => {
       const c = cleanSlug(r.class_level);
       const s = cleanSlug(r.subject);
       const slug = cleanSlug(r.slug);
-      const lastmod = (r.published_at || r.updated_at || new Date().toISOString()).split('T')[0];
+      const rawDate = r.updated_at || r.published_at;
+      const lastmod = rawDate ? rawDate.split('T')[0] : null;
 
       xml += '  <url>\n';
       xml += `    <loc>${base}/learning-hub/${c}/${s}/${slug}</loc>\n`;
-      xml += `    <lastmod>${lastmod}</lastmod>\n`;
+      if (lastmod) {
+        xml += `    <lastmod>${lastmod}</lastmod>\n`;
+      }
       xml += '    <changefreq>monthly</changefreq>\n';
       xml += '    <priority>0.7</priority>\n';
       xml += '  </url>\n';
@@ -162,11 +172,13 @@ async function generate() {
 
     xml += '</urlset>\n';
 
-    const outPath = path.join(__dirname, 'sitemap.xml');
+    const outPath = customOutPath || path.join(__dirname, 'sitemap.xml');
     fs.writeFileSync(outPath, xml, 'utf8');
-    console.log(`Successfully generated sitemap at ${outPath} with ${classes.size + classSubjects.size + resources.length + 1} URLs.`);
+    console.log(`Successfully generated sitemap at ${outPath} with ${classes.size + classSubjects.size + resources.length + 2} URLs.`);
+    return xml;
   } catch (err) {
     console.error('Error generating sitemap:', err.message);
+    throw err;
   }
 }
 

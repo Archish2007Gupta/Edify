@@ -1,0 +1,31 @@
+# Robots.txt for Edify Tutorial
+# Production Domain: https://www.edifytutorial.com
+
+User-agent: *
+Allow: /
+Allow: /learning-hub
+Allow: /learning-hub/*
+
+# Allow all static assets and media
+Allow: /*.css$
+Allow: /*.js$
+Allow: /*.png$
+Allow: /*.jpg$
+Allow: /*.jpeg$
+Allow: /*.webp$
+Allow: /*.svg$
+Allow: /*.ico$
+Allow: /images/
+
+# Discourage crawling of private application areas and administrative portals
+Disallow: /teacher-login
+Disallow: /teacher-login.html
+Disallow: /teacher-dashboard
+Disallow: /teacher-dashboard.html
+Disallow: /edify-review
+Disallow: /edify-review.html
+Disallow: /admin
+Disallow: /admin/*
+
+# Sitemap
+Sitemap: https://www.edifytutorial.com/sitemap.xml

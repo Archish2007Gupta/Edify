@@ -9,21 +9,30 @@
       document.write('<base href="/">');
     }
   </script>
-  <title id="pageTitle">Learning Hub — Free Educational Resources | Edify Tutorial</title>
+  <title id="pageTitle">Edify Tutorial Learning Hub | Free Study Resources & Notes</title>
   <meta id="metaDescription" name="description"
     content="Explore free educational resources, topic notes, important questions, formula sheets, and worksheets from Edify Tutorial teachers for Classes 6 to 12." />
+  <meta id="robotsMeta" name="robots" content="index, follow" />
   <meta name="theme-color" content="#0E2E57" />
 
   <!-- Canonical URL -->
   <link id="canonicalUrl" rel="canonical" href="https://www.edifytutorial.com/learning-hub" />
 
   <!-- Open Graph Meta Tags -->
-  <meta id="ogTitle" property="og:title" content="Learning Hub — Free Educational Resources | Edify Tutorial" />
+  <meta id="ogTitle" property="og:title" content="Edify Tutorial Learning Hub | Free Study Resources & Notes" />
   <meta id="ogDescription" property="og:description"
     content="Explore free educational resources, topic notes, important questions, formula sheets, and worksheets from Edify Tutorial teachers." />
   <meta id="ogUrl" property="og:url" content="https://www.edifytutorial.com/learning-hub" />
   <meta id="ogType" property="og:type" content="website" />
   <meta id="ogImage" property="og:image" content="https://www.edifytutorial.com/_logo1.png" />
+  <meta property="og:site_name" content="Edify Tutorial" />
+
+  <!-- Twitter Card Meta Tags -->
+  <meta id="twitterCard" name="twitter:card" content="summary_large_image" />
+  <meta id="twitterTitle" name="twitter:title" content="Edify Tutorial Learning Hub | Free Study Resources & Notes" />
+  <meta id="twitterDescription" name="twitter:description" content="Explore free educational resources, topic notes, important questions, formula sheets, and worksheets from Edify Tutorial teachers." />
+  <meta id="twitterImage" name="twitter:image" content="https://www.edifytutorial.com/_logo1.png" />
+  <meta id="twitterUrl" name="twitter:url" content="https://www.edifytutorial.com/learning-hub" />
 
   <!-- Structured Data JSON-LD Placeholder -->
   <script id="structuredData" type="application/ld+json">
@@ -1364,8 +1373,10 @@
             return { view: "class", classSlug: hashParts[0] };
           } else if (hashParts.length === 2) {
             return { view: "class-subject", classSlug: hashParts[0], subjectSlug: hashParts[1] };
-          } else if (hashParts.length >= 3) {
+          } else if (hashParts.length === 3) {
             return { view: "resource", classSlug: hashParts[0], subjectSlug: hashParts[1], resourceSlug: hashParts[2] };
+          } else if (hashParts.length > 3) {
+            return { view: "not-found" };
           }
         }
 
@@ -1379,8 +1390,10 @@
               return { view: "class", classSlug: parts[0] };
             } else if (parts.length === 2) {
               return { view: "class-subject", classSlug: parts[0], subjectSlug: parts[1] };
-            } else if (parts.length >= 3) {
+            } else if (parts.length === 3) {
               return { view: "resource", classSlug: parts[0], subjectSlug: parts[1], resourceSlug: parts[2] };
+            } else if (parts.length > 3) {
+              return { view: "not-found" };
             }
           }
         }
@@ -1477,9 +1490,11 @@
       // SEO & STRUCTURED DATA UPDATER
       // ========================================================================
       function updatePageSeo(seo) {
-        var title = seo.title || "Learning Hub — Free Educational Resources | Edify Tutorial";
+        var title = seo.title || "Edify Tutorial Learning Hub | Free Study Resources & Notes";
         var desc = seo.description || "Explore free educational resources, topic notes, questions, and worksheets from Edify Tutorial teachers.";
         var canonical = seo.canonical || "https://www.edifytutorial.com/learning-hub";
+        var robots = seo.robots || "index, follow";
+        var image = seo.image || "https://www.edifytutorial.com/_logo1.png";
 
         document.title = title;
         var metaDesc = document.getElementById("metaDescription");
@@ -1487,6 +1502,9 @@
 
         var canEl = document.getElementById("canonicalUrl");
         if (canEl) canEl.setAttribute("href", canonical);
+
+        var robEl = document.getElementById("robotsMeta");
+        if (robEl) robEl.setAttribute("content", robots);
 
         var ogT = document.getElementById("ogTitle");
         if (ogT) ogT.setAttribute("content", title);
@@ -1496,6 +1514,17 @@
         if (ogU) ogU.setAttribute("content", canonical);
         var ogType = document.getElementById("ogType");
         if (ogType) ogType.setAttribute("content", seo.type || "website");
+        var ogImg = document.getElementById("ogImage");
+        if (ogImg) ogImg.setAttribute("content", image);
+
+        var twTitle = document.getElementById("twitterTitle");
+        if (twTitle) twTitle.setAttribute("content", title);
+        var twDesc = document.getElementById("twitterDescription");
+        if (twDesc) twDesc.setAttribute("content", desc);
+        var twImg = document.getElementById("twitterImage");
+        if (twImg) twImg.setAttribute("content", image);
+        var twUrl = document.getElementById("twitterUrl");
+        if (twUrl) twUrl.setAttribute("content", canonical);
 
         // Structured data JSON-LD
         var ldScript = document.getElementById("structuredData");
@@ -1510,14 +1539,29 @@
       function updateBreadcrumbs(crumbs) {
         var bc = document.getElementById("hubBreadcrumbs");
         if (!bc) return;
-        var html = '<li><a href="javascript:void(0)" onclick="hubNavigate({view:\'home\'})">Learning Hub</a></li>';
+
+        var isHttp = window.location.protocol.indexOf("http") === 0;
+        var homeHref = isHttp ? "/" : "edify-tutorial-landing.html";
+        var hubHref = isHttp ? "/learning-hub" : "learning-hub.html";
+
+        var html = '<li><a href="' + homeHref + '">Home</a></li>';
+        html += '<li class="crumb-sep">/</li>';
+
+        if (!crumbs || !crumbs.length) {
+          html += '<li class="current-crumb" aria-current="page">Learning Hub</li>';
+          bc.innerHTML = html;
+          return;
+        }
+
+        html += '<li><a href="' + hubHref + '" onclick="event.preventDefault(); hubNavigate({view:\'home\'})">Learning Hub</a></li>';
 
         crumbs.forEach(function (c, idx) {
           html += '<li class="crumb-sep">/</li>';
           if (idx === crumbs.length - 1) {
             html += '<li class="current-crumb" aria-current="page">' + c.label + '</li>';
           } else {
-            html += '<li><a href="javascript:void(0)" onclick="hubNavigate(' + JSON.stringify(c.route).replace(/"/g, '&quot;') + ')">' + c.label + '</a></li>';
+            var url = buildRouteUrl(c.route);
+            html += '<li><a href="' + url + '" onclick="event.preventDefault(); hubNavigate(' + JSON.stringify(c.route).replace(/"/g, '&quot;') + ')">' + c.label + '</a></li>';
           }
         });
 
@@ -1531,10 +1575,53 @@
         var main = document.getElementById("hubMain");
         updateBreadcrumbs([]);
         updatePageSeo({
-          title: "Learning Hub — Free Study Material, Notes & Worksheets | Edify Tutorial",
+          title: "Edify Tutorial Learning Hub | Free Study Resources & Notes",
           description: "Explore free educational resources, topic notes, questions, worksheets and study material from Edify Tutorial teachers for Classes 6 to 12.",
           canonical: "https://www.edifytutorial.com/learning-hub",
-          type: "website"
+          type: "website",
+          structuredData: {
+            "@context": "https://schema.org",
+            "@graph": [
+              {
+                "@type": "WebSite",
+                "@id": "https://www.edifytutorial.com/#website",
+                "name": "Edify Tutorial",
+                "url": "https://www.edifytutorial.com",
+                "potentialAction": {
+                  "@type": "SearchAction",
+                  "target": "https://www.edifytutorial.com/learning-hub?search={search_term_string}",
+                  "query-input": "required name=search_term_string"
+                }
+              },
+              {
+                "@type": "CollectionPage",
+                "@id": "https://www.edifytutorial.com/learning-hub#webpage",
+                "url": "https://www.edifytutorial.com/learning-hub",
+                "name": "Edify Tutorial Learning Hub",
+                "description": "Free educational resources, topic notes, questions, and worksheets for Classes 6 to 12.",
+                "isPartOf": {
+                  "@id": "https://www.edifytutorial.com/#website"
+                },
+                "breadcrumb": {
+                  "@type": "BreadcrumbList",
+                  "itemListElement": [
+                    {
+                      "@type": "ListItem",
+                      "position": 1,
+                      "name": "Home",
+                      "item": "https://www.edifytutorial.com/"
+                    },
+                    {
+                      "@type": "ListItem",
+                      "position": 2,
+                      "name": "Learning Hub",
+                      "item": "https://www.edifytutorial.com/learning-hub"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
         });
 
         main.innerHTML = `
@@ -1542,7 +1629,7 @@
           <section class="hub-hero">
             <div class="container">
               <span class="eyebrow">Free Educational Resources</span>
-              <h1 class="hub-hero-title">Learn. Revise. <span>Understand.</span></h1>
+              <h1 class="hub-hero-title">Learning Hub: Learn. Revise. <span>Understand.</span></h1>
               <p class="hub-hero-lede">
                 Explore free educational resources, topic notes, questions, worksheets and study material from Edify Tutorial teachers.
               </p>
@@ -1674,15 +1761,17 @@
           return;
         }
 
-        // Render Class Cards
+        // Render Class Cards with clean crawlable links
         var classCardsHtml = "";
         res.data.classes.forEach(function (cls) {
           var clsSlug = toSlug(cls.name);
+          var clsRoute = { view: 'class', classSlug: clsSlug };
+          var clsUrl = buildRouteUrl(clsRoute);
           var subjectNames = Object.keys(cls.subjects || {}).slice(0, 3).join(", ");
           if (Object.keys(cls.subjects || {}).length > 3) subjectNames += ", ...";
 
           classCardsHtml += `
-            <div class="hub-class-card" onclick="hubNavigate({view: 'class', classSlug: '${clsSlug}'})">
+            <a href="${clsUrl}" class="hub-class-card" onclick="event.preventDefault(); hubNavigate(${JSON.stringify(clsRoute).replace(/"/g, '&quot;')})">
               <span class="hub-class-badge">${cls.count} ${cls.count === 1 ? 'Resource' : 'Resources'}</span>
               <h3 class="hub-class-name">${cls.name}</h3>
               <p style="font-size: 13px; color: var(--ink-soft); line-height: 1.4; margin-bottom: 12px;">
@@ -1692,7 +1781,7 @@
                 <span>View resources</span>
                 <span class="arrow">→</span>
               </div>
-            </div>
+            </a>
           `;
         });
         classGrid.innerHTML = classCardsHtml;
@@ -1700,7 +1789,6 @@
         // Render Subject Chips
         var subjectChipsHtml = "";
         res.data.subjects.forEach(function (sub) {
-          var subSlug = toSlug(sub.name);
           subjectChipsHtml += `
             <button type="button" class="hub-subject-btn" onclick="quickSearch('${sub.name}')">
               <span>${sub.name}</span>
@@ -1737,6 +1825,8 @@
         var clsSlug = toSlug(item.class_level);
         var subSlug = toSlug(item.subject);
         var resSlug = toSlug(item.slug);
+        var cardRoute = { view: 'resource', classSlug: clsSlug, subjectSlug: subSlug, resourceSlug: resSlug };
+        var cardUrl = buildRouteUrl(cardRoute);
         var teacherName = (item.teachers && item.teachers.name) ? item.teachers.name : "Edify Master Teacher";
         var dateFormatted = formatDate(item.published_at);
         var views = item.views || 0;
@@ -1748,7 +1838,7 @@
               <span class="hub-tag-hierarchy">${item.class_level} • ${item.subject}</span>
             </div>
             <h3 class="hub-card-title">
-              <a href="javascript:void(0)" onclick="hubNavigate({view:'resource', classSlug:'${clsSlug}', subjectSlug:'${subSlug}', resourceSlug:'${resSlug}'})">
+              <a href="${cardUrl}" onclick="event.preventDefault(); hubNavigate(${JSON.stringify(cardRoute).replace(/"/g, '&quot;')})">
                 ${item.title}
               </a>
             </h3>
@@ -1759,7 +1849,7 @@
                 <span class="hub-author-name">By ${teacherName}</span>
                 <span class="hub-author-brand">${dateFormatted ? dateFormatted + ' · ' : ''}Edify Tutorial</span>
               </div>
-              <a href="javascript:void(0)" class="hub-card-read-btn" onclick="hubNavigate({view:'resource', classSlug:'${clsSlug}', subjectSlug:'${subSlug}', resourceSlug:'${resSlug}'})">
+              <a href="${cardUrl}" class="hub-card-read-btn" onclick="event.preventDefault(); hubNavigate(${JSON.stringify(cardRoute).replace(/"/g, '&quot;')})">
                 Read Resource →
               </a>
             </div>
@@ -1828,15 +1918,32 @@
         var className = classSlug.replace(/class-?/i, "Class ").replace(/\b\w/g, function (l) { return l.toUpperCase(); }).trim();
         if (!className.startsWith("Class")) className = "Class " + className;
 
+        var classCanonical = "https://www.edifytutorial.com/learning-hub/" + encodeURIComponent(classSlug);
+
         updateBreadcrumbs([
           { label: className, route: { view: "class", classSlug: classSlug } }
         ]);
 
         updatePageSeo({
-          title: `${className} Study Resources & Notes | Edify Tutorial`,
+          title: `${className} Study Materials & Notes | Edify Tutorial`,
           description: `Download free chapter notes, important questions, formula sheets, and worksheets for ${className}. Curated by Edify Tutorial master teachers.`,
-          canonical: `https://www.edifytutorial.com/learning-hub/${classSlug}`,
-          type: "website"
+          canonical: classCanonical,
+          type: "website",
+          structuredData: {
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            "name": `${className} Study Resources`,
+            "description": `Download free chapter notes, important questions, formula sheets, and worksheets for ${className}.`,
+            "url": classCanonical,
+            "breadcrumb": {
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.edifytutorial.com/" },
+                { "@type": "ListItem", "position": 2, "name": "Learning Hub", "item": "https://www.edifytutorial.com/learning-hub" },
+                { "@type": "ListItem", "position": 3, "name": className, "item": classCanonical }
+              ]
+            }
+          }
         });
 
         main.innerHTML = `
@@ -1886,8 +1993,10 @@
             Object.keys(matchedClass.subjects).forEach(function (sub) {
               var subSlug = toSlug(sub);
               var count = matchedClass.subjects[sub];
+              var subRoute = { view: 'class-subject', classSlug: classSlug, subjectSlug: subSlug };
+              var subUrl = buildRouteUrl(subRoute);
               html += `
-                <a href="javascript:void(0)" class="hub-subject-btn" onclick="hubNavigate({view:'class-subject', classSlug:'${classSlug}', subjectSlug:'${subSlug}'})">
+                <a href="${subUrl}" class="hub-subject-btn" onclick="event.preventDefault(); hubNavigate(${JSON.stringify(subRoute).replace(/"/g, '&quot;')})">
                   <span>${sub}</span>
                   <span class="hub-subject-count">${count}</span>
                 </a>
@@ -1911,11 +2020,18 @@
           if (resourcesRes.success && resourcesRes.data.length) {
             resGrid.innerHTML = resourcesRes.data.map(renderResourceCard).join("");
           } else {
+            // Thin content protection
+            updatePageSeo({
+              title: `${className} Study Resources | Edify Tutorial`,
+              description: `Study resources for ${className} are currently being prepared by Edify Tutorial faculty.`,
+              canonical: classCanonical,
+              robots: "noindex, follow"
+            });
             resGrid.innerHTML = `
               <div class="hub-empty-state" style="grid-column: 1/-1;">
                 <h3 class="hub-empty-title">No resources published yet for ${className}</h3>
                 <p class="hub-empty-text">Our teachers are working on new study material for this class. Explore other classes or request a demo class!</p>
-                <button type="button" class="btn btn-navy" onclick="hubNavigate({view:'home'})">Browse all classes</button>
+                <a href="/learning-hub" class="btn btn-navy" onclick="event.preventDefault(); hubNavigate({view:'home'})">Browse all classes</a>
               </div>
             `;
           }
@@ -1932,16 +2048,35 @@
         if (!className.startsWith("Class")) className = "Class " + className;
         var subjectName = subjectSlug.replace(/-/g, " ").replace(/\b\w/g, function (l) { return l.toUpperCase(); }).trim();
 
+        var classCanonical = "https://www.edifytutorial.com/learning-hub/" + encodeURIComponent(classSlug);
+        var subCanonical = "https://www.edifytutorial.com/learning-hub/" + encodeURIComponent(classSlug) + "/" + encodeURIComponent(subjectSlug);
+
         updateBreadcrumbs([
           { label: className, route: { view: "class", classSlug: classSlug } },
           { label: subjectName, route: { view: "class-subject", classSlug: classSlug, subjectSlug: subjectSlug } }
         ]);
 
         updatePageSeo({
-          title: `${className} ${subjectName} Notes, Chapters & Solutions | Edify Tutorial`,
-          description: `Chapter-wise educational resources, notes, formulas, and revision materials for ${className} ${subjectName}.`,
-          canonical: `https://www.edifytutorial.com/learning-hub/${classSlug}/${subjectSlug}`,
-          type: "website"
+          title: `${className} ${subjectName} Notes, Formulas & Study Material | Edify Tutorial`,
+          description: `Chapter-wise educational resources, notes, formulas, and revision materials for ${className} ${subjectName} from Edify Tutorial.`,
+          canonical: subCanonical,
+          type: "website",
+          structuredData: {
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            "name": `${className} ${subjectName} Study Materials`,
+            "description": `Chapter-wise educational resources, notes, and worksheets for ${className} ${subjectName}.`,
+            "url": subCanonical,
+            "breadcrumb": {
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.edifytutorial.com/" },
+                { "@type": "ListItem", "position": 2, "name": "Learning Hub", "item": "https://www.edifytutorial.com/learning-hub" },
+                { "@type": "ListItem", "position": 3, "name": className, "item": classCanonical },
+                { "@type": "ListItem", "position": 4, "name": subjectName, "item": subCanonical }
+              ]
+            }
+          }
         });
 
         main.innerHTML = `
@@ -1949,7 +2084,7 @@
             <div style="margin-bottom: 36px;">
               <span class="eyebrow">${className} • ${subjectName}</span>
               <h1 style="font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(28px, 3.8vw, 44px); font-weight: 700; color: var(--blue-deep); margin-top: 8px;">
-                ${className} ${subjectName}
+                ${className} ${subjectName} Study Materials
               </h1>
               <p style="font-size: 16px; color: var(--ink-soft); max-width: 680px; margin-top: 8px; line-height: 1.5;">
                 Explore resources grouped by chapter. Master concepts, study derivations, and review important questions.
@@ -1974,11 +2109,18 @@
         if (!container) return;
 
         if (!res.success || !res.data.length) {
+          // Thin content protection
+          updatePageSeo({
+            title: `${className} ${subjectName} Study Materials | Edify Tutorial`,
+            description: `Study resources for ${className} ${subjectName} are currently being prepared by Edify Tutorial faculty.`,
+            canonical: subCanonical,
+            robots: "noindex, follow"
+          });
           container.innerHTML = `
             <div class="hub-empty-state">
               <h3 class="hub-empty-title">No resources found for ${className} ${subjectName}</h3>
               <p class="hub-empty-text">Teacher resources for this subject are currently under review. Check back soon or view all classes.</p>
-              <button type="button" class="btn btn-navy" onclick="hubNavigate({view:'class', classSlug:'${classSlug}'})">Back to ${className}</button>
+              <a href="${classCanonical}" class="btn btn-navy" onclick="event.preventDefault(); hubNavigate({view:'class', classSlug:'${classSlug}'})">Back to ${className}</a>
             </div>
           `;
           return;
@@ -2001,7 +2143,7 @@
             <div class="hub-chapter-section">
               <div class="hub-chapter-header">
                 <div class="hub-chapter-title">
-                  <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--blue); flex: none;">
+                  <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--blue); flex: none;" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                   </svg>
                   <span>${chTitle}</span>
@@ -2013,11 +2155,13 @@
 
           items.forEach(function (it) {
             var itemSlug = toSlug(it.slug);
+            var itemRoute = { view: 'resource', classSlug: classSlug, subjectSlug: subjectSlug, resourceSlug: itemSlug };
+            var itemUrl = buildRouteUrl(itemRoute);
             var itemTeacher = (it.teachers && it.teachers.name) ? it.teachers.name : "Edify Master Teacher";
             html += `
               <li class="hub-topic-item">
-                <a href="javascript:void(0)" onclick="hubNavigate({view:'resource', classSlug:'${classSlug}', subjectSlug:'${subjectSlug}', resourceSlug:'${itemSlug}'})">
-                  <svg class="hub-topic-icon" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <a href="${itemUrl}" onclick="event.preventDefault(); hubNavigate(${JSON.stringify(itemRoute).replace(/"/g, '&quot;')})">
+                  <svg class="hub-topic-icon" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                   </svg>
                   <div>
@@ -2027,7 +2171,7 @@
                     </div>
                   </div>
                 </a>
-                <a href="javascript:void(0)" class="hub-card-read-btn" onclick="hubNavigate({view:'resource', classSlug:'${classSlug}', subjectSlug:'${subjectSlug}', resourceSlug:'${itemSlug}'})">
+                <a href="${itemUrl}" class="hub-card-read-btn" onclick="event.preventDefault(); hubNavigate(${JSON.stringify(itemRoute).replace(/"/g, '&quot;')})">
                   Read →
                 </a>
               </li>
@@ -2059,12 +2203,21 @@
         // Fetch resource by slug
         var res = await window.getPublishedResourceBySlug(resourceSlug);
         if (!res.success || !res.data) {
+          updateBreadcrumbs([
+            { label: "Resource Not Found" }
+          ]);
+          updatePageSeo({
+            title: "Resource Not Found | Edify Tutorial Learning Hub",
+            description: "The requested educational resource could not be found or has been unpublished.",
+            canonical: "https://www.edifytutorial.com/learning-hub",
+            robots: "noindex, nofollow"
+          });
           main.innerHTML = `
             <div class="container" style="padding: 60px 0;">
               <div class="hub-empty-state">
-                <h2 class="hub-empty-title">Resource Not Found</h2>
+                <h1 class="hub-empty-title" style="font-size: 28px;">Resource Not Found</h1>
                 <p class="hub-empty-text">This educational resource may not be published or the link might be outdated.</p>
-                <button type="button" class="btn btn-navy" onclick="hubNavigate({view:'home'})">Return to Learning Hub</button>
+                <a href="/learning-hub" class="btn btn-navy" onclick="event.preventDefault(); hubNavigate({view:'home'})">Return to Learning Hub</a>
               </div>
             </div>
           `;
@@ -2090,43 +2243,66 @@
         updateBreadcrumbs(crumbs);
 
         // SEO and Canonical URL
-        var seoTitle = item.seo_title || `${item.title} | ${item.class_level} ${item.subject} | Edify Tutorial`;
-        var seoDesc = item.seo_description || item.description || `Study ${item.title} for ${item.class_level} ${item.subject}. Notes and formulas from Edify Tutorial.`;
+        var seoTitle = item.seo_title || `${item.title} — ${item.class_level} ${item.subject} | Edify Tutorial`;
+        var seoDesc = item.seo_description || item.description || `Study ${item.title} for ${item.class_level} ${item.subject}. Complete explanations, key formulas, diagrams and study material from Edify Tutorial.`;
         var canonicalUrl = `https://www.edifytutorial.com/learning-hub/${itemClassSlug}/${itemSubjectSlug}/${encodeURIComponent(item.slug)}`;
+        var coverImage = item.cover_image_url || "https://www.edifytutorial.com/_logo1.png";
+        var teacherName = (item.teachers && item.teachers.name) ? item.teachers.name : "Edify Master Teacher";
 
         updatePageSeo({
           title: seoTitle,
           description: seoDesc,
           canonical: canonicalUrl,
           type: "article",
+          image: coverImage,
+          robots: "index, follow",
           structuredData: {
             "@context": "https://schema.org",
-            "@type": "Article",
-            "headline": item.title,
-            "description": seoDesc,
-            "datePublished": item.published_at || item.created_at,
-            "dateModified": item.updated_at || item.published_at,
-            "author": {
-              "@type": "Organization",
-              "name": "Edify Tutorial",
-              "url": "https://www.edifytutorial.com"
-            },
-            "publisher": {
-              "@type": "Organization",
-              "name": "Edify Tutorial",
-              "logo": {
-                "@type": "ImageObject",
-                "url": "https://www.edifytutorial.com/_logo1.png"
+            "@graph": [
+              {
+                "@type": ["Article", "LearningResource"],
+                "@id": canonicalUrl + "#article",
+                "headline": item.title,
+                "description": seoDesc,
+                "datePublished": item.published_at || item.created_at,
+                "dateModified": item.updated_at || item.published_at || item.created_at,
+                "mainEntityOfPage": canonicalUrl,
+                "image": coverImage,
+                "educationalLevel": item.class_level,
+                "learningResourceType": item.resource_type || "Topic Notes",
+                "about": {
+                  "@type": "Thing",
+                  "name": item.subject
+                },
+                "author": {
+                  "@type": "Person",
+                  "name": teacherName
+                },
+                "publisher": {
+                  "@type": "Organization",
+                  "name": "Edify Tutorial",
+                  "url": "https://www.edifytutorial.com",
+                  "logo": {
+                    "@type": "ImageObject",
+                    "url": "https://www.edifytutorial.com/_logo1.png"
+                  }
+                }
+              },
+              {
+                "@type": "BreadcrumbList",
+                "@id": canonicalUrl + "#breadcrumb",
+                "itemListElement": [
+                  { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.edifytutorial.com/" },
+                  { "@type": "ListItem", "position": 2, "name": "Learning Hub", "item": "https://www.edifytutorial.com/learning-hub" },
+                  { "@type": "ListItem", "position": 3, "name": item.class_level, "item": "https://www.edifytutorial.com/learning-hub/" + itemClassSlug },
+                  { "@type": "ListItem", "position": 4, "name": item.subject, "item": "https://www.edifytutorial.com/learning-hub/" + itemClassSlug + "/" + itemSubjectSlug },
+                  { "@type": "ListItem", "position": 5, "name": item.title, "item": canonicalUrl }
+                ]
               }
-            },
-            "mainEntityOfPage": {
-              "@type": "WebPage",
-              "@id": canonicalUrl
-            }
+            ]
           }
         });
 
-        var teacherName = (item.teachers && item.teachers.name) ? item.teachers.name : "Edify Master Teacher";
         var dateFormatted = formatDate(item.published_at);
         var views = (item.views || 0) + 1; // Anticipate current view increment
 
@@ -2154,7 +2330,7 @@
                     </div>
                     ${dateFormatted ? `<div>• Published on ${dateFormatted}</div>` : ''}
                     <div class="hub-views-badge">
-                      <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                       </svg>
@@ -2162,6 +2338,13 @@
                     </div>
                   </div>
                 </header>
+
+                <!-- Cover Image (If available) -->
+                ${item.cover_image_url ? `
+                  <div style="margin: 20px 0; border-radius: 12px; overflow: hidden; max-height: 420px;">
+                    <img src="${item.cover_image_url}" alt="${item.title} — ${item.class_level} ${item.subject} Study Notes" style="width: 100%; height: auto; object-fit: cover; display: block;" loading="lazy" />
+                  </div>
+                ` : ''}
 
                 <!-- Quick Overview Callout -->
                 ${item.description ? `
@@ -2174,7 +2357,7 @@
                 <!-- Dynamic Table of Contents -->
                 <div class="hub-toc-card" id="articleTocCard" style="display: none;">
                   <div class="hub-toc-title">
-                    <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
                     </svg>
                     <span>Table of Contents</span>
@@ -2187,15 +2370,30 @@
                   ${item.content || '<p>No content provided for this resource.</p>'}
                 </div>
 
+                <!-- Contextual Internal Navigation Links -->
+                <div class="hub-article-context-links" style="margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--rule); display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; align-items: center;">
+                  <div>
+                    <span style="font-size: 13px; color: var(--ink-soft); display: block; margin-bottom: 4px;">More in this subject:</span>
+                    <a href="/learning-hub/${itemClassSlug}/${itemSubjectSlug}" onclick="event.preventDefault(); hubNavigate({view:'class-subject', classSlug:'${itemClassSlug}', subjectSlug:'${itemSubjectSlug}'})" style="color: var(--blue); font-weight: 600; text-decoration: none;">
+                      ← All ${item.class_level} ${item.subject} Chapters & Topics
+                    </a>
+                  </div>
+                  <div>
+                    <a href="/learning-hub/${itemClassSlug}" onclick="event.preventDefault(); hubNavigate({view:'class', classSlug:'${itemClassSlug}'})" style="color: var(--blue-deep); font-size: 13.5px; font-weight: 600; text-decoration: underline;">
+                      Browse All ${item.class_level} Resources →
+                    </a>
+                  </div>
+                </div>
+
                 <!-- PDF Download Banner -->
                 ${item.pdf_url ? `
-                  <div class="hub-pdf-box">
+                  <div class="hub-pdf-box" style="margin-top: 28px;">
                     <div class="hub-pdf-info">
                       <h4>Download Study Material</h4>
                       <p>Get the complete chapter notes and solved examples in printable PDF format.</p>
                     </div>
                     <a href="${item.pdf_url}" target="_blank" rel="noopener" class="btn btn-amber" style="display: inline-flex; align-items: center; gap: 8px;">
-                      <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                       </svg>
                       Download PDF
@@ -2300,7 +2498,7 @@
         }
       }
 
-      // Related resources query
+      // Related resources query with crawlable internal links
       async function loadRelatedResources(resource) {
         var list = document.getElementById("relatedResourcesList");
         if (!list) return;
@@ -2316,9 +2514,11 @@
           var cSlug = toSlug(r.class_level);
           var sSlug = toSlug(r.subject);
           var rSlug = toSlug(r.slug);
+          var rRoute = { view: 'resource', classSlug: cSlug, subjectSlug: sSlug, resourceSlug: rSlug };
+          var rUrl = buildRouteUrl(rRoute);
           html += `
             <li class="hub-related-item">
-              <a href="javascript:void(0)" onclick="hubNavigate({view:'resource', classSlug:'${cSlug}', subjectSlug:'${sSlug}', resourceSlug:'${rSlug}'})">
+              <a href="${rUrl}" onclick="event.preventDefault(); hubNavigate(${JSON.stringify(rRoute).replace(/"/g, '&quot;')})">
                 ${r.title}
               </a>
               <div class="hub-related-meta">
@@ -2343,6 +2543,31 @@
       }
 
       // ========================================================================
+      // VIEW 5: NOT FOUND / 404 STATE
+      // ========================================================================
+      function renderNotFoundView() {
+        var main = document.getElementById("hubMain");
+        updateBreadcrumbs([
+          { label: "Page Not Found" }
+        ]);
+        updatePageSeo({
+          title: "Page Not Found | Edify Tutorial Learning Hub",
+          description: "The requested educational page or study resource could not be found.",
+          canonical: "https://www.edifytutorial.com/learning-hub",
+          robots: "noindex, nofollow"
+        });
+        main.innerHTML = `
+          <div class="container" style="padding: 60px 0;">
+            <div class="hub-empty-state">
+              <h1 class="hub-empty-title" style="font-size: 28px;">Page Not Found</h1>
+              <p class="hub-empty-text">We couldn't find the educational resource or section you were looking for.</p>
+              <a href="/learning-hub" class="btn btn-navy" onclick="event.preventDefault(); hubNavigate({view:'home'})">Return to Learning Hub</a>
+            </div>
+          </div>
+        `;
+      }
+
+      // ========================================================================
       // ROUTE DISPATCHER
       // ========================================================================
       function renderCurrentRoute() {
@@ -2353,6 +2578,8 @@
           renderClassSubjectView(route.classSlug, route.subjectSlug);
         } else if (route.view === "resource") {
           renderResourceView(route.classSlug, route.subjectSlug, route.resourceSlug);
+        } else if (route.view === "not-found") {
+          renderNotFoundView();
         } else {
           renderHomeView();
         }

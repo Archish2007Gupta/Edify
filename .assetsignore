@@ -1,0 +1,24 @@
+# Cloudflare Workers Assets Ignore List
+# Prevents sensitive and non-web assets from being uploaded to the public CDN
+
+.git/**
+.gitignore
+.gitattributes
+.claude/**
+.gallery_build/**
+.wrangler/**
+.env*
+
+*.bak-*
+*.bak
+*.tmp
+*.log
+
+schema.sql
+test-*.js
+verify-*.js
+sitemap-generator.js
+sitemap-test-*.xml
+
+.htaccess
+vercel.json

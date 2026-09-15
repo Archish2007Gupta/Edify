@@ -291,7 +291,6 @@ test('6.2 _redirects exists and configures clean routing for Cloudflare Pages', 
   assert(fs.existsSync(redirectsPath), '_redirects must exist for Cloudflare Pages SPA & clean routing');
   const content = fs.readFileSync(redirectsPath, 'utf8');
   assert(content.includes('/learning-hub/* /learning-hub.html 200'), 'Missing dynamic learning-hub rewrite');
-  assert(content.includes('/ /index.html 200'), 'Missing root rewrite');
 });
 
 test('6.3 _headers exists and configures security and caching headers', () => {

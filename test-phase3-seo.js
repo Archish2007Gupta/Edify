@@ -276,6 +276,33 @@ test('5.2 Draft & unpublished resources are strictly excluded from indexing and 
 });
 
 // -------------------------------------------------------------
+// 6. CLOUDFLARE PAGES & HOSTING READINESS TESTS
+// -------------------------------------------------------------
+test('6.1 index.html exists as root entrypoint with canonical, OG & JSON-LD schema', () => {
+  const indexPath = path.join(__dirname, 'index.html');
+  assert(fs.existsSync(indexPath), 'index.html must exist at root for Cloudflare Pages');
+  const content = fs.readFileSync(indexPath, 'utf8');
+  assert(content.includes('<link rel="canonical" href="https://www.edifytutorial.com/" />'), 'Missing canonical URL on index.html');
+  assert(content.includes('"@type": "EducationalOrganization"'), 'Missing EducationalOrganization in index.html schema');
+});
+
+test('6.2 _redirects exists and configures clean routing for Cloudflare Pages', () => {
+  const redirectsPath = path.join(__dirname, '_redirects');
+  assert(fs.existsSync(redirectsPath), '_redirects must exist for Cloudflare Pages SPA & clean routing');
+  const content = fs.readFileSync(redirectsPath, 'utf8');
+  assert(content.includes('/learning-hub/* /learning-hub.html 200'), 'Missing dynamic learning-hub rewrite');
+  assert(content.includes('/ /index.html 200'), 'Missing root rewrite');
+});
+
+test('6.3 _headers exists and configures security and caching headers', () => {
+  const headersPath = path.join(__dirname, '_headers');
+  assert(fs.existsSync(headersPath), '_headers must exist for Cloudflare Pages');
+  const content = fs.readFileSync(headersPath, 'utf8');
+  assert(content.includes('X-Content-Type-Options: nosniff'), 'Missing X-Content-Type-Options header');
+  assert(content.includes('X-Frame-Options: SAMEORIGIN'), 'Missing X-Frame-Options header');
+});
+
+// -------------------------------------------------------------
 // SUMMARY
 // -------------------------------------------------------------
 console.log('\n----------------------------------------------------');

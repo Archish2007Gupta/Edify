@@ -1,0 +1,17 @@
+# Cloudflare Pages Routing Configuration
+# Status 200 rewrites preserve the browser URL and serve the destination file.
+
+# Root
+/ /index.html 200
+
+# Learning Hub dynamic SPA routing (supports /learning-hub/class-10/physics/ohms-law-class-10)
+/learning-hub /learning-hub.html 200
+/learning-hub/* /learning-hub.html 200
+
+# Clean extensionless URLs
+/notes /notes.html 200
+/teacher-login /teacher-login.html 200
+/teacher-dashboard /teacher-dashboard.html 200
+/event-gallery /event-gallery.html 200
+/edify-review /edify-review.html 200
+/edify-tutorial-landing /index.html 200

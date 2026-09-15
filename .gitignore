@@ -1,0 +1,15 @@
+# Operating System
+.DS_Store
+Thumbs.db
+
+# Dependencies
+node_modules/
+
+# Test & Temp files
+sitemap-test-*.xml
+*.bak-*
+
+# Editor & Build Artifacts
+.claude/
+.gallery_build/
+.wrangler/

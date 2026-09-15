@@ -1,0 +1,71 @@
+# ==============================================================================
+# Edify Tutorial - Apache / GoDaddy cPanel Web Server Configuration (.htaccess)
+# Production Domain: https://www.edifytutorial.com
+# ==============================================================================
+
+# Prevent directory browsing and disable MultiViews for predictable URL rewriting
+Options -Indexes -MultiViews
+
+# Ensure directory index loads the main landing page
+DirectoryIndex edify-tutorial-landing.html index.html
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # --------------------------------------------------------------------------
+    # 1. Canonical Domain & HTTPS Redirection
+    # Directs traffic to canonical https://www.edifytutorial.com
+    # (Only applies when accessed via edifytutorial.com domain, preserving staging/preview URLs)
+    # --------------------------------------------------------------------------
+    RewriteCond %{HTTP_HOST} ^edifytutorial\.com$ [NC]
+    RewriteRule ^(.*)$ https://www.edifytutorial.com/$1 [L,R=301]
+
+    RewriteCond %{HTTP_HOST} ^www\.edifytutorial\.com$ [NC]
+    RewriteCond %{HTTPS} off
+    RewriteCond %{HTTP:X-Forwarded-Proto} !https
+    RewriteRule ^(.*)$ https://www.edifytutorial.com/$1 [L,R=301]
+
+    # --------------------------------------------------------------------------
+    # 2. Root URL
+    # Map root "/" directly to edify-tutorial-landing.html
+    # --------------------------------------------------------------------------
+    RewriteRule ^$ edify-tutorial-landing.html [L]
+
+    # --------------------------------------------------------------------------
+    # 3. Existing Physical Files & Directories
+    # Directly serve static files (CSS, JS, images, PDF, robots.txt, sitemap.xml)
+    # --------------------------------------------------------------------------
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # --------------------------------------------------------------------------
+    # 4. Learning Hub Clean URLs
+    # Supports:
+    #   /learning-hub
+    #   /learning-hub/
+    #   /learning-hub/class-10
+    #   /learning-hub/class-10/physics
+    #   /learning-hub/class-10/physics/[resource-slug]
+    #
+    # Internally rewrites to learning-hub.html so direct page refreshes
+    # and deep-linked URLs return HTTP 200 without changing the browser URL.
+    # Preserves query parameters (?class=..., ?subject=..., ?search=...) with QSA.
+    # --------------------------------------------------------------------------
+    RewriteRule ^learning-hub(/.*)?$ learning-hub.html [L,QSA]
+
+    # --------------------------------------------------------------------------
+    # 5. Clean URLs for Static HTML Pages (extensionless URL support)
+    # Maps /notes -> notes.html, /teacher-login -> teacher-login.html, etc.
+    # --------------------------------------------------------------------------
+    RewriteCond %{DOCUMENT_ROOT}/$1.html -f [OR]
+    RewriteCond %{REQUEST_FILENAME}\.html -f
+    RewriteRule ^([^/]+)/?$ $1.html [L,QSA]
+
+</IfModule>
+
+# Gzip / Deflate compression for fast loading
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json application/xml image/svg+xml
+</IfModule>

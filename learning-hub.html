@@ -1381,10 +1381,11 @@
         }
 
         // 3. Clean Path routing check (e.g. /learning-hub/class-10/physics/slug)
-        var hubIdx = path.indexOf("/learning-hub");
+        var cleanPath = path.replace(/\.html(?=\/|$)/i, "");
+        var hubIdx = cleanPath.indexOf("/learning-hub");
         if (hubIdx !== -1) {
-          var subPath = path.substring(hubIdx + "/learning-hub".length).replace(/^\/+|\/+$/g, "");
-          if (subPath && !subPath.endsWith(".html")) {
+          var subPath = cleanPath.substring(hubIdx + "/learning-hub".length).replace(/^\/+|\/+$/g, "");
+          if (subPath) {
             var parts = subPath.split("/").filter(Boolean);
             if (parts.length === 1) {
               return { view: "class", classSlug: parts[0] };
@@ -2455,7 +2456,7 @@
           var isH3 = h.tagName.toLowerCase() === "h3";
           tocHtml += `
             <li class="${isH3 ? 'toc-h3' : 'toc-h2'}">
-              <a href="#${id}">${h.textContent}</a>
+              <a href="#${id}" onclick="var el=document.getElementById('${id}');if(el){el.scrollIntoView({behavior:'smooth'});event.preventDefault();}">${h.textContent}</a>
             </li>
           `;
         });

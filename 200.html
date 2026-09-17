@@ -339,7 +339,7 @@
 
     .nav-links {
       display: flex;
-      gap: 26px;
+      gap: clamp(14px, 1.8vw, 24px);
       align-items: center;
       margin-left: auto;
     }
@@ -1147,6 +1147,226 @@
     @media (max-width: 540px) {
       .subjects {
         grid-template-columns: 1fr;
+      }
+    }
+
+    /* ---------- homepage learning hub preview ---------- */
+    .hub-preview-section {
+      background: var(--paper);
+      position: relative;
+    }
+
+    .hub-preview-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: clamp(36px, 4.5vw, 50px);
+    }
+
+    .hub-preview-card {
+      position: relative;
+      background: var(--card);
+      border: 1px solid var(--rule);
+      border-radius: var(--radius);
+      padding: clamp(24px, 2.5vw, 28px);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      box-shadow: var(--shadow-sm);
+      text-decoration: none;
+      color: inherit;
+      overflow: hidden;
+      transition:
+        box-shadow 0.25s ease,
+        border-color 0.25s ease,
+        transform 0.25s ease;
+    }
+
+    .hub-preview-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--card-accent, var(--blue));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.28s cubic-bezier(0.2, 0.7, 0.2, 1);
+    }
+
+    .hub-preview-card:hover {
+      box-shadow: var(--shadow-card);
+      transform: translateY(-4px);
+      border-color: rgba(30, 90, 168, 0.2);
+    }
+
+    .hub-preview-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .hub-preview-card.card-notes {
+      --card-accent: var(--blue);
+      --icon-bg: rgba(30, 90, 168, 0.09);
+      --icon-color: var(--blue);
+    }
+
+    .hub-preview-card.card-materials {
+      --card-accent: var(--pass);
+      --icon-bg: rgba(46, 125, 87, 0.09);
+      --icon-color: var(--pass);
+    }
+
+    .hub-preview-card.card-questions {
+      --card-accent: var(--amber-deep);
+      --icon-bg: rgba(245, 166, 35, 0.14);
+      --icon-color: var(--amber-deep);
+    }
+
+    .hub-preview-card.card-exam {
+      --card-accent: var(--marking);
+      --icon-bg: rgba(198, 64, 47, 0.09);
+      --icon-color: var(--marking);
+    }
+
+    .hub-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .hub-preview-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: var(--icon-bg);
+      color: var(--icon-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: transform 0.25s ease;
+    }
+
+    .hub-preview-card:hover .hub-preview-icon {
+      transform: scale(1.06);
+    }
+
+    .hub-preview-icon svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .hub-card-badge {
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      background: var(--paper-2);
+      padding: 4px 10px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+
+    .hub-card-title {
+      font-family: "Bricolage Grotesque", "Hanken Grotesk", sans-serif;
+      font-size: clamp(19px, 1.8vw, 22px);
+      font-weight: 600;
+      color: var(--blue-deep);
+      line-height: 1.25;
+      margin: 0;
+    }
+
+    .hub-card-desc {
+      font-size: 15px;
+      color: var(--ink-soft);
+      line-height: 1.55;
+      margin: 0;
+      flex-grow: 1;
+    }
+
+    .hub-card-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14.5px;
+      font-weight: 600;
+      color: var(--card-accent, var(--blue));
+      margin-top: 4px;
+      transition: gap 0.2s ease;
+    }
+
+    .hub-card-action svg {
+      width: 16px;
+      height: 16px;
+      transition: transform 0.2s ease;
+    }
+
+    .hub-preview-card:hover .hub-card-action {
+      gap: 9px;
+    }
+
+    .hub-preview-card:hover .hub-card-action svg {
+      transform: translateX(3px);
+    }
+
+    .hub-preview-cta-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 12px;
+    }
+
+    .hub-preview-cta-btn {
+      gap: 10px;
+      padding: 16px 32px;
+      font-size: 16px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px -8px rgba(14, 46, 87, 0.4);
+      transition: all 0.22s ease;
+    }
+
+    .hub-preview-cta-btn svg {
+      transition: transform 0.22s ease;
+    }
+
+    .hub-preview-cta-btn:hover svg {
+      transform: translateX(4px);
+    }
+
+    .hub-preview-sub-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: var(--ink-soft);
+    }
+
+    .hub-preview-sub-badge .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--pass);
+    }
+
+    @media (max-width: 1080px) {
+      .hub-preview-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 18px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .hub-preview-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      .hub-preview-cta-btn {
+        width: 100%;
       }
     }
 
@@ -2857,6 +3077,7 @@
         <a href="#subjects">Subjects</a>
         <a href="#gallery">Gallery</a>
         <a href="#pricing">Fees</a>
+        <a href="learning-hub.html">Learning Hub</a>
         <a href="notes.html">Notes</a>
       </nav>
       <div class="nav-actions">
@@ -2880,6 +3101,7 @@
       <a href="#subjects">Subjects</a>
       <a href="#gallery">Gallery</a>
       <a href="#pricing">Fees</a>
+      <a href="learning-hub.html">Learning Hub</a>
       <a href="notes.html">Notes</a>
       <a href="#lead-form" class="mobile-cta">Book a free demo class</a>
     </div>
@@ -3197,6 +3419,151 @@
             </div>
             <span class="lvl">IN</span>
           </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LEARNING HUB PREVIEW -->
+  <section class="section hub-preview-section" id="learning-hub" aria-labelledby="hubTitle">
+    <div class="container reveal">
+      <div class="head">
+        <div>
+          <span class="eyebrow">Self-Study &amp; Resources</span>
+          <span class="m-note">open library</span>
+        </div>
+        <div>
+          <h2 class="h-title" id="hubTitle">Learn Beyond the Classroom</h2>
+          <p class="lede">
+            Explore notes, study materials, important questions, and curated resources designed to help students learn
+            smarter and prepare with confidence.
+          </p>
+        </div>
+      </div>
+
+      <div class="hub-preview-grid">
+        <!-- Card 1: Class Notes -->
+        <a href="learning-hub.html" class="hub-preview-card card-notes" aria-label="Explore Class Notes in Learning Hub">
+          <div class="hub-card-top">
+            <div class="hub-preview-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z" />
+                <path d="M6 6h10" />
+                <path d="M6 10h10" />
+                <path d="M6 14h6" />
+              </svg>
+            </div>
+            <span class="hub-card-badge">Classes 6–12</span>
+          </div>
+          <h3 class="hub-card-title">Class Notes</h3>
+          <p class="hub-card-desc">
+            Chapter-wise structured notes and topic summaries across CBSE, ICSE, and regional boards to build solid fundamentals.
+          </p>
+          <span class="hub-card-action">
+            Browse notes
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+              stroke-linejoin="round" aria-hidden="true">
+              <path d="M5 12h14" />
+              <path d="m12 5 7 7-7 7" />
+            </svg>
+          </span>
+        </a>
+
+        <!-- Card 2: Study Materials -->
+        <a href="learning-hub.html" class="hub-preview-card card-materials" aria-label="Explore Study Materials in Learning Hub">
+          <div class="hub-card-top">
+            <div class="hub-preview-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="16" y1="13" x2="8" y2="13" />
+                <line x1="16" y1="17" x2="8" y2="17" />
+                <polyline points="10 9 9 9 8 9" />
+              </svg>
+            </div>
+            <span class="hub-card-badge">Curated Kits</span>
+          </div>
+          <h3 class="hub-card-title">Study Materials</h3>
+          <p class="hub-card-desc">
+            Comprehensive formula sheets, quick concept breakdowns, and downloadable revision guides authored by expert faculty.
+          </p>
+          <span class="hub-card-action">
+            View materials
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+              stroke-linejoin="round" aria-hidden="true">
+              <path d="M5 12h14" />
+              <path d="m12 5 7 7-7 7" />
+            </svg>
+          </span>
+        </a>
+
+        <!-- Card 3: Important Questions -->
+        <a href="learning-hub.html" class="hub-preview-card card-questions" aria-label="Explore Important Questions in Learning Hub">
+          <div class="hub-card-top">
+            <div class="hub-preview-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
+              </svg>
+            </div>
+            <span class="hub-card-badge">High-Yield</span>
+          </div>
+          <h3 class="hub-card-title">Important Questions</h3>
+          <p class="hub-card-desc">
+            Hand-picked practice problems, chapter numericals, and step-by-step model solutions to test conceptual clarity.
+          </p>
+          <span class="hub-card-action">
+            Practice questions
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+              stroke-linejoin="round" aria-hidden="true">
+              <path d="M5 12h14" />
+              <path d="m12 5 7 7-7 7" />
+            </svg>
+          </span>
+        </a>
+
+        <!-- Card 4: Exam Preparation -->
+        <a href="learning-hub.html" class="hub-preview-card card-exam" aria-label="Explore Exam Preparation in Learning Hub">
+          <div class="hub-card-top">
+            <div class="hub-preview-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M12 15l-2 5l9-13h-6l2-5l-9 13h6z" />
+              </svg>
+            </div>
+            <span class="hub-card-badge">Board Prep</span>
+          </div>
+          <h3 class="hub-card-title">Exam Preparation</h3>
+          <p class="hub-card-desc">
+            Board-focused question banks, marking scheme tips, and targeted revision packs for confident test performance.
+          </p>
+          <span class="hub-card-action">
+            Prepare for exams
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+              stroke-linejoin="round" aria-hidden="true">
+              <path d="M5 12h14" />
+              <path d="m12 5 7 7-7 7" />
+            </svg>
+          </span>
+        </a>
+      </div>
+
+      <div class="hub-preview-cta-wrap">
+        <a href="learning-hub.html" class="btn btn-ink hub-preview-cta-btn">
+          Explore Learning Hub
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12h14" />
+            <path d="m12 5 7 7-7 7" />
+          </svg>
+        </a>
+        <div class="hub-preview-sub-badge">
+          <span class="dot"></span>
+          <span>Free access to topic notes, formulas &amp; worksheets</span>
         </div>
       </div>
     </div>

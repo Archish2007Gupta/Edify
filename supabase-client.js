@@ -649,7 +649,9 @@
   };
 
   /**
-   * Upload an optional file (cover image or PDF) to Supabase Storage bucket `learning-resources`.
+   * Upload an optional file (cover image or PDF) to Supabase Storage.
+   * First attempts 'learning-resources' bucket using 'covers/<filename>' or 'pdfs/<filename>'.
+   * If unavailable and folder is 'covers' or 'pdfs', falls back to dedicated 'covers' or 'pdfs' bucket.
    * @param {File} file - Browser File object
    * @param {string} folder - 'covers' | 'pdfs'
    * @returns {Promise<{success: boolean, publicUrl?: string, error?: any}>}
@@ -661,11 +663,23 @@
     try {
       folder = folder || "general";
       var cleanName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
-      var filePath = folder + "/" + Date.now() + "_" + cleanName;
+      var fileName = Date.now() + "_" + cleanName;
+      var targetBucket = "learning-resources";
+      var filePath = folder + "/" + fileName;
 
       var uploadResult = await window.supabaseClient.storage
-        .from("learning-resources")
+        .from(targetBucket)
         .upload(filePath, file, { cacheControl: "3600", upsert: true });
+
+      // If learning-resources upload failed and folder is 'covers' or 'pdfs', fallback to dedicated bucket
+      if (uploadResult.error && (folder === "covers" || folder === "pdfs")) {
+        console.info("[Learning Hub Storage] Primary bucket notice, trying dedicated '" + folder + "' bucket...");
+        targetBucket = folder;
+        filePath = fileName;
+        uploadResult = await window.supabaseClient.storage
+          .from(targetBucket)
+          .upload(filePath, file, { cacheControl: "3600", upsert: true });
+      }
 
       if (uploadResult.error) {
         console.warn("[Learning Hub Storage] Upload error:", uploadResult.error);
@@ -673,7 +687,7 @@
       }
 
       var urlResult = window.supabaseClient.storage
-        .from("learning-resources")
+        .from(targetBucket)
         .getPublicUrl(filePath);
 
       var publicUrl = urlResult.data ? urlResult.data.publicUrl : "";
@@ -846,19 +860,20 @@
   };
 
   /**
-   * Fetch a single published resource by its slug.
-   * @param {string} slug
+   * Fetch a single published resource by its human-readable slug or UUID ID.
+   * @param {string} identifier - Slug or UUID
    * @returns {Promise<{success: boolean, data?: object, error?: any}>}
    */
-  window.getPublishedResourceBySlug = async function (slug) {
-    if (!slug) {
-      return { success: false, error: new Error("Invalid resource slug") };
+  window.getPublishedResourceBySlug = async function (identifier) {
+    if (!identifier) {
+      return { success: false, error: new Error("Invalid resource identifier") };
     }
-    var cleanSlug = slug.trim().toLowerCase();
+    var cleanId = identifier.trim().toLowerCase();
+    var isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(cleanId);
 
     // Check seed fallback first if matching
     var matchedSeed = DEFAULT_SEED_RESOURCES.find(function (r) {
-      return r.slug === cleanSlug || cleanSlug.indexOf(r.slug) !== -1 || r.slug.indexOf(cleanSlug) !== -1;
+      return r.slug === cleanId || r.id === cleanId || cleanId.indexOf(r.slug) !== -1 || r.slug.indexOf(cleanId) !== -1;
     });
 
     if (!window.supabaseClient) {
@@ -867,12 +882,18 @@
     }
 
     try {
-      var result = await window.supabaseClient
+      var query = window.supabaseClient
         .from("resources")
         .select("id, title, slug, description, resource_type, class_level, subject, chapter, topic, content, cover_image_url, pdf_url, seo_title, seo_description, views, published_at, created_at, updated_at, teachers:teacher_id(name, subjects)")
-        .eq("status", "published")
-        .eq("slug", cleanSlug)
-        .single();
+        .eq("status", "published");
+
+      if (isUuid) {
+        query = query.eq("id", cleanId);
+      } else {
+        query = query.eq("slug", cleanId);
+      }
+
+      var result = await query.single();
 
       if (result.error) {
         if (matchedSeed) {

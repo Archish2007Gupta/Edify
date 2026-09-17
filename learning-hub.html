@@ -1357,12 +1357,13 @@
         var hash = window.location.hash.replace(/^#\/?/, "");
 
         // 1. Direct search parameter takes highest priority for explicit links
-        if (searchParams.get("slug") || searchParams.get("resource")) {
+        var targetResource = searchParams.get("slug") || searchParams.get("resource") || searchParams.get("id");
+        if (targetResource) {
           return {
             view: "resource",
             classSlug: searchParams.get("class") || "",
             subjectSlug: searchParams.get("subject") || "",
-            resourceSlug: searchParams.get("slug") || searchParams.get("resource") || ""
+            resourceSlug: targetResource
           };
         }
 

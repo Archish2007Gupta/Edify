@@ -1614,11 +1614,7 @@
         return '<option value="' + st + '"' + sel + '>' + st + '</option>';
       }).join('');
 
-      var isAdmin = currentTeacher && (
-        currentTeacher.role === 'admin' ||
-        currentTeacher.is_admin === true ||
-        (currentTeacher.email && currentTeacher.email.toLowerCase().includes('admin'))
-      );
+      var isAdmin = Boolean(currentTeacher && currentTeacher.role === 'admin');
 
       var assignTeacherHtml = '';
       if (isAdmin && allTeachersList.length > 0) {
@@ -1877,11 +1873,7 @@
       }
 
       const teacherId = currentTeacher ? currentTeacher.id : null;
-      const isAdmin = currentTeacher && (
-        currentTeacher.role === 'admin' ||
-        currentTeacher.is_admin === true ||
-        (currentTeacher.email && currentTeacher.email.toLowerCase().includes('admin'))
-      );
+      const isAdmin = Boolean(currentTeacher && currentTeacher.role === 'admin');
 
       if (!teacherId && !isAdmin) {
         rawDemoRequests = [];
@@ -2804,9 +2796,7 @@
         return;
       }
 
-      const isAdmin = currentTeacher.role === 'admin' ||
-        currentTeacher.is_admin === true ||
-        (currentTeacher.email && currentTeacher.email.toLowerCase().includes('admin'));
+      const isAdmin = Boolean(currentTeacher && currentTeacher.role === 'admin');
 
       if (isAdmin && typeof window.getAllTeachers === 'function') {
         const tRes = await window.getAllTeachers();

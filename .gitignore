@@ -8,6 +8,7 @@ node_modules/
 # Test & Temp files
 sitemap-test-*.xml
 *.bak-*
+*.bak
 
 # Editor & Build Artifacts
 .claude/

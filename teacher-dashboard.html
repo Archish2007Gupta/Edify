@@ -2055,6 +2055,14 @@
               </div>
               <button class="btn-sm btn-ghost" onclick="loadReviewQueue()">Refresh Queue</button>
             </div>
+            <!-- Review Queue Quick Filters -->
+            <div style="padding: 10px 18px; background: var(--bg-page); border-bottom: 1px solid var(--border-subtle); display: flex; flex-wrap: wrap; gap: 8px; font-size: 13px; align-items: center;">
+              <button type="button" class="btn-sm btn-ghost" id="chipQueue_all" onclick="setReviewFilter('all')" style="font-size:12px; padding:4px 10px;">All (<strong id="reviewChipAll">0</strong>)</button>
+              <button type="button" class="btn-sm btn-primary" id="chipQueue_under_review" onclick="setReviewFilter('under_review')" style="font-size:12px; padding:4px 10px;">⏳ Pending Review (<strong id="reviewChipReview">0</strong>)</button>
+              <button type="button" class="btn-sm btn-ghost" id="chipQueue_published" onclick="setReviewFilter('published')" style="font-size:12px; padding:4px 10px;">✓ Published (<strong id="reviewChipPublished">0</strong>)</button>
+              <button type="button" class="btn-sm btn-ghost" id="chipQueue_rejected" onclick="setReviewFilter('rejected')" style="font-size:12px; padding:4px 10px;">✕ Rejected (<strong id="reviewChipRejected">0</strong>)</button>
+              <button type="button" class="btn-sm btn-ghost" id="chipQueue_archived" onclick="setReviewFilter('archived')" style="font-size:12px; padding:4px 10px;">📦 Archived (<strong id="reviewChipArchived">0</strong>)</button>
+            </div>
             <div class="table-toolbar">
               <div class="search-input-group">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -3602,19 +3610,79 @@
       const tbody = document.getElementById('reviewTableBody');
       if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:24px;">Loading review queue...</td></tr>';
 
+      if (window.location.search.includes('preview=true')) {
+        if (!reviewQueueResources || reviewQueueResources.length === 0) {
+          reviewQueueResources = [
+            {
+              id: 'preview-res-1',
+              title: "Ohm's Law – Definition, Formula & Examples",
+              slug: 'ohms-law-definition-formula-examples-class-10',
+              class_level: 'Class 10',
+              subject: 'Physics',
+              chapter: 'Electricity',
+              topic: "Ohm's Law",
+              resource_type: 'Topic Notes',
+              status: 'under_review',
+              updated_at: new Date().toISOString(),
+              teachers: { name: 'Er. Rohit Verma' },
+              description: 'Learn the fundamental relationship between voltage, current, and resistance in electrical circuits.',
+              content: '<p>Ohm’s law states that electric current is directly proportional to voltage at constant temperature.</p>'
+            },
+            {
+              id: 'preview-res-2',
+              title: 'Chemical Reactions and Equations – Balancing Guide',
+              slug: 'chemical-reactions-equations-class-10',
+              class_level: 'Class 10',
+              subject: 'Chemistry',
+              chapter: 'Chemical Reactions',
+              topic: 'Balancing Equations',
+              resource_type: 'Topic Notes',
+              status: 'under_review',
+              updated_at: new Date().toISOString(),
+              teachers: { name: 'Dr. Ananya Sen' },
+              description: 'Step by step balancing of chemical equations and reaction types.',
+              content: '<p>Master combination, decomposition, displacement and redox reactions.</p>'
+            },
+            {
+              id: 'preview-res-3',
+              title: 'Resistance – Formula and Explanation',
+              slug: 'resistance-formula-and-explanation-class-10',
+              class_level: 'Class 10',
+              subject: 'Physics',
+              chapter: 'Electricity',
+              topic: 'Resistance',
+              resource_type: 'Topic Notes',
+              status: 'published',
+              updated_at: new Date().toISOString(),
+              teachers: { name: 'Er. Rohit Verma' },
+              description: 'Factors affecting electrical resistance, resistivity formula, and combinations.',
+              content: '<p>Detailed analysis of resistivity and temperature coefficients.</p>'
+            }
+          ];
+        }
+        updateReviewBadges();
+        renderReviewQueue();
+        return;
+      }
+
       const res = await window.getResources({ isAdmin: true, status: statusParam });
       if (!res.success) {
-        if (window.location.search.includes('preview=true')) {
-          reviewQueueResources = [];
-          renderReviewQueue();
-          return;
-        }
         if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:24px; color:var(--danger);">Unable to load review queue.</td></tr>';
         return;
       }
 
       reviewQueueResources = res.data || [];
-      const pendingReviewCount = reviewQueueResources.filter(function(r){ return r.status === 'under_review'; }).length;
+      updateReviewBadges();
+      renderReviewQueue();
+    };
+
+    function updateReviewBadges() {
+      const all = reviewQueueResources || [];
+      const pendingReviewCount = all.filter(function(r){ return r.status === 'under_review'; }).length;
+      const publishedCount = all.filter(function(r){ return r.status === 'published'; }).length;
+      const rejectedCount = all.filter(function(r){ return r.status === 'rejected'; }).length;
+      const archivedCount = all.filter(function(r){ return r.status === 'archived'; }).length;
+
       var rBadge = document.getElementById('reviewBadge');
       if (rBadge) {
         rBadge.textContent = pendingReviewCount;
@@ -3623,17 +3691,54 @@
       var tabBadgeReview = document.getElementById('tabBadgeReviewQueue');
       if (tabBadgeReview) tabBadgeReview.textContent = pendingReviewCount;
 
+      var elAll = document.getElementById('reviewChipAll');
+      if (elAll) elAll.textContent = all.length;
+      var elRev = document.getElementById('reviewChipReview');
+      if (elRev) elRev.textContent = pendingReviewCount;
+      var elPub = document.getElementById('reviewChipPublished');
+      if (elPub) elPub.textContent = publishedCount;
+      var elRej = document.getElementById('reviewChipRejected');
+      if (elRej) elRej.textContent = rejectedCount;
+      var elArc = document.getElementById('reviewChipArchived');
+      if (elArc) elArc.textContent = archivedCount;
+    }
+
+    window.setReviewFilter = function(val) {
+      const sel = document.getElementById('reviewStatusSelect');
+      if (sel) sel.value = val;
+      ['all', 'under_review', 'published', 'rejected', 'archived'].forEach(function(k) {
+        var chip = document.getElementById('chipQueue_' + k);
+        if (chip) {
+          chip.classList.toggle('btn-primary', k === val);
+          chip.classList.toggle('btn-ghost', k !== val);
+        }
+      });
       renderReviewQueue();
     };
 
-    window.filterReviewQueue = function() { loadReviewQueue(); };
+    window.filterReviewQueue = function() {
+      const sel = document.getElementById('reviewStatusSelect');
+      const val = sel ? sel.value : 'all';
+      ['all', 'under_review', 'published', 'rejected', 'archived'].forEach(function(k) {
+        var chip = document.getElementById('chipQueue_' + k);
+        if (chip) {
+          chip.classList.toggle('btn-primary', k === val);
+          chip.classList.toggle('btn-ghost', k !== val);
+        }
+      });
+      renderReviewQueue();
+    };
 
     function renderReviewQueue() {
       const tbody = document.getElementById('reviewTableBody');
       if (!tbody) return;
 
+      const statusSelect = document.getElementById('reviewStatusSelect');
+      const filterVal = statusSelect ? statusSelect.value : 'all';
+
       const q = (document.getElementById('reviewSearchInput').value || '').toLowerCase().trim();
-      const filtered = reviewQueueResources.filter(function(r) {
+      const filtered = (reviewQueueResources || []).filter(function(r) {
+        if (filterVal && filterVal !== 'all' && r.status !== filterVal) return false;
         if (!q) return true;
         const author = r.teachers ? (r.teachers.name || '') : '';
         return (r.title && r.title.toLowerCase().includes(q)) || author.toLowerCase().includes(q);
@@ -3642,7 +3747,7 @@
       if (!filtered.length) {
         tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state-box">' +
           '<div class="empty-state-title">No resources in this status</div>' +
-          '<div class="empty-state-desc">Select a different filter option or refresh the queue.</div>' +
+          '<div class="empty-state-desc">Select a different filter option or click "All" above.</div>' +
         '</div></td></tr>';
         return;
       }
@@ -3658,11 +3763,11 @@
           '<td>' + resStatusBadge(r.status) + '</td>' +
           '<td>' + formatDate(r.updated_at) + '</td>' +
           '<td>' +
-            '<div style="display:flex; gap:6px;">' +
-              '<button class="btn-sm btn-ghost" style="padding:4px 8px; font-size:12px;" onclick="openResourcePreview(\'' + r.id + '\')">Preview</button>' +
-              (!isPublished ? '<button class="btn-sm" style="background:var(--success); color:#fff; padding:4px 8px; font-size:12px; border:none;" onclick="adminApproveAction(\'' + r.id + '\')">Approve</button>' : '') +
-              (r.status !== 'rejected' ? '<button class="btn-sm btn-ghost" style="color:var(--danger); border-color:var(--danger); padding:4px 8px; font-size:12px;" onclick="openRejectModal(\'' + r.id + '\')">Reject</button>' : '') +
-              (r.status !== 'archived' ? '<button class="btn-sm btn-ghost" style="color:var(--text-muted); padding:4px 8px; font-size:12px;" onclick="adminArchiveAction(\'' + r.id + '\')">Archive</button>' : '') +
+            '<div style="display:flex; gap:6px;" onclick="event.stopPropagation();">' +
+              '<button type="button" class="btn-sm btn-ghost" style="padding:4px 8px; font-size:12px;" onclick="event.stopPropagation(); openResourcePreview(\'' + r.id + '\')">Preview</button>' +
+              (!isPublished ? '<button type="button" class="btn-sm" style="background:var(--success); color:#fff; padding:4px 8px; font-size:12px; border:none;" onclick="event.stopPropagation(); adminApproveAction(\'' + r.id + '\')">✓ Approve</button>' : '') +
+              (r.status !== 'rejected' ? '<button type="button" class="btn-sm btn-ghost" style="color:var(--danger); border-color:var(--danger); padding:4px 8px; font-size:12px;" onclick="event.stopPropagation(); openRejectModal(\'' + r.id + '\')">✕ Reject</button>' : '') +
+              (r.status !== 'archived' ? '<button type="button" class="btn-sm btn-ghost" style="color:var(--text-muted); padding:4px 8px; font-size:12px;" onclick="event.stopPropagation(); adminArchiveAction(\'' + r.id + '\')">📦 Archive</button>' : '') +
             '</div>' +
           '</td>' +
         '</tr>';
@@ -3670,28 +3775,75 @@
     }
 
     window.adminApproveAction = async function(id) {
-      if (!confirm("Approve and publish this educational resource to the Learning Hub?")) return;
-      showToast("Publishing resource...", "info");
+      showToast("Publishing educational resource...", "info");
+
+      if (window.location.search.includes('preview=true')) {
+        let r = (reviewQueueResources || []).find(function(x) { return x.id === id; });
+        if (r) {
+          r.status = 'published';
+          r.published_at = new Date().toISOString();
+          r.updated_at = new Date().toISOString();
+        }
+        let tr = (teacherResources || []).find(function(x) { return x.id === id; });
+        if (tr) {
+          tr.status = 'published';
+          tr.published_at = new Date().toISOString();
+          tr.updated_at = new Date().toISOString();
+        }
+        showToast("✓ Resource approved and published live!", "success");
+        updateReviewBadges();
+        // Switch filter to 'all' so the approved item stays visible with its green badge
+        setReviewFilter('all');
+        if (typeof renderResourcesTable === 'function') renderResourcesTable();
+        closeResourcePreview();
+        return;
+      }
+
       const res = await window.reviewResource(id, { status: 'published' });
       if (res && res.success) {
-        showToast("Resource approved and published!", "success");
+        showToast("✓ Resource approved and published live!", "success");
+        setReviewFilter('all');
         await loadReviewQueue();
         await loadTeacherResources(true);
+        closeResourcePreview();
       } else {
-        showToast("Failed to approve: " + ((res && res.error) ? res.error.message : "Error"), "error");
+        const msg = (res && res.error) ? (res.error.message || res.error) : "Database update failed";
+        showToast("Failed to approve: " + msg, "error");
       }
     };
 
     window.adminArchiveAction = async function(id) {
-      if (!confirm("Archive this resource? It will no longer be visible on the public website.")) return;
-      showToast("Archiving resource...", "info");
+      showToast("Archiving educational resource...", "info");
+
+      if (window.location.search.includes('preview=true')) {
+        let r = (reviewQueueResources || []).find(function(x) { return x.id === id; });
+        if (r) {
+          r.status = 'archived';
+          r.updated_at = new Date().toISOString();
+        }
+        let tr = (teacherResources || []).find(function(x) { return x.id === id; });
+        if (tr) {
+          tr.status = 'archived';
+          tr.updated_at = new Date().toISOString();
+        }
+        showToast("📦 Resource moved to archive.", "info");
+        updateReviewBadges();
+        setReviewFilter('all');
+        if (typeof renderResourcesTable === 'function') renderResourcesTable();
+        closeResourcePreview();
+        return;
+      }
+
       const res = await window.reviewResource(id, { status: 'archived' });
       if (res && res.success) {
-        showToast("Resource archived.", "info");
+        showToast("📦 Resource moved to archive.", "info");
+        setReviewFilter('all');
         await loadReviewQueue();
         await loadTeacherResources(true);
+        closeResourcePreview();
       } else {
-        showToast("Failed to archive: " + ((res && res.error) ? res.error.message : "Error"), "error");
+        const msg = (res && res.error) ? (res.error.message || res.error) : "Database update failed";
+        showToast("Failed to archive: " + msg, "error");
       }
     };
 
@@ -3708,16 +3860,40 @@
     window.submitRejectFeedback = async function() {
       const id = document.getElementById('rejectResourceId').value;
       const reason = (document.getElementById('rejectReasonInput').value || '').trim();
-      if (!reason) { showToast("Please provide a reason or revision note for the teacher.", "warning"); return; }
-      showToast("Submitting feedback...", "info");
+      if (!reason) { showToast("Please state why revision is required.", "error"); return; }
+
+      if (window.location.search.includes('preview=true')) {
+        let r = reviewQueueResources.find(function(x) { return x.id === id; });
+        if (r) {
+          r.status = 'rejected';
+          r.rejection_reason = reason;
+          r.updated_at = new Date().toISOString();
+        }
+        let tr = teacherResources.find(function(x) { return x.id === id; });
+        if (tr) {
+          tr.status = 'rejected';
+          tr.rejection_reason = reason;
+          tr.updated_at = new Date().toISOString();
+        }
+        closeRejectModal();
+        closeResourcePreview();
+        showToast("Feedback sent to teacher.", "info");
+        updateReviewBadges();
+        renderReviewQueue();
+        if (typeof renderResourcesTable === 'function') renderResourcesTable();
+        return;
+      }
+
       const res = await window.reviewResource(id, { status: 'rejected', rejectionReason: reason });
       if (res && res.success) {
         closeRejectModal();
+        closeResourcePreview();
         showToast("Feedback sent to teacher.", "info");
         await loadReviewQueue();
         await loadTeacherResources(true);
       } else {
-        showToast("Failed to update status: " + ((res && res.error) ? res.error.message : "Error"), "error");
+        const msg = (res && res.error) ? (res.error.message || res.error) : "Database update failed";
+        showToast("Failed to update status: " + msg, "error");
       }
     };
 

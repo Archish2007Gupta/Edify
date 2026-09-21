@@ -2875,6 +2875,453 @@
       }
     }
 
+    /* =====================================================
+       MOBILE RESPONSIVE — deep small-screen polish
+       Targets 320px–480px phones without altering desktop
+    ===================================================== */
+
+    /* Prevent hero underline-highlight text from overflowing on tiny screens */
+    .hero h1 .u {
+      white-space: normal;
+    }
+
+    @media (max-width: 480px) {
+      /* --- Root variable overrides for small screens --- */
+      :root {
+        --pad: clamp(32px, 8vw, 52px);
+        --gutter: clamp(16px, 4.5vw, 24px);
+        --radius: 14px;
+        --radius-lg: 18px;
+      }
+
+      /* --- Hero section --- */
+      .hero h1 {
+        font-size: clamp(28px, 8vw, 38px);
+        line-height: 1.1;
+      }
+
+      .hero h1 .u {
+        white-space: normal;
+      }
+
+      .hero-eyebrow {
+        font-size: 11px;
+        padding: 7px 12px;
+        margin-bottom: 18px;
+      }
+
+      .hero-sub {
+        font-size: 16px;
+      }
+
+      .hero-ctas {
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 24px;
+      }
+
+      .hero-ctas .btn {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .hero-trust {
+        gap: 8px 16px;
+        font-size: 13px;
+        margin-top: 24px;
+      }
+
+      /* --- Report card (hero side) --- */
+      .report {
+        padding: 22px 18px 20px 36px;
+        max-width: 100%;
+      }
+
+      .report::before {
+        left: 22px;
+      }
+
+      .bar {
+        grid-template-columns: 56px 1fr 30px;
+        gap: 8px;
+      }
+
+      /* --- Section heads --- */
+      .head {
+        gap: 10px;
+        margin-bottom: clamp(24px, 5vw, 40px);
+      }
+
+      .h-title {
+        font-size: clamp(24px, 7vw, 34px);
+      }
+
+      .lede {
+        font-size: 15.5px;
+        margin-top: 14px;
+      }
+
+      /* --- Navigation --- */
+      .nav {
+        padding: 12px var(--gutter);
+        gap: 12px;
+      }
+
+      .brand-logo {
+        height: 34px;
+      }
+
+      .nav-toggle {
+        width: 40px;
+        height: 40px;
+      }
+
+      /* --- Buttons --- */
+      .btn {
+        font-size: 14.5px;
+        padding: 13px 20px;
+        min-height: 44px; /* touch target */
+      }
+
+      /* --- Format cards (three ways) --- */
+      .fmt {
+        padding: 22px 20px;
+      }
+
+      .fmt h3 {
+        font-size: 19px;
+      }
+
+      /* --- Tutor cards --- */
+      .tutor {
+        padding: 22px 18px;
+      }
+
+      .medallion {
+        width: 64px;
+        height: 64px;
+        font-size: 23px;
+      }
+
+      .tutor-name {
+        font-size: 20px;
+      }
+
+      /* --- Subject grid chips --- */
+      .subj {
+        padding: 12px 14px;
+        gap: 11px;
+      }
+
+      .subj .idx {
+        width: 36px;
+        height: 36px;
+        font-size: 17px;
+      }
+
+      .subj h4 {
+        font-size: 14px;
+      }
+
+      /* --- Hub preview cards --- */
+      .hub-preview-grid {
+        gap: 14px;
+      }
+
+      .hub-preview-card {
+        padding: 20px 18px;
+        gap: 12px;
+      }
+
+      .hub-card-title {
+        font-size: 18px;
+      }
+
+      /* --- Checklist (sticky notes) --- */
+      .checklist {
+        gap: 28px 0;
+        padding-top: 16px;
+      }
+
+      .check {
+        padding: 22px 20px 20px;
+      }
+
+      .check h4 {
+        font-size: 22px;
+      }
+
+      /* --- Fee / pricing table --- */
+      .fee-wrap {
+        margin-top: 20px;
+      }
+
+      .pricing-toggle {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 6px;
+        padding: 6px;
+      }
+
+      .pricing-toggle button {
+        font-size: 13px;
+        padding: 9px 16px;
+      }
+
+      /* --- Steps --- */
+      .step {
+        padding: 24px 20px 20px;
+      }
+
+      .step h4 {
+        font-size: 17px;
+      }
+
+      .step-n::before {
+        font-size: 38px;
+      }
+
+      /* --- Form / enrol section --- */
+      .form-card {
+        padding: clamp(20px, 5vw, 30px);
+      }
+
+      .form-grid {
+        gap: 14px;
+      }
+
+      .field input,
+      .field select,
+      .field textarea {
+        font-size: 16px; /* prevents iOS zoom on focus */
+        padding: 12px 13px;
+      }
+
+      .radio-opt {
+        font-size: 13.5px;
+        padding: 12px 12px;
+        min-height: 44px;
+      }
+
+      .form-submit {
+        font-size: 15.5px;
+        padding: 15px;
+        min-height: 48px;
+      }
+
+      /* --- Notes grid --- */
+      .note {
+        padding: 18px 16px;
+      }
+
+      .notes-cta {
+        padding: 22px 20px;
+        border-radius: 14px;
+      }
+
+      /* --- Footer --- */
+      .footer-grid {
+        gap: 28px;
+      }
+
+      footer .desc {
+        max-width: 100%;
+      }
+
+      .footer-bottom {
+        gap: 8px;
+        font-size: 12.5px;
+      }
+
+      /* --- Event gallery reel --- */
+      .egal-section {
+        padding-block: clamp(36px, 7vw, 56px);
+      }
+
+      /* --- WhatsApp float --- */
+      .whatsapp-float {
+        width: 48px;
+        height: 48px;
+        bottom: 16px;
+        right: 16px;
+      }
+
+      .whatsapp-float svg {
+        width: 26px;
+        height: 26px;
+      }
+    }
+
+    /* --- Extra-small phones (≤ 360px) --- */
+    @media (max-width: 360px) {
+      :root {
+        --gutter: 14px;
+        --pad: clamp(28px, 8vw, 44px);
+      }
+
+      .hero h1 {
+        font-size: clamp(26px, 7.5vw, 34px);
+      }
+
+      .h-title {
+        font-size: clamp(22px, 7vw, 30px);
+      }
+
+      .btn {
+        font-size: 14px;
+        padding: 12px 16px;
+      }
+
+      .report {
+        padding: 18px 14px 16px 30px;
+      }
+
+      .report::before {
+        left: 18px;
+      }
+
+      .bar {
+        grid-template-columns: 48px 1fr 28px;
+        gap: 6px;
+      }
+
+      .bar-label {
+        font-size: 11.5px;
+      }
+
+      .bar-mark {
+        font-size: 14px;
+      }
+
+      .medallion {
+        width: 56px;
+        height: 56px;
+        font-size: 20px;
+      }
+
+      .tutor-name {
+        font-size: 18px;
+      }
+
+      .nav-toggle {
+        width: 38px;
+        height: 38px;
+      }
+
+      .brand-logo {
+        height: 30px;
+      }
+
+      .fmt {
+        padding: 18px 16px;
+      }
+
+      .fmt h3 {
+        font-size: 18px;
+      }
+
+      /* Pricing toggle wraps on very small screens */
+      .pricing-toggle {
+        width: 100%;
+      }
+
+      .pricing-toggle button {
+        flex: 1;
+        text-align: center;
+        font-size: 12.5px;
+        padding: 8px 10px;
+      }
+    }
+
+    /* --- Landscape mobile orientation fixes --- */
+    @media (max-width: 767px) and (orientation: landscape) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+        padding-block: clamp(28px, 4vw, 48px);
+        gap: 28px;
+      }
+
+      .hero h1 {
+        font-size: clamp(26px, 5vw, 38px);
+      }
+
+      .hero-trust {
+        margin-top: 18px;
+      }
+
+      .hero-ctas {
+        flex-direction: row;
+        flex-wrap: wrap;
+        margin-top: 20px;
+        gap: 10px;
+      }
+
+      /* Keep mobile menu accessible in landscape */
+      .mobile-menu.open {
+        max-height: 340px;
+        overflow-y: auto;
+      }
+
+      /* Event gallery smaller card height in landscape on small screens */
+      .egal-row-a {
+        --rh: clamp(130px, 28vw, 200px);
+      }
+    }
+
+    /* --- Ensure no horizontal overflow on any screen --- */
+    @media (max-width: 767px) {
+      html,
+      body {
+        overflow-x: hidden;
+        max-width: 100%;
+      }
+
+      /* Prevent any absolutely-positioned elements from causing horizontal scroll */
+      .section,
+      .hero,
+      header,
+      footer,
+      .egal-section {
+        overflow-x: clip;
+      }
+
+      /* Make the mobile menu accessible and styled correctly */
+      .mobile-menu a {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        padding: 10px 4px;
+      }
+
+      .mobile-menu .mobile-cta {
+        min-height: 48px;
+        padding: 13px;
+      }
+
+      /* Hub preview CTA button full width on mobile */
+      .hub-preview-cta-btn {
+        width: 100%;
+        max-width: 360px;
+      }
+
+      /* Notes CTA button fills container */
+      .notes-cta .btn {
+        width: 100%;
+        justify-content: center;
+      }
+
+      /* Checklist: prevent tilted notes from creating horizontal overflow */
+      .check {
+        rotate: 0deg !important;
+        transform: none !important;
+      }
+
+      .check:hover {
+        rotate: 0deg !important;
+        transform: translateY(-2px) !important;
+      }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       * {
         scroll-behavior: auto !important;

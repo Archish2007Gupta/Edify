@@ -1064,6 +1064,32 @@
         position: static;
       }
     }
+
+    @media (max-width: 860px) {
+      .nav-links, .nav-actions { display: none; }
+      .nav-toggle { display: flex; }
+      .mobile-menu { display: flex; }
+    }
+
+    @media (max-width: 767px) {
+      html, body { overflow-x: hidden; max-width: 100%; }
+      header, .section, footer { overflow-x: clip; }
+      .mobile-menu a { min-height: 44px; display: flex; align-items: center; padding: 10px 4px; }
+    }
+
+    @media (max-width: 480px) {
+      :root { --pad: clamp(28px, 7vw, 48px); --gutter: clamp(14px, 4vw, 22px); }
+      .nav { padding: 12px var(--gutter); }
+      .brand-logo { height: 32px; }
+      .btn { font-size: 14px; padding: 12px 18px; min-height: 44px; }
+      .h-title { font-size: clamp(22px, 7vw, 32px); }
+      .lede { font-size: 15px; }
+    }
+
+    @media (max-width: 360px) {
+      :root { --gutter: 12px; }
+      .brand-logo { height: 28px; }
+    }
   </style>
 </head>
 

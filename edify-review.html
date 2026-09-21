@@ -1609,7 +1609,109 @@
           right: 18px;
         }
       }
+
+      /* =====================================================
+         MOBILE RESPONSIVE — deep small-screen polish
+      ===================================================== */
+      .hero h1 .u { white-space: normal; }
+
+      @media (max-width: 480px) {
+        :root {
+          --pad: clamp(32px, 8vw, 52px);
+          --gutter: clamp(16px, 4.5vw, 24px);
+          --radius: 14px;
+          --radius-lg: 18px;
+        }
+        .hero h1 { font-size: clamp(28px, 8vw, 38px); line-height: 1.1; }
+        .hero h1 .u { white-space: normal; }
+        .hero-eyebrow { font-size: 11px; padding: 7px 12px; margin-bottom: 18px; }
+        .hero-sub { font-size: 16px; }
+        .hero-ctas { flex-direction: column; gap: 10px; margin-top: 24px; }
+        .hero-ctas .btn { width: 100%; justify-content: center; }
+        .hero-trust { gap: 8px 16px; font-size: 13px; margin-top: 24px; }
+        .report { padding: 22px 18px 20px 36px; max-width: 100%; }
+        .report::before { left: 22px; }
+        .bar { grid-template-columns: 56px 1fr 30px; gap: 8px; }
+        .head { gap: 10px; margin-bottom: clamp(24px, 5vw, 40px); }
+        .h-title { font-size: clamp(24px, 7vw, 34px); }
+        .lede { font-size: 15.5px; margin-top: 14px; }
+        .nav { padding: 12px var(--gutter); gap: 12px; }
+        .brand-logo { height: 34px; }
+        .nav-toggle { width: 40px; height: 40px; }
+        .btn { font-size: 14.5px; padding: 13px 20px; min-height: 44px; }
+        .fmt { padding: 22px 20px; }
+        .fmt h3 { font-size: 19px; }
+        .tutor { padding: 22px 18px; }
+        .medallion { width: 64px; height: 64px; font-size: 23px; }
+        .tutor-name { font-size: 20px; }
+        .subj { padding: 12px 14px; gap: 11px; }
+        .subj .idx { width: 36px; height: 36px; font-size: 17px; }
+        .subj h4 { font-size: 14px; }
+        .checklist { gap: 28px 0; padding-top: 16px; }
+        .check { padding: 22px 20px 20px; }
+        .check h4 { font-size: 22px; }
+        .fee-wrap { margin-top: 20px; }
+        .pricing-toggle { flex-wrap: wrap; justify-content: center; gap: 6px; padding: 6px; }
+        .pricing-toggle button { font-size: 13px; padding: 9px 16px; }
+        .step { padding: 24px 20px 20px; }
+        .step h4 { font-size: 17px; }
+        .step-n::before { font-size: 38px; }
+        .form-card { padding: clamp(20px, 5vw, 30px); }
+        .form-grid { gap: 14px; }
+        .field input, .field select, .field textarea { font-size: 16px; padding: 12px 13px; }
+        .radio-opt { font-size: 13.5px; padding: 12px 12px; min-height: 44px; }
+        .form-submit { font-size: 15.5px; padding: 15px; min-height: 48px; }
+        .note { padding: 18px 16px; }
+        .notes-cta { padding: 22px 20px; border-radius: 14px; }
+        .footer-grid { gap: 28px; }
+        footer .desc { max-width: 100%; }
+        .footer-bottom { gap: 8px; font-size: 12.5px; }
+        .egal-section { padding-block: clamp(36px, 7vw, 56px); }
+        .whatsapp-float { width: 48px; height: 48px; bottom: 16px; right: 16px; }
+        .whatsapp-float svg { width: 26px; height: 26px; }
+      }
+
+      @media (max-width: 360px) {
+        :root { --gutter: 14px; --pad: clamp(28px, 8vw, 44px); }
+        .hero h1 { font-size: clamp(26px, 7.5vw, 34px); }
+        .h-title { font-size: clamp(22px, 7vw, 30px); }
+        .btn { font-size: 14px; padding: 12px 16px; }
+        .report { padding: 18px 14px 16px 30px; }
+        .report::before { left: 18px; }
+        .bar { grid-template-columns: 48px 1fr 28px; gap: 6px; }
+        .bar-label { font-size: 11.5px; }
+        .bar-mark { font-size: 14px; }
+        .medallion { width: 56px; height: 56px; font-size: 20px; }
+        .tutor-name { font-size: 18px; }
+        .nav-toggle { width: 38px; height: 38px; }
+        .brand-logo { height: 30px; }
+        .fmt { padding: 18px 16px; }
+        .fmt h3 { font-size: 18px; }
+        .pricing-toggle { width: 100%; }
+        .pricing-toggle button { flex: 1; text-align: center; font-size: 12.5px; padding: 8px 10px; }
+      }
+
+      @media (max-width: 767px) and (orientation: landscape) {
+        .hero-grid { padding-block: clamp(28px, 4vw, 48px); gap: 28px; }
+        .hero h1 { font-size: clamp(26px, 5vw, 38px); }
+        .hero-ctas { flex-direction: row; flex-wrap: wrap; margin-top: 20px; gap: 10px; }
+        .mobile-menu.open { max-height: 340px; overflow-y: auto; }
+        .egal-row-a { --rh: clamp(130px, 28vw, 200px); }
+      }
+
+      @media (max-width: 767px) {
+        html, body { overflow-x: hidden; max-width: 100%; }
+        .section, .hero, header, footer, .egal-section { overflow-x: clip; }
+        .mobile-menu a { min-height: 44px; display: flex; align-items: center; padding: 10px 4px; }
+        .mobile-menu .mobile-cta { min-height: 48px; padding: 13px; }
+        .hub-preview-cta-btn { width: 100%; max-width: 360px; }
+        .notes-cta .btn { width: 100%; justify-content: center; }
+        .check { rotate: 0deg !important; transform: none !important; }
+        .check:hover { rotate: 0deg !important; transform: translateY(-2px) !important; }
+      }
+
       @media (prefers-reduced-motion: reduce) {
+
         * {
           scroll-behavior: auto !important;
         }
